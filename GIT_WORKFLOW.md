@@ -112,7 +112,7 @@ git commit --amend -m "nuevo mensaje"
 #### Agregar un repositorio remoto (GitHub, GitLab, etc.)
 ```bash
 # Primera vez
-git remote add origin https://github.com/tu-usuario/athlete-app.git
+git remote add origin https://github.com/albert1903-ux/athlete-app.git
 ```
 
 #### Ver repositorios remotos
