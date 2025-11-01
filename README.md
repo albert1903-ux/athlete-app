@@ -84,6 +84,26 @@ La aplicación está configurada con un enfoque mobile-first:
 - `npm run preview` - Previsualiza build de producción
 - `npm run lint` - Ejecuta ESLint
 
+## 🔄 Control de Versiones
+
+Este proyecto usa Git para el control de versiones. Consulta [GIT_WORKFLOW.md](GIT_WORKFLOW.md) para una guía completa de comandos y flujo de trabajo.
+
+### Comandos básicos:
+
+```bash
+# Ver estado actual
+git status
+
+# Agregar cambios
+git add .
+
+# Hacer commit
+git commit -m "descripción del cambio"
+
+# Ver historial
+git log --oneline
+```
+
 ## 📝 Próximos Pasos
 
 1. Crear componentes específicos en `/src/components`
