@@ -115,6 +115,44 @@ git commit --amend -m "nuevo mensaje"
 git remote add origin https://github.com/albert1903-ux/athlete-app.git
 ```
 
+#### Autenticación con GitHub
+GitHub requiere autenticación para hacer push. Tienes tres opciones:
+
+**Opción 1: Personal Access Token (PAT) - Recomendado**
+1. Ve a GitHub → Settings → Developer settings → Personal access tokens → Tokens (classic)
+2. Genera un nuevo token con permisos `repo`
+3. Cópialo y guárdalo de forma segura
+4. Cuando hagas push por primera vez, Git te pedirá usuario y contraseña
+   - Usuario: tu usuario de GitHub
+   - Contraseña: pega el token (no tu contraseña real)
+
+**Opción 2: GitHub CLI**
+```bash
+# Instalar GitHub CLI (macOS)
+brew install gh
+
+# Autenticarse
+gh auth login
+
+# Configurar remote automáticamente
+gh repo set-default albert1903-ux/athlete-app
+```
+
+**Opción 3: SSH (más seguro a largo plazo)**
+```bash
+# Generar clave SSH
+ssh-keygen -t ed25519 -C "tu.email@ejemplo.com"
+
+# Copiar clave pública
+cat ~/.ssh/id_ed25519.pub
+
+# En GitHub: Settings → SSH and GPG keys → New SSH key
+# Pega tu clave pública
+
+# Cambiar remote a SSH
+git remote set-url origin git@github.com:albert1903-ux/athlete-app.git
+```
+
 #### Ver repositorios remotos
 ```bash
 git remote -v
