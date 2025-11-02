@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import AppBar from '@mui/material/AppBar'
 import Toolbar from '@mui/material/Toolbar'
 import Typography from '@mui/material/Typography'
@@ -12,11 +12,19 @@ import Alert from '@mui/material/Alert'
 import { supabase } from './lib/supabase'
 import AthleteSelector from './components/AthleteSelector'
 import AthleteResultsChart from './components/AthleteResultsChart'
+import AthleteComparator from './components/AthleteComparator'
+import AthleteSpiderChart from './components/AthleteSpiderChart'
 
 function App() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
   const [connected, setConnected] = useState(false)
+  const [comparatorAthletes, setComparatorAthletes] = useState([])
+
+  const handleComparatorsChange = useCallback((comparators) => {
+    setComparatorAthletes(comparators)
+  }, [])
+
 
   const testConnection = async () => {
     setLoading(true)
@@ -81,9 +89,19 @@ function App() {
           <AthleteSelector />
         </Box>
 
+        {/* Componente comparador de atletas */}
+        <Box sx={{ width: '100%' }}>
+          <AthleteComparator onComparatorsChange={handleComparatorsChange} />
+        </Box>
+
+        {/* Componente gráfico de araña */}
+        <Box sx={{ width: '100%' }}>
+          <AthleteSpiderChart comparatorAthletes={comparatorAthletes} />
+        </Box>
+
         {/* Componente gráfico de resultados */}
         <Box sx={{ width: '100%' }}>
-          <AthleteResultsChart />
+          <AthleteResultsChart comparatorAthletes={comparatorAthletes} />
         </Box>
 
         {/* Card de estado de conexión */}
