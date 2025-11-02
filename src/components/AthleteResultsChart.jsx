@@ -8,8 +8,12 @@ import {
   Alert,
   Paper,
   ToggleButton,
-  ToggleButtonGroup
+  ToggleButtonGroup,
+  IconButton,
+  Tooltip as MuiTooltip
 } from '@mui/material'
+import CalendarTodayIcon from '@mui/icons-material/CalendarToday'
+import PersonIcon from '@mui/icons-material/Person'
 import {
   LineChart,
   Line,
@@ -33,6 +37,7 @@ function AthleteResultsChart({ comparatorAthletes = [] }) {
   const [allPruebasData, setAllPruebasData] = useState({}) // Almacenar datos agrupados por prueba
   const [comparatorData, setComparatorData] = useState({}) // Datos de atletas comparados
   const [athleteColors, setAthleteColors] = useState({}) // Mapa de atleta_id -> color consistente
+  const [viewMode, setViewMode] = useState('fecha') // 'fecha' o 'edad'
   const [chartWidth, setChartWidth] = useState(() => {
     // Inicializar con un ancho razonable desde el inicio
     if (typeof window !== 'undefined') {
@@ -179,10 +184,10 @@ function AthleteResultsChart({ comparatorAthletes = [] }) {
       let fechaNacimiento = null
       
       try {
-        // Intentar obtener nombre del atleta (puede que fecha_nacimiento no exista en la tabla)
+        // Obtener nombre y fecha de nacimiento del atleta desde la tabla atletas
         const { data: atletaInfo, error: atletaError } = await supabase
           .from('atletas')
-          .select('nombre')
+          .select('nombre, fecha_nac')
           .eq('atleta_id', atletaId)
           .maybeSingle()
         
@@ -190,6 +195,7 @@ function AthleteResultsChart({ comparatorAthletes = [] }) {
           console.warn('Error al obtener información del atleta:', atletaError)
         } else if (atletaInfo) {
           atletaNombre = atletaInfo.nombre
+          fechaNacimiento = atletaInfo.fecha_nac || null
         }
       } catch (err) {
         console.warn('No se pudo obtener información del atleta:', err)
@@ -310,11 +316,22 @@ function AthleteResultsChart({ comparatorAthletes = [] }) {
           )
         }
         
-        // También obtener fecha de nacimiento desde resultados si está disponible
-        if (!fechaNacimiento) {
+        // Si no obtuvimos fecha_nac desde atletas, intentar desde resultados como fallback
+        if (!fechaNacimiento && data.length > 0) {
           const fechasEncontradas = [...new Set(data.map(r => r.fecha_nacimiento).filter(Boolean))]
           if (fechasEncontradas.length === 1) {
             fechaNacimiento = fechasEncontradas[0]
+          } else if (fechasEncontradas.length > 1) {
+            // Si hay múltiples fechas, usar la más común
+            const conteoFechas = {}
+            fechasEncontradas.forEach(fecha => {
+              const conteo = data.filter(r => r.fecha_nacimiento === fecha).length
+              conteoFechas[fecha] = conteo
+            })
+            const fechaMasComun = Object.keys(conteoFechas).reduce((a, b) => 
+              conteoFechas[a] > conteoFechas[b] ? a : b
+            )
+            fechaNacimiento = fechaMasComun
           }
         }
       }
@@ -383,28 +400,21 @@ function AthleteResultsChart({ comparatorAthletes = [] }) {
         // Usar fecha de nacimiento si está disponible en los resultados encontrados
         const fechaParaBuscar = fechaNacimiento || (fechasNacimientoEncontradas.length > 0 ? fechasNacimientoEncontradas[0] : null)
         
-        // Estrategia 2: Buscar resultados con atleta_id NULL (sin filtrar por fecha primero)
+        // Estrategia 2: Buscar resultados con atleta_id NULL
+        // Nota: fecha_nacimiento no existe en la tabla resultados, así que no podemos filtrar por ella
         try {
-          let queryNull = supabase
+          const resultNull = await supabase
             .from('resultados')
             .select('*')
             .is('atleta_id', null)
-          
-          // Si tenemos fecha, filtrar por ella; si no, buscar todos y luego filtrar manualmente
-          if (fechaParaBuscar) {
-            queryNull = queryNull.eq('fecha_nacimiento', fechaParaBuscar)
-          }
-          
-          const resultNull = await queryNull
             .order('fecha', { ascending: true })
-            .limit(200) // Aumentar límite para tener más resultados para filtrar
+            .limit(200)
           
           if (!resultNull.error && resultNull.data && resultNull.data.length > 0) {
             let nuevosResultados = resultNull.data
             
-            // Si no filtramos por fecha en la query, filtrar manualmente
-            if (!fechaParaBuscar && fechasNacimientoEncontradas.length > 0) {
-              // Filtrar por las fechas encontradas en los resultados principales
+            // Filtrar manualmente por fecha de nacimiento si está disponible en los datos
+            if (fechasNacimientoEncontradas.length > 0) {
               nuevosResultados = nuevosResultados.filter(r => 
                 r.fecha_nacimiento && fechasNacimientoEncontradas.includes(r.fecha_nacimiento)
               )
@@ -421,7 +431,7 @@ function AthleteResultsChart({ comparatorAthletes = [] }) {
             }
           }
         } catch (errNull) {
-          // Error silenciado
+          // Error silenciado - fecha_nacimiento no existe en resultados
         }
         
         // Estrategia 3: Buscar otros atletas con nombre similar y obtener sus resultados
@@ -467,33 +477,8 @@ function AthleteResultsChart({ comparatorAthletes = [] }) {
         }
         
         // Estrategia 4: Si tenemos fecha de nacimiento, buscar por esa fecha directamente
-        if (fechaParaBuscar && resultadosAdicionales.length === 0) {
-          try {
-            // Buscar resultados con la misma fecha de nacimiento pero diferente atleta_id o NULL
-            let queryFecha = supabase
-              .from('resultados')
-              .select('*')
-              .eq('fecha_nacimiento', fechaParaBuscar)
-              .or(`atleta_id.is.null,atleta_id.neq.${atletaId}`)
-            
-            const resultFecha = await queryFecha
-              .order('fecha', { ascending: true })
-            
-            if (!resultFecha.error && resultFecha.data) {
-              // Filtrar los que ya están en data
-              const nuevosResultados = resultFecha.data.filter(r => {
-                const resultadoId = r.resultado_id || r.id
-                return resultadoId && !resultadosIdsEncontrados.has(resultadoId)
-              })
-              
-              if (nuevosResultados.length > 0) {
-                resultadosAdicionales = [...resultadosAdicionales, ...nuevosResultados]
-              }
-            }
-          } catch (errFecha) {
-            // Error silenciado
-          }
-        }
+        // Nota: fecha_nacimiento no existe en la tabla resultados, así que esta estrategia no es viable
+        // Se omite para evitar errores 400
         
         // Obtener información de pruebas para todos los resultados adicionales
         if (resultadosAdicionales.length > 0) {
@@ -616,25 +601,40 @@ function AthleteResultsChart({ comparatorAthletes = [] }) {
         }
 
         // Convertir fecha a formato adecuado para el gráfico
+        // Nota: El campo puede ser 'anio' o 'año' dependiendo de la BD
+        const año = resultado.anio || resultado.año
         let fecha = null
         if (resultado.fecha) {
           fecha = new Date(resultado.fecha)
-        } else if (resultado.año && resultado.mes) {
-          // Si hay año y mes pero no fecha completa
-          fecha = new Date(resultado.año, resultado.mes - 1, 1)
+        } else if (año && resultado.mes) {
+          // Si hay año y mes pero no fecha completa, usar día 15 del mes para mejor precisión
+          fecha = new Date(año, resultado.mes - 1, 15)
         }
 
         const fechaFormateada = fecha && !isNaN(fecha.getTime())
-          ? fecha.toLocaleDateString('es-ES', { year: 'numeric', month: 'short', day: fecha.getDate() === 1 ? undefined : 'numeric' })
-          : resultado.año && resultado.mes
-          ? `${new Date(resultado.año, resultado.mes - 1).toLocaleDateString('es-ES', { month: 'short' })} ${resultado.año}`
+          ? fecha.toLocaleDateString('es-ES', { year: 'numeric', month: 'short' })
+          : año && resultado.mes
+          ? `${new Date(año, resultado.mes - 1).toLocaleDateString('es-ES', { month: 'short' })} ${año}`
           : 'Fecha desconocida'
 
+        // Calcular edad si tenemos fecha de nacimiento y fecha del resultado
+        // Usar fecha_nacimiento del resultado, o la general del atleta como fallback
+        const fechaNacimientoResultado = resultado.fecha_nacimiento || null
+        const fechaNacimientoParaEdad = fechaNacimientoResultado || fechaNacimiento || null
+        let edad = null
+        
+        if (fechaNacimientoParaEdad && fecha && !isNaN(fecha.getTime())) {
+          edad = calcularEdad(fechaNacimientoParaEdad, fecha)
+        }
+
         // Agregar punto de datos
+        const añoParaTimestamp = resultado.anio || resultado.año
         groupedByPrueba[pruebaNombre].data.push({
           fecha: fechaFormateada,
-          fechaTimestamp: fecha && !isNaN(fecha.getTime()) ? fecha.getTime() : (resultado.año ? new Date(resultado.año, resultado.mes || 0, 1).getTime() : 0),
-          marca: marcaValor
+          fechaTimestamp: fecha && !isNaN(fecha.getTime()) ? fecha.getTime() : (añoParaTimestamp ? new Date(añoParaTimestamp, resultado.mes || 0, 15).getTime() : 0),
+          marca: marcaValor,
+          edad: edad,
+          fechaNacimiento: fechaNacimientoResultado || fechaNacimiento // Guardar para uso posterior
         })
       })
 
@@ -697,6 +697,22 @@ function AthleteResultsChart({ comparatorAthletes = [] }) {
   // Función para obtener datos de un atleta comparado (sin setear loading ni error)
   const fetchAthleteResultsForComparator = async (atletaId) => {
     try {
+      // Obtener fecha de nacimiento del atleta desde la tabla atletas
+      let fechaNacimiento = null
+      try {
+        const { data: atletaInfo } = await supabase
+          .from('atletas')
+          .select('fecha_nac')
+          .eq('atleta_id', atletaId)
+          .maybeSingle()
+        
+        if (atletaInfo && atletaInfo.fecha_nac) {
+          fechaNacimiento = atletaInfo.fecha_nac
+        }
+      } catch (err) {
+        console.warn('No se pudo obtener fecha de nacimiento del comparador:', err)
+      }
+
       let data = null
       let queryError = null
       let result1 = null
@@ -829,23 +845,36 @@ function AthleteResultsChart({ comparatorAthletes = [] }) {
           }
         }
 
+        // Nota: El campo puede ser 'anio' o 'año' dependiendo de la BD
+        const año = resultado.anio || resultado.año
         let fecha = null
         if (resultado.fecha) {
           fecha = new Date(resultado.fecha)
-        } else if (resultado.año && resultado.mes) {
-          fecha = new Date(resultado.año, resultado.mes - 1, 1)
+        } else if (año && resultado.mes) {
+          // Si hay año y mes pero no fecha completa, usar día 15 del mes para mejor precisión
+          fecha = new Date(año, resultado.mes - 1, 15)
         }
 
         const fechaFormateada = fecha && !isNaN(fecha.getTime())
-          ? fecha.toLocaleDateString('es-ES', { year: 'numeric', month: 'short', day: fecha.getDate() === 1 ? undefined : 'numeric' })
-          : resultado.año && resultado.mes
-          ? `${new Date(resultado.año, resultado.mes - 1).toLocaleDateString('es-ES', { month: 'short' })} ${resultado.año}`
+          ? fecha.toLocaleDateString('es-ES', { year: 'numeric', month: 'short' })
+          : año && resultado.mes
+          ? `${new Date(año, resultado.mes - 1).toLocaleDateString('es-ES', { month: 'short' })} ${año}`
           : 'Fecha desconocida'
 
+        // Calcular edad si tenemos fecha de nacimiento y fecha del resultado
+        // Usar fecha_nac de la tabla atletas (disponible en el scope de la función)
+        const fechaNacimientoParaEdad = fechaNacimiento || resultado.fecha_nacimiento || null
+        const edad = fechaNacimientoParaEdad && fecha && !isNaN(fecha.getTime())
+          ? calcularEdad(fechaNacimientoParaEdad, fecha)
+          : null
+
+        const añoParaTimestamp = resultado.anio || resultado.año
         groupedByPrueba[pruebaNombre].data.push({
           fecha: fechaFormateada,
-          fechaTimestamp: fecha && !isNaN(fecha.getTime()) ? fecha.getTime() : (resultado.año ? new Date(resultado.año, resultado.mes || 0, 1).getTime() : 0),
-          marca: marcaValor
+          fechaTimestamp: fecha && !isNaN(fecha.getTime()) ? fecha.getTime() : (añoParaTimestamp ? new Date(añoParaTimestamp, resultado.mes || 0, 15).getTime() : 0),
+          marca: marcaValor,
+          edad: edad,
+          fechaNacimiento: fechaNacimientoParaEdad // Guardar para uso posterior
         })
       })
 
@@ -878,7 +907,9 @@ function AthleteResultsChart({ comparatorAthletes = [] }) {
     const datosGrafico = pruebaData.data.map(punto => ({
       fecha: punto.fecha,
       fechaTimestamp: punto.fechaTimestamp,
-      marca: punto.marca
+      marca: punto.marca,
+      edad: punto.edad || null,
+      fechaNacimiento: punto.fechaNacimiento || null
     }))
 
     // Siempre usar el mismo color para el atleta principal
@@ -1003,16 +1034,36 @@ function AthleteResultsChart({ comparatorAthletes = [] }) {
   
   useEffect(() => {
     if (selectedPrueba && chartData.datos && chartData.datos.length > 0) {
-      // Crear un mapa de fechas con todos los datos
-      const dateMap = new Map()
+      // Si estamos en modo edad, usar edad como clave, si no, usar fecha
+      const keyField = viewMode === 'edad' ? 'edad' : 'fecha'
+      
+      // Crear un mapa con todos los datos usando la clave apropiada
+      const dataMap = new Map()
       
       // Añadir datos del atleta principal
       chartData.datos.forEach(point => {
-        dateMap.set(point.fecha, {
-          fecha: point.fecha,
-          fechaTimestamp: point.fechaTimestamp,
-          marca: point.marca
-        })
+        const key = point[keyField]
+        // En modo edad, solo incluir puntos que tengan edad calculada
+        // En modo fecha, incluir todos los puntos
+        if (viewMode === 'edad') {
+          if (key !== null && key !== undefined && typeof key === 'number') {
+            dataMap.set(key, {
+              fecha: point.fecha,
+              fechaTimestamp: point.fechaTimestamp,
+              marca: point.marca,
+              edad: point.edad
+            })
+          }
+        } else {
+          if (key !== null && key !== undefined) {
+            dataMap.set(key, {
+              fecha: point.fecha,
+              fechaTimestamp: point.fechaTimestamp,
+              marca: point.marca,
+              edad: point.edad
+            })
+          }
+        }
       })
       
       // Añadir datos de cada comparador
@@ -1024,33 +1075,69 @@ function AthleteResultsChart({ comparatorAthletes = [] }) {
             const atletaDataKey = `marca_comp_${athlete.atleta_id}`
             
             compPruebaData.data.forEach(compPoint => {
-              if (dateMap.has(compPoint.fecha)) {
-                // Si la fecha ya existe, añadir el dato del comparador
-                dateMap.get(compPoint.fecha)[atletaDataKey] = compPoint.marca
-              } else {
-                // Si la fecha no existe, crear una nueva entrada
-                const newPoint = {
-                  fecha: compPoint.fecha,
-                  fechaTimestamp: compPoint.fechaTimestamp,
-                  marca: null, // No hay dato del atleta principal para esta fecha
-                  [atletaDataKey]: compPoint.marca
+              const compKey = compPoint[keyField]
+              // En modo edad, solo incluir puntos que tengan edad calculada (número)
+              // En modo fecha, incluir todos los puntos
+              if (viewMode === 'edad') {
+                if (compKey !== null && compKey !== undefined && typeof compKey === 'number') {
+                  if (dataMap.has(compKey)) {
+                    // Si la clave ya existe, añadir el dato del comparador
+                    dataMap.get(compKey)[atletaDataKey] = compPoint.marca
+                  } else {
+                    // Si la clave no existe, crear una nueva entrada
+                    const newPoint = {
+                      fecha: compPoint.fecha || '',
+                      fechaTimestamp: compPoint.fechaTimestamp || 0,
+                      marca: null, // No hay dato del atleta principal para esta clave
+                      edad: compPoint.edad,
+                      [atletaDataKey]: compPoint.marca
+                    }
+                    dataMap.set(compKey, newPoint)
+                  }
                 }
-                dateMap.set(compPoint.fecha, newPoint)
+              } else {
+                if (compKey !== null && compKey !== undefined) {
+                  if (dataMap.has(compKey)) {
+                    // Si la clave ya existe, añadir el dato del comparador
+                    dataMap.get(compKey)[atletaDataKey] = compPoint.marca
+                  } else {
+                    // Si la clave no existe, crear una nueva entrada
+                    const newPoint = {
+                      fecha: compPoint.fecha || '',
+                      fechaTimestamp: compPoint.fechaTimestamp || 0,
+                      marca: null, // No hay dato del atleta principal para esta clave
+                      edad: compPoint.edad,
+                      [atletaDataKey]: compPoint.marca
+                    }
+                    dataMap.set(compKey, newPoint)
+                  }
+                }
               }
             })
           }
         })
       }
       
-      // Convertir el mapa a array y ordenar por fecha
-      const newData = Array.from(dateMap.values()).sort((a, b) => a.fechaTimestamp - b.fechaTimestamp)
+      // Convertir el mapa a array y ordenar
+      let newData = Array.from(dataMap.values())
+      if (viewMode === 'edad') {
+        // Ordenar por edad
+        newData.sort((a, b) => {
+          if (a.edad === null || a.edad === undefined) return 1
+          if (b.edad === null || b.edad === undefined) return -1
+          return a.edad - b.edad
+        })
+      } else {
+        // Ordenar por fecha
+        newData.sort((a, b) => a.fechaTimestamp - b.fechaTimestamp)
+      }
       
       setCombinedChartData(newData)
     } else {
       setCombinedChartData(chartData.datos || [])
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [chartData.datos, selectedPrueba, comparatorAthletes, comparatorData])
+  }, [chartData.datos, selectedPrueba, comparatorAthletes, comparatorData, viewMode])
 
   // Función para asignar colores a las pruebas
   const getColorForPrueba = (nombrePrueba) => {
@@ -1073,6 +1160,63 @@ function AthleteResultsChart({ comparatorAthletes = [] }) {
       hash = nombrePrueba.charCodeAt(i) + ((hash << 5) - hash)
     }
     return colors[Math.abs(hash) % colors.length]
+  }
+
+  // Función para calcular la edad del atleta en un momento dado
+  const calcularEdad = (fechaNacimiento, fechaResultado) => {
+    if (!fechaNacimiento || !fechaResultado) {
+      return null
+    }
+
+    try {
+      // Asegurarse de que fechaNacimiento es un string o Date válido
+      let nacimiento
+      if (typeof fechaNacimiento === 'string') {
+        // Si es string, crear Date directamente
+        nacimiento = new Date(fechaNacimiento)
+      } else if (fechaNacimiento instanceof Date) {
+        nacimiento = fechaNacimiento
+      } else {
+        return null
+      }
+
+      // fechaResultado debería ser ya un Date object
+      const resultado = fechaResultado instanceof Date ? fechaResultado : new Date(fechaResultado)
+
+      if (isNaN(nacimiento.getTime()) || isNaN(resultado.getTime())) {
+        return null
+      }
+
+      // Calcular diferencia en años
+      let edad = resultado.getFullYear() - nacimiento.getFullYear()
+      const mesDiferencia = resultado.getMonth() - nacimiento.getMonth()
+      const diaDiferencia = resultado.getDate() - nacimiento.getDate()
+
+      // Ajustar si aún no ha cumplido años
+      if (mesDiferencia < 0 || (mesDiferencia === 0 && diaDiferencia < 0)) {
+        edad--
+      }
+
+      // Calcular meses adicionales para mayor precisión (edad en años con decimales)
+      // Si el resultado es solo año/mes (día = 1), usar aproximación más precisa
+      let mesesAdicionales = 0
+      if (resultado.getDate() === 1) {
+        // Si solo tenemos mes/año, aproximar al día 15 del mes para cálculo más preciso
+        mesesAdicionales = mesDiferencia >= 0 ? mesDiferencia : mesDiferencia + 12
+        // Aproximar a medio mes si estamos a mitad del mes
+        mesesAdicionales = mesesAdicionales + 0.5
+      } else {
+        mesesAdicionales = Math.max(0, mesDiferencia) + (diaDiferencia >= 0 ? 0 : -1)
+        if (mesesAdicionales < 0) mesesAdicionales = 0
+      }
+      
+      const edadDecimal = edad + (mesesAdicionales / 12)
+
+      // Redondear a 2 decimales
+      return Math.round(edadDecimal * 100) / 100
+    } catch (error) {
+      return null
+    }
   }
 
   // Función para formatear valores en segundos
@@ -1114,11 +1258,28 @@ function AthleteResultsChart({ comparatorAthletes = [] }) {
       const esSegundos = unidadLower === 's' || unidadLower === 'seg' || unidadLower === 'segundos'
       const textoUnidad = esSegundos ? '' : (unidad ? ` ${unidad}` : '')
       
+      // Obtener el punto de datos completo para mostrar fecha y edad
+      const dataPoint = payload[0]?.payload
+      const mostrarFecha = dataPoint?.fecha || label
+      const mostrarEdad = dataPoint?.edad !== null && dataPoint?.edad !== undefined 
+        ? `${dataPoint.edad.toFixed(1)} años`
+        : null
+      
       return (
         <Paper sx={{ p: 1.5, backgroundColor: 'rgba(255, 255, 255, 0.95)' }} elevation={3}>
-          <Typography variant="body2" sx={{ fontWeight: 'bold', mb: 1 }}>
-            {label}
+          <Typography variant="body2" sx={{ fontWeight: 'bold', mb: 0.5 }}>
+            {viewMode === 'edad' ? mostrarEdad || label : mostrarFecha}
           </Typography>
+          {viewMode === 'edad' && mostrarFecha && (
+            <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', mb: 0.5 }}>
+              {mostrarFecha}
+            </Typography>
+          )}
+          {viewMode === 'fecha' && mostrarEdad && (
+            <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', mb: 0.5 }}>
+              Edad: {mostrarEdad}
+            </Typography>
+          )}
           {payload.map((entry, index) => {
             if (entry.value !== null && entry.value !== undefined) {
               const valorFormateado = formatTiempo(entry.value, unidad)
@@ -1196,9 +1357,38 @@ function AthleteResultsChart({ comparatorAthletes = [] }) {
   return (
     <Card sx={{ width: '100%' }}>
       <CardContent sx={{ px: { xs: 2 }, py: { xs: 2 } }}>
-        <Typography variant="h6" gutterBottom sx={{ fontSize: { xs: '1.1rem' } }}>
-          Evolución de Resultados - {selectedAthlete.nombre}
-        </Typography>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+          <Typography variant="h6" gutterBottom sx={{ fontSize: { xs: '1.1rem' }, mb: 0 }}>
+            Evolución de Resultados - {selectedAthlete.nombre}
+          </Typography>
+          {/* Botones para cambiar entre vista por fecha y por edad */}
+          <Box sx={{ display: 'flex', gap: 0.5 }}>
+            <MuiTooltip title="Vista por Fecha">
+              <IconButton
+                size="small"
+                onClick={() => setViewMode('fecha')}
+                color={viewMode === 'fecha' ? 'primary' : 'default'}
+                sx={{
+                  backgroundColor: viewMode === 'fecha' ? 'action.selected' : 'transparent'
+                }}
+              >
+                <CalendarTodayIcon fontSize="small" />
+              </IconButton>
+            </MuiTooltip>
+            <MuiTooltip title="Vista por Edad">
+              <IconButton
+                size="small"
+                onClick={() => setViewMode('edad')}
+                color={viewMode === 'edad' ? 'primary' : 'default'}
+                sx={{
+                  backgroundColor: viewMode === 'edad' ? 'action.selected' : 'transparent'
+                }}
+              >
+                <PersonIcon fontSize="small" />
+              </IconButton>
+            </MuiTooltip>
+          </Box>
+        </Box>
         
         {/* Segmented Control para seleccionar prueba */}
         {pruebasDisponibles.length > 0 && (
@@ -1239,12 +1429,25 @@ function AthleteResultsChart({ comparatorAthletes = [] }) {
               >
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis
-                      dataKey="fecha"
-                      angle={-45}
-                      textAnchor="end"
-                      height={80}
+                      dataKey={viewMode === 'edad' ? 'edad' : 'fecha'}
+                      angle={viewMode === 'edad' ? 0 : -45}
+                      textAnchor={viewMode === 'edad' ? 'middle' : 'end'}
+                      height={viewMode === 'edad' ? 40 : 80}
                       interval="preserveStartEnd"
                       tick={{ fontSize: 10 }}
+                      label={{
+                        value: viewMode === 'edad' ? 'Edad (años)' : 'Fecha',
+                        position: 'insideBottom',
+                        offset: viewMode === 'edad' ? -5 : -10,
+                        style: { textAnchor: 'middle', fontSize: '10px' }
+                      }}
+                      tickFormatter={(value) => {
+                        if (viewMode === 'edad') {
+                          // Formatear edad como número con un decimal
+                          return typeof value === 'number' ? value.toFixed(1) : value
+                        }
+                        return value
+                      }}
                     />
                     <YAxis 
                       label={{ 
