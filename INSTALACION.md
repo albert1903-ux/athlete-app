@@ -111,3 +111,4 @@ Si los componentes no se ven con Material Design:
 - [Documentación Supabase](https://supabase.com/docs)
 - [Documentación React](https://react.dev)
 
+

@@ -330,45 +330,25 @@ function AthleteSpiderChart({ comparatorAthletes = [] }) {
               resultados: results,
               atleta_id: athlete.atleta_id // Guardar también el ID original
             }
-            // Debug: verificar que los datos se cargaron
-            console.log(`[SpiderChart] Datos cargados para ${athlete.nombre}:`, {
-              atletaIdKey,
-              pruebas: Object.keys(results),
-              cantidadPruebas: Object.keys(results).length
-            })
-          } else {
-            console.warn(`[SpiderChart] No se encontraron resultados para ${athlete.nombre} (${athlete.atleta_id})`)
           }
         }
 
-        // Verificar que se cargaron datos para TODOS los atletas esperados
-        const expectedAthletes = [selectedAthlete, ...comparatorAthletes]
-        const loadedAthleteIds = Object.keys(athleteResults).map(k => parseInt(k))
-        const expectedAthleteIds = expectedAthletes.map(a => a.atleta_id)
-        
-        console.log(`[SpiderChart] Verificación de carga:`, {
-          esperados: expectedAthleteIds,
-          cargados: loadedAthleteIds,
-          todosCargados: expectedAthleteIds.every(id => loadedAthleteIds.includes(id))
-        })
-
         setAthleteData(athleteResults)
 
-        // Encontrar todas las pruebas únicas (de TODOS los atletas)
+        // Determinar qué pruebas mostrar
+        // Cuando hay comparadores, solo mostrar las pruebas del atleta principal
+        // (mismo criterio que el gráfico de línea)
+        // Si no hay comparadores, también mostrar solo las del atleta principal
         const pruebasSet = new Set()
-        Object.values(athleteResults).forEach(athlete => {
-          Object.keys(athlete.resultados).forEach(prueba => {
+        const selectedAthleteKey = String(selectedAthlete.atleta_id)
+        const selectedAthleteData = athleteResults[selectedAthleteKey]
+        if (selectedAthleteData) {
+          Object.keys(selectedAthleteData.resultados).forEach(prueba => {
             pruebasSet.add(prueba)
           })
-        })
+        }
 
         const pruebasList = Array.from(pruebasSet)
-        console.log(`[SpiderChart] Todas las pruebas encontradas:`, pruebasList)
-        console.log(`[SpiderChart] Datos por atleta en athleteResults:`, Object.keys(athleteResults).map(k => ({
-          key: k,
-          nombre: athleteResults[k]?.nombre,
-          pruebas: Object.keys(athleteResults[k]?.resultados || {})
-        })))
         setAllPruebas(pruebasList)
       } catch (err) {
         console.error('Error al cargar datos:', err)
@@ -490,47 +470,6 @@ function AthleteSpiderChart({ comparatorAthletes = [] }) {
 
       return entry
     })
-
-    // Debug: verificar que los datos se construyeron correctamente
-    console.log(`[SpiderChart] ===== DATOS DEL GRÁFICO CONSTRUIDOS =====`)
-    console.log(`[SpiderChart] Total pruebas: ${radarDataArray.length}`)
-    console.log(`[SpiderChart] Pruebas:`, radarDataArray.map(e => e.prueba))
-    console.log(`[SpiderChart] Atletas en allAthletes:`, allAthletes.map(a => ({ nombre: a.nombre, id: String(a.atleta_id) })))
-    console.log(`[SpiderChart] Atletas en athleteData:`, Object.keys(athleteData).map(k => ({ key: k, nombre: athleteData[k]?.nombre })))
-    
-    // Verificar que CADA entrada tiene claves para TODOS los atletas
-    console.log(`[SpiderChart] Verificación de claves por entrada:`)
-    radarDataArray.forEach((entry, idx) => {
-      const clavesAtletas = Object.keys(entry).filter(k => 
-        !k.includes('_real') && 
-        !k.includes('_unidad') && 
-        k !== 'prueba' && 
-        k !== 'unidad'
-      )
-      const atletasEsperados = allAthletes.map(a => String(a.atleta_id))
-      const faltantes = atletasEsperados.filter(id => !clavesAtletas.includes(id))
-      
-      console.log(`[SpiderChart]   ${entry.prueba}:`, {
-        clavesPresentes: clavesAtletas,
-        atletasEsperados: atletasEsperados,
-        faltantes: faltantes.length > 0 ? faltantes : 'NINGUNO',
-        valores: clavesAtletas.map(k => ({ clave: k, valor: entry[k] }))
-      })
-    })
-    
-    // Datos por atleta para verificar valores
-    console.log(`[SpiderChart] Datos por atleta (valores normalizados):`)
-    allAthletes.forEach(athlete => {
-      const atletaIdKey = String(athlete.atleta_id)
-      const valores = radarDataArray.map(e => ({ 
-        prueba: e.prueba, 
-        valorNormalizado: e[atletaIdKey] !== undefined ? e[atletaIdKey] : 'NO DEFINIDO',
-        valorReal: e[`${atletaIdKey}_real`] || 'NO TIENE'
-      }))
-      console.log(`[SpiderChart]   ${athlete.nombre} (${atletaIdKey}):`, valores)
-    })
-    
-    console.log(`[SpiderChart] ========================================`)
 
     setRadarData(radarDataArray)
   }, [allPruebas, athleteData, allAthletes])
