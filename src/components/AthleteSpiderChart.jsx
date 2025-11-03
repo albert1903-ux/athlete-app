@@ -374,8 +374,9 @@ function AthleteSpiderChart({ comparatorAthletes = [] }) {
       return
     }
 
-    // Recopilar todos los valores para normalización (por cada prueba individualmente)
-    // Añadir un margen del 20% para mejorar la comparación visual
+    // Recopilar todos los valores para normalización usando fórmula min-max estándar
+    // X' = (X - min(X)) / (max(X) - min(X))
+    // Esto normaliza todos los valores a 0-1, evitando distorsión visual
     const allValues = {}
     allPruebas.forEach(prueba => {
       const valores = []
@@ -395,7 +396,7 @@ function AthleteSpiderChart({ comparatorAthletes = [] }) {
         const min = Math.min(...valores)
         const max = Math.max(...valores)
         
-        // Usar los valores mínimo y máximo reales sin márgenes adicionales
+        // Guardar información de la prueba para normalización min-max
         allValues[prueba] = {
           min: min,
           max: max,
@@ -413,7 +414,8 @@ function AthleteSpiderChart({ comparatorAthletes = [] }) {
         unidad: range?.unidad || ''
       }
 
-      // Añadir valor para cada atleta (normalizado a 0-100)
+      // Añadir valor para cada atleta usando normalización min-max estándar
+      // X' = (X - min(X)) / (max(X) - min(X)) → valores entre 0 y 1
       // IMPORTANTE: iterar sobre TODOS los atletas usando allAthletes para asegurar consistencia
       allAthletes.forEach(athlete => {
         const atletaIdKey = String(athlete.atleta_id)
@@ -423,39 +425,34 @@ function AthleteSpiderChart({ comparatorAthletes = [] }) {
         if (athleteDataEntry && athleteDataEntry.resultados[prueba]) {
           const valor = athleteDataEntry.resultados[prueba].valor
           
-          // Si hay range (hay otros atletas con esta prueba), normalizar
-          if (range) {
-            // Normalizar: para tiempo (menor es mejor), invertir la escala
-            // Para distancia (mayor es mejor), usar escala normal
-            // Usar un rango de 30-130 para dejar márgenes visuales
-            // El rango expandido (con margen del 20%) permite mejor comparación visual
-            const MIN_VALUE = 30  // Valor mínimo visible con margen
-            const MAX_VALUE = 130
-            const RANGE_SIZE = MAX_VALUE - MIN_VALUE  // 100
+          // Si hay range (hay otros atletas con esta prueba), normalizar usando fórmula min-max
+          if (range && range.max !== range.min) {
+            // Aplicar fórmula min-max: X' = (X - min) / (max - min)
+            // Esto normaliza el valor a un rango 0-1
+            const normalized01 = (valor - range.min) / (range.max - range.min)
             
-            let normalized = MIN_VALUE
-            if (range.max !== range.min) {
-              // Calcular la posición del valor en el rango expandido (con margen del 20%)
-              const positionInExpandedRange = (valor - range.min) / (range.max - range.min)
-              
-              if (range.isTimeBased) {
-                // Invertir: mejor tiempo (menor) = 130, peor tiempo (mayor) = 30
-                // En tiempo, menor es mejor, así que invertimos la posición
-                normalized = MAX_VALUE - (positionInExpandedRange * RANGE_SIZE)
-              } else {
-                // Normal: mejor distancia (mayor) = 130, peor distancia (menor) = 30
-                normalized = MIN_VALUE + (positionInExpandedRange * RANGE_SIZE)
-              }
-            } else {
-              // Si todos los valores son iguales (o solo hay uno), usar 130 como mejor
-              normalized = MAX_VALUE
-            }
+            // Para pruebas de tiempo (menor es mejor), invertir: 1 - normalized01
+            // Para pruebas de distancia/altura (mayor es mejor), usar normalized01 directamente
+            const normalizedValue = range.isTimeBased ? 1 - normalized01 : normalized01
             
-            // Asegurar que el valor esté dentro del rango visible
-            entry[atletaIdKey] = Math.max(MIN_VALUE, Math.min(MAX_VALUE, normalized))
+            // Escalar al rango visual del gráfico (0-100)
+            // Mantener márgenes para mejor visualización (30-130 sería equivalente a 0.3-1.3)
+            // Usamos 0-100 para simplicidad, pero podemos usar 0-100 directamente
+            const MIN_VISUAL = 0
+            const MAX_VISUAL = 100
+            const visualValue = MIN_VISUAL + (normalizedValue * (MAX_VISUAL - MIN_VISUAL))
+            
+            // Desplazar solo la representación visual a 30–130 para dar aire,
+            // manteniendo 0 para "sin prueba".
+            const SHIFT = 0
+            const visualShifted = SHIFT + visualValue
+            entry[atletaIdKey] = Math.max(30, Math.min(100, visualShifted))
+          } else if (range && range.max === range.min) {
+            // Si todos los valores son iguales, usar valor máximo visual (130)
+            entry[atletaIdKey] = 100
           } else {
             // Si no hay range (solo este atleta tiene esta prueba), usar 130 (mejor)
-            entry[atletaIdKey] = 130
+            entry[atletaIdKey] = 100
           }
           
           // Guardar el valor real para el tooltip
@@ -648,7 +645,7 @@ function AthleteSpiderChart({ comparatorAthletes = [] }) {
                     dataKey={atletaIdKey}
                     stroke={athleteColors[athlete.atleta_id] || getColorForAthlete(athlete.atleta_id, athlete.atleta_id === selectedAthlete?.atleta_id) || '#8884d8'}
                     fill={athleteColors[athlete.atleta_id] || getColorForAthlete(athlete.atleta_id, athlete.atleta_id === selectedAthlete?.atleta_id) || '#8884d8'}
-                    fillOpacity={0.6}
+                    fillOpacity={0.4}
                     connectNulls={true}
                     isAnimationActive={true}
                   />
