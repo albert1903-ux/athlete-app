@@ -1517,13 +1517,7 @@ function AthleteResultsChart({ comparatorAthletes = [] }) {
               </LineChart>
             </Box>
 
-            {chartData.pruebas && chartData.pruebas.length > 0 && chartData.pruebas[0].unidad && (
-              <Box sx={{ mt: 2 }}>
-                <Typography variant="caption" color="text.secondary">
-                  <strong>Unidad:</strong> {chartData.pruebas[0].unidad}
-                </Typography>
-              </Box>
-            )}
+            
           </>
         ) : selectedPrueba && (
           <Box sx={{ mt: 2, p: 2 }}>
