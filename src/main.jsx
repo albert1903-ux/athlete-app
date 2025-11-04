@@ -5,16 +5,28 @@ import { ThemeProvider, createTheme } from '@mui/material/styles'
 import './index.css'
 import App from './App.jsx'
 
-// Tema Material Design para mobile
+// Tema Material Design 3 para mobile
 const theme = createTheme({
   palette: {
     mode: 'light',
     primary: {
       main: '#1976d2',
+      light: '#42a5f5',
+      dark: '#1565c0',
     },
     secondary: {
       main: '#dc004e',
+      light: '#ff5983',
+      dark: '#9a0036',
     },
+    background: {
+      default: '#ffffff',
+      paper: '#ffffff',
+    },
+    // Colores MD3
+    surface: '#ffffff',
+    onSurface: '#1c1b1f',
+    onSurfaceVariant: '#49454f',
   },
   typography: {
     fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
@@ -27,6 +39,45 @@ const theme = createTheme({
       md: 960,
       lg: 1280,
       xl: 1920,
+    },
+  },
+  components: {
+    // Estilos para BottomNavigation según MD3
+    MuiBottomNavigation: {
+      styleOverrides: {
+        root: {
+          backgroundColor: 'background.paper',
+          borderTop: '1px solid',
+          borderColor: 'divider',
+          height: '80px',
+          paddingTop: '8px',
+          paddingBottom: '8px',
+        },
+      },
+    },
+    MuiBottomNavigationAction: {
+      styleOverrides: {
+        root: {
+          color: 'text.secondary',
+          paddingTop: '8px',
+          paddingBottom: '8px',
+          minWidth: '64px',
+          transition: 'color 0.2s ease-in-out',
+          '&.Mui-selected': {
+            color: 'primary.main',
+          },
+        },
+        label: {
+          fontSize: '0.75rem',
+          fontWeight: 500,
+          marginTop: '4px',
+          transition: 'font-size 0.2s ease-in-out, font-weight 0.2s ease-in-out',
+          '&.Mui-selected': {
+            fontSize: '0.75rem',
+            fontWeight: 600,
+          },
+        },
+      },
     },
   },
 })

@@ -147,13 +147,15 @@ function AthleteSelector() {
             width: '100%',
             maxWidth: '100%',
             m: { xs: 0 },
-            height: { xs: '90vh', sm: 'auto' },
+            height: { xs: '90vh', sm: '80vh' },
             maxHeight: { xs: '90vh', sm: '80vh' },
-            minHeight: { xs: '90vh', sm: '500px' }
+            minHeight: { xs: '90vh', sm: '500px' },
+            display: 'flex',
+            flexDirection: 'column'
           }
         }}
       >
-        <DialogTitle>
+        <DialogTitle sx={{ flexShrink: 0 }}>
           Seleccionar Atleta
         </DialogTitle>
         
@@ -162,11 +164,14 @@ function AthleteSelector() {
           sx={{ 
             pb: 0,
             position: 'relative',
-            maxHeight: 'calc(80vh - 200px)',
-            overflow: 'auto'
+            flex: 1,
+            overflow: 'auto',
+            display: 'flex',
+            flexDirection: 'column',
+            minHeight: 0
           }}
         >
-          <Box sx={{ mb: tempSelectedAthlete ? '140px' : 0 }}>
+          <Box sx={{ flex: 1, overflow: 'auto', mb: tempSelectedAthlete ? '140px' : 0 }}>
             <AthleteSearch onResultClick={handleResultClick} />
           </Box>
           
@@ -221,7 +226,7 @@ function AthleteSelector() {
           )}
         </DialogContent>
         
-        <DialogActions>
+        <DialogActions sx={{ flexShrink: 0, py: 1.5 }}>
           <Button 
             onClick={handleClose}
             startIcon={<CloseIcon />}

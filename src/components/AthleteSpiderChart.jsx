@@ -647,7 +647,7 @@ function AthleteSpiderChart({ comparatorAthletes = [] }) {
                     fill={athleteColors[athlete.atleta_id] || getColorForAthlete(athlete.atleta_id, athlete.atleta_id === selectedAthlete?.atleta_id) || '#8884d8'}
                     fillOpacity={0.4}
                     connectNulls={true}
-                    isAnimationActive={true}
+                    isAnimationActive={false}
                   />
                 )
               })}

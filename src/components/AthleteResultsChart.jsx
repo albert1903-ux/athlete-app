@@ -41,7 +41,9 @@ function AthleteResultsChart({ comparatorAthletes = [] }) {
   const [chartWidth, setChartWidth] = useState(() => {
     // Inicializar con un ancho razonable desde el inicio
     if (typeof window !== 'undefined') {
-      return Math.max(300, window.innerWidth - 40)
+      // Calcular ancho considerando padding y márgenes
+      const padding = 32 // 16px a cada lado (px: 2 = 16px)
+      return Math.max(300, window.innerWidth - padding)
     }
     return 300
   })
@@ -49,7 +51,9 @@ function AthleteResultsChart({ comparatorAthletes = [] }) {
   // Calcular ancho del gráfico
   useEffect(() => {
     const updateWidth = () => {
-      const width = window.innerWidth - 40 // Restar padding
+      // Calcular ancho considerando padding y márgenes para evitar overflow
+      const padding = 32 // 16px a cada lado (px: 2 = 16px)
+      const width = window.innerWidth - padding
       setChartWidth(Math.max(300, width))
     }
     updateWidth()
@@ -1420,7 +1424,7 @@ function AthleteResultsChart({ comparatorAthletes = [] }) {
         {/* Gráfico */}
         {combinedChartData && combinedChartData.length > 0 && chartWidth > 0 ? (
           <>
-            <Box sx={{ mt: 2, width: '100%', overflow: 'auto' }}>
+            <Box sx={{ mt: 2, width: '100%', overflow: 'hidden' }}>
               <LineChart
                 width={chartWidth}
                 height={300}
