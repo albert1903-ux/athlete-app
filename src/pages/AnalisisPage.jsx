@@ -113,43 +113,7 @@ const AnalisisPage = () => {
         <AthleteBodyMeasurementsChart />
 
         {/* Gráfico de dispersión Altura-Peso */}
-        <AthleteHeightWeightScatter />
-        <Card>
-          <CardContent>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
-              <MonitorHeartIcon color="primary" sx={{ fontSize: 40 }} />
-              <Typography variant="h6">Gráficos de Rendimiento</Typography>
-            </Box>
-            <Typography variant="body2" color="text.secondary">
-              Visualiza gráficos de peso, altura y rendimiento físico de los atletas.
-              Aquí podrás ver la evolución de las métricas clave a lo largo del tiempo.
-            </Typography>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
-              <BarChartIcon color="primary" sx={{ fontSize: 40 }} />
-              <Typography variant="h6">Métricas Corporales</Typography>
-            </Box>
-            <Typography variant="body2" color="text.secondary">
-              Análisis detallado de las medidas corporales y su impacto en el rendimiento deportivo.
-            </Typography>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
-              <TrendingUpIcon color="primary" sx={{ fontSize: 40 }} />
-              <Typography variant="h6">Tendencias</Typography>
-            </Box>
-            <Typography variant="body2" color="text.secondary">
-              Compara y analiza las tendencias de rendimiento entre diferentes períodos y atletas.
-            </Typography>
-          </CardContent>
-        </Card>
+        <AthleteHeightWeightScatter />          
       </Box>
 
       {/* Diálogo para añadir mediciones */}

@@ -9,10 +9,12 @@ import {
   DialogContent,
   DialogActions,
   Typography,
-  Chip
+  Chip,
+  IconButton
 } from '@mui/material'
 import CloseIcon from '@mui/icons-material/Close'
 import CheckIcon from '@mui/icons-material/Check'
+import EditIcon from '@mui/icons-material/Edit'
 import AthleteSearch from './AthleteSearch'
 
 const STORAGE_KEY = 'selectedAthlete'
@@ -87,12 +89,26 @@ function AthleteSelector() {
     <Box sx={{ width: '100%' }}>
       {/* Interfaz principal */}
       {selectedAthlete ? (
-        <Card sx={{ width: '100%' }}>
+        <Card sx={{ width: '100%', position: 'relative' }}>
           <CardContent sx={{ px: { xs: 2 }, py: { xs: 2 } }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
+            {/* Fila superior: Nombre del atleta e icono de editar */}
+            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
               <Typography variant="h6" component="span" fontWeight="bold">
                 {selectedAthlete.nombre}
               </Typography>
+              <IconButton 
+                size="small" 
+                onClick={handleRemove}
+                color="primary"
+                aria-label="Cambiar atleta"
+                sx={{ ml: 'auto' }}
+              >
+                <EditIcon />
+              </IconButton>
+            </Box>
+            
+            {/* Fila inferior: Chips de licencia y club */}
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
               {selectedAthlete.licencia && selectedAthlete.licencia !== 'N/A' && (
                 <Chip 
                   label={`Lic: ${selectedAthlete.licencia}`} 
@@ -108,14 +124,6 @@ function AthleteSelector() {
                   variant="outlined"
                 />
               )}
-              <Button 
-                size="small" 
-                variant="outlined" 
-                onClick={handleRemove}
-                startIcon={<CloseIcon />}
-              >
-                Cambiar
-              </Button>
             </Box>
           </CardContent>
         </Card>
@@ -165,13 +173,13 @@ function AthleteSelector() {
             pb: 0,
             position: 'relative',
             flex: 1,
-            overflow: 'auto',
+            overflow: 'hidden',
             display: 'flex',
             flexDirection: 'column',
             minHeight: 0
           }}
         >
-          <Box sx={{ flex: 1, overflow: 'auto', mb: tempSelectedAthlete ? '140px' : 0 }}>
+          <Box sx={{ flex: 1, overflow: 'auto', minHeight: 0 }}>
             <AthleteSearch onResultClick={handleResultClick} />
           </Box>
           
@@ -179,14 +187,12 @@ function AthleteSelector() {
           {tempSelectedAthlete && (
             <Box
               sx={{
-                position: 'sticky',
-                bottom: 0,
-                zIndex: 10,
+                flexShrink: 0,
                 backgroundColor: 'white',
                 borderTop: '1px solid',
                 borderColor: 'divider',
-                mt: 2,
-                pt: 2
+                pt: 1.5,
+                pb: 1
               }}
             >
               <Card 

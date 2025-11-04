@@ -137,13 +137,13 @@ function AthleteComparator({ onComparatorsChange }) {
               pb: 0,
               position: 'relative',
               flex: 1,
-              overflow: 'auto',
+              overflow: 'hidden',
               display: 'flex',
               flexDirection: 'column',
               minHeight: 0
             }}
           >
-            <Box sx={{ flex: 1, overflow: 'auto', mb: tempSelectedAthlete ? '140px' : 0 }}>
+            <Box sx={{ flex: 1, overflow: 'auto', minHeight: 0 }}>
               <AthleteSearch onResultClick={handleResultClick} />
             </Box>
             
@@ -151,14 +151,12 @@ function AthleteComparator({ onComparatorsChange }) {
             {tempSelectedAthlete && (
               <Box
                 sx={{
-                  position: 'sticky',
-                  bottom: 0,
-                  zIndex: 10,
+                  flexShrink: 0,
                   backgroundColor: 'white',
                   borderTop: '1px solid',
                   borderColor: 'divider',
-                  mt: 2,
-                  pt: 2
+                  pt: 1.5,
+                  pb: 1
                 }}
               >
                 <Card 
@@ -171,10 +169,13 @@ function AthleteComparator({ onComparatorsChange }) {
                     <Typography variant="subtitle2" gutterBottom>
                       Atleta seleccionado:
                     </Typography>
+                    {/* Nombre del atleta */}
+                    <Typography variant="body1" fontWeight="bold" sx={{ mb: 1 }}>
+                      {tempSelectedAthlete.nombre}
+                    </Typography>
+                    
+                    {/* Chips de licencia y club */}
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
-                      <Typography variant="body1" fontWeight="bold">
-                        {tempSelectedAthlete.nombre}
-                      </Typography>
                       {tempSelectedAthlete.licencia && tempSelectedAthlete.licencia !== 'N/A' && (
                         <Chip 
                           label={`Lic: ${tempSelectedAthlete.licencia}`} 
@@ -240,10 +241,24 @@ function AthleteComparator({ onComparatorsChange }) {
           }}
         >
           <CardContent sx={{ px: { xs: 2 }, py: { xs: 2 } }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
+            {/* Fila superior: Nombre del atleta e icono de eliminar */}
+            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
               <Typography variant="h6" component="span" fontWeight="bold">
                 {comparator.nombre}
               </Typography>
+              <IconButton 
+                size="small" 
+                color="error"
+                onClick={() => handleRemove(comparator.atleta_id)}
+                aria-label="Eliminar atleta comparador"
+                sx={{ ml: 'auto' }}
+              >
+                <DeleteIcon />
+              </IconButton>
+            </Box>
+            
+            {/* Fila inferior: Chips de licencia y club */}
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
               {comparator.licencia && comparator.licencia !== 'N/A' && (
                 <Chip 
                   label={`Lic: ${comparator.licencia}`} 
@@ -260,14 +275,6 @@ function AthleteComparator({ onComparatorsChange }) {
                   variant="outlined"
                 />
               )}
-              <IconButton 
-                size="small" 
-                color="error"
-                onClick={() => handleRemove(comparator.atleta_id)}
-                sx={{ ml: 'auto' }}
-              >
-                <DeleteIcon />
-              </IconButton>
             </Box>
           </CardContent>
         </Card>

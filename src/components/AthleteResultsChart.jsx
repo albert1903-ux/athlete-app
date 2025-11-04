@@ -1191,33 +1191,13 @@ function AthleteResultsChart({ comparatorAthletes = [] }) {
         return null
       }
 
-      // Calcular diferencia en años
-      let edad = resultado.getFullYear() - nacimiento.getFullYear()
-      const mesDiferencia = resultado.getMonth() - nacimiento.getMonth()
-      const diaDiferencia = resultado.getDate() - nacimiento.getDate()
-
-      // Ajustar si aún no ha cumplido años
-      if (mesDiferencia < 0 || (mesDiferencia === 0 && diaDiferencia < 0)) {
-        edad--
-      }
-
-      // Calcular meses adicionales para mayor precisión (edad en años con decimales)
-      // Si el resultado es solo año/mes (día = 1), usar aproximación más precisa
-      let mesesAdicionales = 0
-      if (resultado.getDate() === 1) {
-        // Si solo tenemos mes/año, aproximar al día 15 del mes para cálculo más preciso
-        mesesAdicionales = mesDiferencia >= 0 ? mesDiferencia : mesDiferencia + 12
-        // Aproximar a medio mes si estamos a mitad del mes
-        mesesAdicionales = mesesAdicionales + 0.5
-      } else {
-        mesesAdicionales = Math.max(0, mesDiferencia) + (diaDiferencia >= 0 ? 0 : -1)
-        if (mesesAdicionales < 0) mesesAdicionales = 0
-      }
-      
-      const edadDecimal = edad + (mesesAdicionales / 12)
+      // Calcular edad usando diferencia de tiempo total para mayor precisión
+      const diferenciaMilisegundos = resultado.getTime() - nacimiento.getTime()
+      const diferenciaDias = diferenciaMilisegundos / (1000 * 60 * 60 * 24)
+      const edadEnAnos = diferenciaDias / 365.25 // Usar 365.25 para considerar años bisiestos
 
       // Redondear a 2 decimales
-      return Math.round(edadDecimal * 100) / 100
+      return Math.round(edadEnAnos * 100) / 100
     } catch (error) {
       return null
     }

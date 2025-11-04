@@ -9,9 +9,7 @@ import {
   CircularProgress,
   Alert,
   List,
-  ListItem,
   ListItemButton,
-  ListItemText,
   Divider,
   Chip,
   ToggleButton,
@@ -303,36 +301,36 @@ function AthleteSearch({ onResultClick }) {
                     onClick={() => onResultClick && onResultClick(item)}
                     sx={{
                       alignItems: 'flex-start',
+                      flexDirection: 'column',
+                      py: 1.5,
                       '&:hover': {
                         backgroundColor: 'action.hover'
                       }
                     }}
                   >
-                    <ListItemText
-                      primary={
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
-                          <Typography variant="subtitle1" component="span" fontWeight="bold">
-                            {item.nombre}
-                          </Typography>
-                          {item.licencia && item.licencia !== 'N/A' && (
-                            <Chip 
-                              label={`Lic: ${item.licencia}`} 
-                              size="small" 
-                              variant="outlined"
-                            />
-                          )}
-                          {item.club && item.club !== 'N/A' && item.club !== 'Sin club' && (
-                            <Chip 
-                              label={item.club} 
-                              size="small" 
-                              color="primary"
-                              variant="outlined"
-                            />
-                          )}
-                        </Box>
-                      }
-                      
-                    />
+                    {/* Nombre del atleta */}
+                    <Typography variant="subtitle1" component="span" fontWeight="bold" sx={{ width: '100%', mb: 1 }}>
+                      {item.nombre}
+                    </Typography>
+                    
+                    {/* Chips de licencia y club */}
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap', width: '100%' }}>
+                      {item.licencia && item.licencia !== 'N/A' && (
+                        <Chip 
+                          label={`Lic: ${item.licencia}`} 
+                          size="small" 
+                          variant="outlined"
+                        />
+                      )}
+                      {item.club && item.club !== 'N/A' && item.club !== 'Sin club' && (
+                        <Chip 
+                          label={item.club} 
+                          size="small" 
+                          color="primary"
+                          variant="outlined"
+                        />
+                      )}
+                    </Box>
                   </ListItemButton>
                   {index < results.length - 1 && <Divider component="li" />}
                 </Box>
