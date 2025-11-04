@@ -43,9 +43,6 @@ const MasPage = () => {
           gap: 2,
         }}
       >
-        <Typography variant="h5" component="h1" sx={{ mb: 1, fontWeight: 600 }}>
-          Más Opciones
-        </Typography>
 
         <Card>
           <CardContent sx={{ p: 0 }}>
@@ -78,4 +75,5 @@ const MasPage = () => {
 }
 
 export default MasPage
+
 

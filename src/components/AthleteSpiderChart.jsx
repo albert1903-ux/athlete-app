@@ -616,7 +616,7 @@ function AthleteSpiderChart({ comparatorAthletes = [] }) {
     <Card sx={{ width: '100%' }}>
       <CardContent sx={{ px: { xs: 2 }, py: { xs: 2 } }}>
         <Typography variant="h6" gutterBottom sx={{ fontSize: { xs: '1.1rem' } }}>
-          Gráfico de Araña - Mejores Resultados
+          Mejores Marcas
         </Typography>
         
         <Box sx={{ mt: 2, width: '100%' }}>

@@ -182,12 +182,11 @@ function AthleteHeightWeightScatter() {
 
   if (!selectedAthlete) {
     return (
-      <Card>
-        <CardContent>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
-            <ScatterPlotIcon color="primary" sx={{ fontSize: 40 }} />
-            <Typography variant="h6">Relación Altura-Peso</Typography>
-          </Box>
+      <Card sx={{ width: '100%' }}>
+      <CardContent sx={{ px: { xs: 2 }, py: { xs: 2 } }}>
+        <Typography variant="h6" gutterBottom sx={{ fontSize: { xs: '1.1rem' } }}>
+          Relación Altura-Peso
+        </Typography>
           <Alert severity="info">
             Selecciona un atleta para ver su gráfico de altura vs peso
           </Alert>
@@ -197,19 +196,11 @@ function AthleteHeightWeightScatter() {
   }
 
   return (
-    <Card>
-      <CardContent>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 3 }}>
-          <ScatterPlotIcon color="primary" sx={{ fontSize: 40 }} />
-          <Box sx={{ flex: 1 }}>
-            <Typography variant="h6" component="h2">
-              Relación Altura-Peso
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
-              {selectedAthlete.nombre}
-            </Typography>
-          </Box>
-        </Box>
+    <Card sx={{ width: '100%' }}>
+      <CardContent sx={{ px: { xs: 2 }, py: { xs: 2 } }}>
+        <Typography variant="h6" gutterBottom sx={{ fontSize: { xs: '1.1rem' } }}>
+          Evolución de Medidas Corporales
+        </Typography>
 
         {loading && (
           <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>

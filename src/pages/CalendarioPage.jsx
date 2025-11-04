@@ -5,14 +5,11 @@ import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
 import Chip from '@mui/material/Chip'
 import CircularProgress from '@mui/material/CircularProgress'
-import IconButton from '@mui/material/IconButton'
-import Menu from '@mui/material/Menu'
-import MenuItem from '@mui/material/MenuItem'
 import Drawer from '@mui/material/Drawer'
+import IconButton from '@mui/material/IconButton'
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth'
 import EventIcon from '@mui/icons-material/Event'
 import SportsIcon from '@mui/icons-material/Sports'
-import MoreVertIcon from '@mui/icons-material/MoreVert'
 import WarningIcon from '@mui/icons-material/Warning'
 import AccessTimeIcon from '@mui/icons-material/AccessTime'
 import EditIcon from '@mui/icons-material/Edit'
@@ -28,7 +25,6 @@ import AddEventDialog from '../components/AddEventDialog'
 import EditParticipantDialog from '../components/EditParticipantDialog'
 
 const CalendarioPage = () => {
-  const [anchorEl, setAnchorEl] = useState(null)
   const [selectedDate, setSelectedDate] = useState(dayjs())
   const [bottomSheetOpen, setBottomSheetOpen] = useState(false)
   const [addEventDialogOpen, setAddEventDialogOpen] = useState(false)
@@ -36,87 +32,67 @@ const CalendarioPage = () => {
   const [loadingEvents, setLoadingEvents] = useState(false)
   const [dayParticipants, setDayParticipants] = useState([])
   const [loadingDayParticipants, setLoadingDayParticipants] = useState(false)
+  const [dayLocation, setDayLocation] = useState(null)
   const [editingParticipant, setEditingParticipant] = useState(null)
   const [editDialogOpen, setEditDialogOpen] = useState(false)
-  const open = Boolean(anchorEl)
 
-  // Cargar eventos desde Supabase
-  useEffect(() => {
-    const loadEvents = async () => {
-      setLoadingEvents(true)
-      try {
-        const { data, error } = await supabase
-          .from('eventos')
-          .select('fecha')
+  // Cargar eventos desde Supabase (solo fechas que tienen participantes)
+  const loadEvents = async () => {
+    setLoadingEvents(true)
+    try {
+      // Obtener eventos que tienen al menos un participante
+      const { data: participantesData, error: participantesError } = await supabase
+        .from('participantes_eventos')
+        .select('evento_id, eventos!inner(fecha)')
 
-        if (error) throw error
+      if (participantesError) throw participantesError
 
-        // Crear un Set con las fechas que tienen eventos (formato YYYY-MM-DD)
-        const datesSet = new Set()
-        if (data) {
-          data.forEach(evento => {
-            if (evento.fecha) {
-              datesSet.add(evento.fecha)
-            }
-          })
-        }
-        setEventDates(datesSet)
-      } catch (err) {
-        console.error('Error al cargar eventos:', err)
-      } finally {
-        setLoadingEvents(false)
+      // Crear un Set con las fechas que tienen eventos con participantes (formato YYYY-MM-DD)
+      const datesSet = new Set()
+      if (participantesData) {
+        participantesData.forEach(p => {
+          if (p.eventos && p.eventos.fecha) {
+            datesSet.add(p.eventos.fecha)
+          }
+        })
       }
+      setEventDates(datesSet)
+    } catch (err) {
+      console.error('Error al cargar eventos:', err)
+    } finally {
+      setLoadingEvents(false)
     }
+  }
 
+  useEffect(() => {
     loadEvents()
   }, [addEventDialogOpen]) // Recargar cuando se cierra el diálogo de añadir evento
-
-  const handleClick = (event) => {
-    setAnchorEl(event.currentTarget)
-  }
-
-  const handleClose = () => {
-    setAnchorEl(null)
-  }
-
-  const handleAddEvent = () => {
-    handleClose()
-    setAddEventDialogOpen(true)
-  }
 
   const handleAddEventDialogClose = () => {
     setAddEventDialogOpen(false)
   }
 
+  // Escuchar evento desde el header
+  useEffect(() => {
+    const handleOpenAddEvent = () => {
+      setAddEventDialogOpen(true)
+    }
+
+    window.addEventListener('openAddEventDialog', handleOpenAddEvent)
+
+    return () => {
+      window.removeEventListener('openAddEventDialog', handleOpenAddEvent)
+    }
+  }, [])
+
   const handleEventSuccess = () => {
     // Recargar eventos cuando se crea uno nuevo
-    const loadEvents = async () => {
-      try {
-        const { data, error } = await supabase
-          .from('eventos')
-          .select('fecha')
-
-        if (error) throw error
-
-        const datesSet = new Set()
-        if (data) {
-          data.forEach(evento => {
-            if (evento.fecha) {
-              datesSet.add(evento.fecha)
-            }
-          })
-        }
-        setEventDates(datesSet)
-        
-        // Recargar también los participantes del día seleccionado si el bottom sheet está abierto
-        if (bottomSheetOpen) {
-          loadDayParticipants(selectedDate)
-        }
-      } catch (err) {
-        console.error('Error al cargar eventos:', err)
-      }
-    }
     loadEvents()
+    
+    // Recargar también los participantes del día seleccionado si el bottom sheet está abierto
+    if (bottomSheetOpen) {
+      loadDayParticipants(selectedDate)
+    }
   }
 
   // Componente personalizado para los días del calendario
@@ -183,6 +159,7 @@ const CalendarioPage = () => {
 
       if (!eventosData || eventosData.length === 0) {
         setDayParticipants([])
+        setDayLocation(null)
         return
       }
 
@@ -236,6 +213,10 @@ const CalendarioPage = () => {
       })
 
       setDayParticipants(participantesConInfo)
+      
+      // Obtener la ubicación (si todos los eventos tienen la misma ubicación, usar esa)
+      const ubicaciones = [...new Set(eventosData.map(e => e.ubicacion).filter(Boolean))]
+      setDayLocation(ubicaciones.length === 1 ? ubicaciones[0] : null)
     } catch (err) {
       console.error('Error al cargar participantes del día:', err)
       setDayParticipants([])
@@ -319,33 +300,30 @@ const CalendarioPage = () => {
 
       if (error) throw error
 
+      // Verificar si el evento queda sin participantes y eliminarlo
+      const { data: participantesRestantes, error: checkError } = await supabase
+        .from('participantes_eventos')
+        .select('participante_id')
+        .eq('evento_id', participante.evento_id)
+
+      if (checkError) throw checkError
+
+      // Si no quedan participantes, eliminar el evento también
+      if (!participantesRestantes || participantesRestantes.length === 0) {
+        const { error: deleteEventError } = await supabase
+          .from('eventos')
+          .delete()
+          .eq('evento_id', participante.evento_id)
+
+        if (deleteEventError) throw deleteEventError
+      }
+
       // Recargar participantes
       if (bottomSheetOpen) {
         loadDayParticipants(selectedDate)
       }
       
       // Recargar eventos para actualizar los puntos en el calendario
-      const loadEvents = async () => {
-        try {
-          const { data, error } = await supabase
-            .from('eventos')
-            .select('fecha')
-
-          if (error) throw error
-
-          const datesSet = new Set()
-          if (data) {
-            data.forEach(evento => {
-              if (evento.fecha) {
-                datesSet.add(evento.fecha)
-              }
-            })
-          }
-          setEventDates(datesSet)
-        } catch (err) {
-          console.error('Error al cargar eventos:', err)
-        }
-      }
       loadEvents()
     } catch (err) {
       console.error('Error al eliminar participante:', err)
@@ -375,42 +353,6 @@ const CalendarioPage = () => {
           gap: 2,
         }}
       >
-        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
-          <Typography variant="h5" component="h1" sx={{ fontWeight: 600 }}>
-            Calendario
-          </Typography>
-          <IconButton
-            onClick={handleClick}
-            sx={{ color: 'text.primary' }}
-            aria-label="menú de opciones"
-            aria-controls={open ? 'menu-calendario' : undefined}
-            aria-haspopup="true"
-            aria-expanded={open ? 'true' : undefined}
-          >
-            <MoreVertIcon />
-          </IconButton>
-          <Menu
-            id="menu-calendario"
-            anchorEl={anchorEl}
-            open={open}
-            onClose={handleClose}
-            MenuListProps={{
-              'aria-labelledby': 'menu-calendario',
-            }}
-            anchorOrigin={{
-              vertical: 'bottom',
-              horizontal: 'right',
-            }}
-            transformOrigin={{
-              vertical: 'top',
-              horizontal: 'right',
-            }}
-          >
-            <MenuItem onClick={handleAddEvent}>
-              Añadir evento
-            </MenuItem>
-          </Menu>
-        </Box>
 
         {/* Calendario */}
         <Card>
@@ -528,13 +470,40 @@ const CalendarioPage = () => {
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
               {(() => {
                 const conflicts = detectConflicts(dayParticipants)
-                return dayParticipants.map((participante) => {
-                  const hasConflict = conflicts.has(participante.participante_id)
+                
+                // Función para normalizar nombres y ubicaciones
+                const normalizeName = (name) => name.trim().toLowerCase()
+                const normalizeLocation = (location) => location ? location.trim().toLowerCase() : ''
+                
+                // Agrupar participantes por nombre de atleta y ubicación
+                const groupedParticipants = new Map()
+                dayParticipants.forEach(p => {
+                  const key = `${normalizeName(p.nombre_atleta)}|${normalizeLocation(p.ubicacion || '')}`
+                  if (!groupedParticipants.has(key)) {
+                    groupedParticipants.set(key, [])
+                  }
+                  groupedParticipants.get(key).push(p)
+                })
+                
+                // Convertir a array y ordenar por nombre
+                const groups = Array.from(groupedParticipants.entries()).map(([key, participantes]) => ({
+                  key,
+                  participantes,
+                  nombreAtleta: participantes[0].nombre_atleta,
+                  ubicacion: participantes[0].ubicacion || ''
+                }))
+                
+                groups.sort((a, b) => a.nombreAtleta.localeCompare(b.nombreAtleta))
+                
+                return groups.map((group) => {
+                  // Verificar si algún participante del grupo tiene conflicto
+                  const groupHasConflict = group.participantes.some(p => conflicts.has(p.participante_id))
+                  
                   return (
-                    <Card key={participante.participante_id} sx={{ position: 'relative' }}>
+                    <Card key={group.key} sx={{ position: 'relative' }}>
                       <CardContent>
                         <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 2 }}>
-                          {hasConflict && (
+                          {groupHasConflict && (
                             <WarningIcon 
                               sx={{ 
                                 color: 'warning.main', 
@@ -544,51 +513,58 @@ const CalendarioPage = () => {
                             />
                           )}
                           <Box sx={{ flex: 1 }}>
-                            <Typography variant="h6" sx={{ mb: 1 }}>
-                              {participante.nombre_atleta}
-                            </Typography>
-                            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mb: 1 }}>
-                              <Chip 
-                                label={participante.prueba_nombre || 'Sin prueba'} 
-                                size="small"
-                                color="primary"
-                                variant="outlined"
-                              />
-                              <Chip
-                                icon={<AccessTimeIcon />}
-                                label={dayjs(participante.hora, 'HH:mm:ss').format('HH:mm')}
-                                size="small"
-                                variant="outlined"
-                              />
-                            </Box>
-                            {participante.ubicacion && (
-                              <Typography variant="body2" color="text.secondary">
-                                📍 {participante.ubicacion}
+                            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
+                              <Typography variant="h6">
+                                {group.nombreAtleta}
                               </Typography>
-                            )}
-                            {hasConflict && (
+                              {group.ubicacion && (
+                                <Typography variant="body2" color="text.secondary" sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                  📍 {group.ubicacion}
+                                </Typography>
+                              )}
+                            </Box>
+                            
+                            {/* Mostrar todas las pruebas y horarios del grupo */}
+                            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5, mb: 1 }}>
+                              {group.participantes.map((participante, idx) => (
+                                <Box key={participante.participante_id} sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+                                  <Chip 
+                                    label={participante.prueba_nombre || 'Sin prueba'} 
+                                    size="small"
+                                    color="primary"
+                                    variant="outlined"
+                                  />
+                                  <Chip
+                                    icon={<AccessTimeIcon />}
+                                    label={dayjs(participante.hora, 'HH:mm:ss').format('HH:mm')}
+                                    size="small"
+                                    variant="outlined"
+                                  />
+                                  <IconButton
+                                    size="small"
+                                    onClick={() => handleEditParticipant(participante)}
+                                    color="primary"
+                                    sx={{ ml: 'auto', width: 32, height: 32 }}
+                                  >
+                                    <EditIcon fontSize="small" />
+                                  </IconButton>
+                                  <IconButton
+                                    size="small"
+                                    onClick={() => handleDeleteParticipant(participante)}
+                                    color="error"
+                                    sx={{ width: 32, height: 32 }}
+                                  >
+                                    <DeleteIcon fontSize="small" />
+                                  </IconButton>
+                                </Box>
+                              ))}
+                            </Box>
+                            
+                            {groupHasConflict && (
                               <Typography variant="caption" color="warning.main" sx={{ mt: 1, display: 'block' }}>
                                 ⚠️ Conflicto de horario detectado
                               </Typography>
                             )}
-                          </Box>
-                          <Box sx={{ display: 'flex', gap: 0.5 }}>
-                            <IconButton
-                              size="small"
-                              onClick={() => handleEditParticipant(participante)}
-                              color="primary"
-                              sx={{ mt: -1 }}
-                            >
-                              <EditIcon fontSize="small" />
-                            </IconButton>
-                            <IconButton
-                              size="small"
-                              onClick={() => handleDeleteParticipant(participante)}
-                              color="error"
-                              sx={{ mt: -1 }}
-                            >
-                              <DeleteIcon fontSize="small" />
-                            </IconButton>
                           </Box>
                         </Box>
                       </CardContent>

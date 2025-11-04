@@ -250,7 +250,7 @@ function AthleteBodyMeasurementsChart() {
       <Card sx={{ width: '100%' }}>
         <CardContent sx={{ px: { xs: 2 }, py: { xs: 2 } }}>
           <Typography variant="h6" gutterBottom sx={{ fontSize: { xs: '1.1rem' } }}>
-            Evolución de Medidas Corporales - {selectedAthlete.nombre}
+            Evolución de Medidas Corporales
           </Typography>
           <Typography variant="body2" color="text.secondary" align="center" sx={{ mt: 2 }}>
             No se encontraron medidas corporales para este atleta
@@ -268,7 +268,7 @@ function AthleteBodyMeasurementsChart() {
     <Card sx={{ width: '100%' }}>
       <CardContent sx={{ px: { xs: 2 }, py: { xs: 2 } }}>
         <Typography variant="h6" gutterBottom sx={{ fontSize: { xs: '1.1rem' } }}>
-          Evolución de Medidas Corporales - {selectedAthlete.nombre}
+          Evolución de Medidas Corporales
         </Typography>
         
         {/* Segmented Control para seleccionar tipo de medida */}

@@ -1343,7 +1343,7 @@ function AthleteResultsChart({ comparatorAthletes = [] }) {
       <CardContent sx={{ px: { xs: 2 }, py: { xs: 2 } }}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
           <Typography variant="h6" gutterBottom sx={{ fontSize: { xs: '1.1rem' }, mb: 0 }}>
-            Evolución de Resultados - {selectedAthlete.nombre}
+            Evolución de Marcas
           </Typography>
           {/* Botones para cambiar entre vista por fecha y por edad */}
           <Box sx={{ display: 'flex', gap: 0.5 }}>

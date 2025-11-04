@@ -13,6 +13,36 @@ const SeguimientoPage = () => {
     setComparatorAthletes(comparators)
   }, [])
 
+  // Cargar comparadores desde localStorage al montar y cuando cambien
+  useEffect(() => {
+    const loadComparators = () => {
+      try {
+        const stored = localStorage.getItem('comparatorAthletes')
+        if (stored) {
+          const parsed = JSON.parse(stored)
+          const comparadoresArray = Array.isArray(parsed) ? parsed : []
+          setComparatorAthletes(comparadoresArray)
+        }
+      } catch (error) {
+        console.error('Error al cargar comparadores desde localStorage:', error)
+        localStorage.removeItem('comparatorAthletes')
+      }
+    }
+
+    loadComparators()
+
+    // Escuchar evento personalizado cuando se añade un atleta desde el header
+    const handleAthleteAdded = () => {
+      loadComparators()
+    }
+
+    window.addEventListener('comparatorAthletesChanged', handleAthleteAdded)
+
+    return () => {
+      window.removeEventListener('comparatorAthletesChanged', handleAthleteAdded)
+    }
+  }, [])
+
   return (
     <Box
       sx={{
@@ -36,18 +66,10 @@ const SeguimientoPage = () => {
           gap: 2,
         }}
       >
-        <Typography variant="h5" component="h1" sx={{ mb: 1, fontWeight: 600 }}>
-          Seguimiento Deportivo
-        </Typography>
 
         {/* Componente selector de atleta */}
         <Box sx={{ width: '100%' }}>
           <AthleteSelector />
-        </Box>
-
-        {/* Componente comparador de atletas */}
-        <Box sx={{ width: '100%' }}>
-          <AthleteComparator onComparatorsChange={handleComparatorsChange} />
         </Box>
 
         {/* Componente gráfico de araña */}
