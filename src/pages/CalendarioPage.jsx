@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
 import Card from '@mui/material/Card'
@@ -14,9 +14,13 @@ import WarningIcon from '@mui/icons-material/Warning'
 import AccessTimeIcon from '@mui/icons-material/AccessTime'
 import EditIcon from '@mui/icons-material/Edit'
 import DeleteIcon from '@mui/icons-material/Delete'
+import ChevronLeftIcon from '@mui/icons-material/ChevronLeft'
+import ChevronRightIcon from '@mui/icons-material/ChevronRight'
+import LocationOnIcon from '@mui/icons-material/LocationOn'
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import { StaticDatePicker } from '@mui/x-date-pickers/StaticDatePicker'
+import { DateCalendar } from '@mui/x-date-pickers/DateCalendar'
 import { PickersDay } from '@mui/x-date-pickers/PickersDay'
 import dayjs from 'dayjs'
 import 'dayjs/locale/es'
@@ -24,8 +28,15 @@ import { supabase } from '../lib/supabase'
 import AddEventDialog from '../components/AddEventDialog'
 import EditParticipantDialog from '../components/EditParticipantDialog'
 
+// Configurar dayjs para usar el locale español
+dayjs.locale('es')
+
 const CalendarioPage = () => {
   const [selectedDate, setSelectedDate] = useState(dayjs())
+  const [currentMonth, setCurrentMonth] = useState(dayjs())
+  const [calendarMonth, setCalendarMonth] = useState(dayjs().startOf('month'))
+  const [calendarKey, setCalendarKey] = useState(0)
+  const [shouldRenderCalendar, setShouldRenderCalendar] = useState(true)
   const [bottomSheetOpen, setBottomSheetOpen] = useState(false)
   const [addEventDialogOpen, setAddEventDialogOpen] = useState(false)
   const [eventDates, setEventDates] = useState(new Set())
@@ -95,11 +106,177 @@ const CalendarioPage = () => {
     }
   }
 
+  // Componente personalizado para el header del calendario (no se usa actualmente, pero se mantiene por si se necesita)
+  const CustomCalendarHeader = (props) => {
+    const { 
+      currentMonth: monthFromProps, 
+      onMonthChange,
+      leftArrowButtonProps,
+      rightArrowButtonProps
+    } = props
+    
+    // Usar el mes del prop o el estado local
+    const displayMonth = monthFromProps || currentMonth
+    
+    const handlePrevMonth = (event) => {
+      if (event) {
+        event.preventDefault()
+        event.stopPropagation()
+      }
+      
+      const newMonth = dayjs(displayMonth).subtract(1, 'month')
+      setCurrentMonth(newMonth)
+      
+      if (onMonthChange) {
+        onMonthChange(newMonth, 'left')
+      }
+      
+      // Llamar también al handler original si existe
+      if (leftArrowButtonProps?.onClick) {
+        leftArrowButtonProps.onClick(event)
+      }
+    }
+    
+    const handleNextMonth = (event) => {
+      if (event) {
+        event.preventDefault()
+        event.stopPropagation()
+      }
+      
+      const newMonth = dayjs(displayMonth).add(1, 'month')
+      setCurrentMonth(newMonth)
+      
+      if (onMonthChange) {
+        onMonthChange(newMonth, 'right')
+      }
+      
+      // Llamar también al handler original si existe
+      if (rightArrowButtonProps?.onClick) {
+        rightArrowButtonProps.onClick(event)
+      }
+    }
+    
+    return (
+      <Box
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          width: '100%',
+          padding: '0 8px',
+          mb: 3,
+          position: 'relative',
+        }}
+      >
+        <Box
+          sx={{
+            position: 'absolute',
+            left: 8,
+            zIndex: 1000,
+          }}
+        >
+          <IconButton
+            onClick={(e) => {
+              handlePrevMonth(e)
+            }}
+            sx={{
+              color: '#6B7280',
+              backgroundColor: 'rgba(0, 0, 0, 0.04)',
+              borderRadius: 2,
+              width: 40,
+              height: 40,
+              padding: 0,
+              pointerEvents: 'auto !important',
+              cursor: 'pointer',
+              position: 'relative',
+              zIndex: 1001,
+              '&:hover': {
+                backgroundColor: 'rgba(0, 0, 0, 0.08)',
+              },
+            }}
+          >
+            <ChevronLeftIcon fontSize="small" />
+          </IconButton>
+        </Box>
+        
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            flex: 1,
+            width: '100%',
+          }}
+        >
+          <Typography
+            variant="h6"
+            sx={{
+              fontSize: '1.5rem',
+              fontWeight: 600,
+              color: '#000000',
+              fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
+              textTransform: 'capitalize',
+              lineHeight: 1.2,
+              mb: 0.5,
+            }}
+          >
+            {displayMonth.format('MMMM')}
+          </Typography>
+          <Typography
+            variant="body2"
+            sx={{
+              fontSize: '0.875rem',
+              fontWeight: 400,
+              color: '#9CA3AF',
+              fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
+            }}
+          >
+            {displayMonth.format('YYYY')}
+          </Typography>
+        </Box>
+        
+        <Box
+          sx={{
+            position: 'absolute',
+            right: 8,
+            zIndex: 1000,
+          }}
+        >
+          <IconButton
+            onClick={(e) => {
+              handleNextMonth(e)
+            }}
+            sx={{
+              color: '#6B7280',
+              backgroundColor: 'rgba(0, 0, 0, 0.04)',
+              borderRadius: 2,
+              width: 40,
+              height: 40,
+              padding: 0,
+              pointerEvents: 'auto !important',
+              cursor: 'pointer',
+              position: 'relative',
+              zIndex: 1001,
+              '&:hover': {
+                backgroundColor: 'rgba(0, 0, 0, 0.08)',
+              },
+            }}
+          >
+            <ChevronRightIcon fontSize="small" />
+          </IconButton>
+        </Box>
+      </Box>
+    )
+  }
+
   // Componente personalizado para los días del calendario
   const CustomDay = (props) => {
     const { day, ...other } = props
     const dateStr = day.format('YYYY-MM-DD')
     const hasEvent = eventDates.has(dateStr)
+    const isToday = dayjs().format('YYYY-MM-DD') === dateStr
+    const isSelected = selectedDate.format('YYYY-MM-DD') === dateStr
 
     const handleDayClick = (event) => {
       // Llamar al onClick original si existe
@@ -113,27 +290,51 @@ const CalendarioPage = () => {
     }
 
     return (
-      <PickersDay
-        {...other}
-        day={day}
-        onClick={handleDayClick}
+      <Box
         sx={{
-          ...(hasEvent && {
-            position: 'relative',
-            '&::after': {
-              content: '""',
+          position: 'relative',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          width: '100%',
+          height: '100%',
+          minHeight: 48,
+        }}
+      >
+        <PickersDay
+          {...other}
+          day={day}
+          onClick={handleDayClick}
+          sx={{
+            fontSize: '0.9375rem',
+            fontWeight: isToday ? 600 : 400,
+            width: isToday ? 40 : 36,
+            height: isToday ? 40 : 36,
+            borderRadius: (isToday || isSelected) ? '10px' : '50%',
+            color: isToday ? 'white' : isSelected ? '#000000' : 'text.primary',
+            backgroundColor: isToday ? '#000000' : isSelected ? 'rgba(0, 0, 0, 0.08)' : 'transparent',
+            '&:hover': {
+              backgroundColor: isToday ? '#000000' : 'rgba(0, 0, 0, 0.04)',
+              borderRadius: '10px',
+            },
+          }}
+        />
+        {hasEvent && (
+          <Box
+            sx={{
               position: 'absolute',
-              bottom: '4px',
+              bottom: '2px',
               left: '50%',
               transform: 'translateX(-50%)',
-              width: '6px',
-              height: '6px',
+              width: '4px',
+              height: '4px',
               borderRadius: '50%',
-              backgroundColor: 'primary.main',
-            },
-          }),
-        }}
-      />
+              backgroundColor: '#4285F4',
+            }}
+          />
+        )}
+      </Box>
     )
   }
 
@@ -142,6 +343,60 @@ const CalendarioPage = () => {
     setBottomSheetOpen(true)
     loadDayParticipants(newDate)
   }
+
+  // Sincronizar currentMonth con selectedDate cuando cambia
+  useEffect(() => {
+    if (selectedDate && !selectedDate.isSame(currentMonth, 'month')) {
+      setCurrentMonth(selectedDate)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedDate])
+
+  // Handlers para navegación de mes
+  const handlePrevMonth = (e) => {
+    if (e) {
+      e.preventDefault()
+      e.stopPropagation()
+    }
+    const newMonth = dayjs(currentMonth).subtract(1, 'month').startOf('month')
+    setCurrentMonth(newMonth)
+    setCalendarMonth(newMonth)
+    setCalendarKey(prev => prev + 1)
+  }
+
+  const handleNextMonth = (e) => {
+    if (e) {
+      e.preventDefault()
+      e.stopPropagation()
+    }
+    const newMonth = dayjs(currentMonth).add(1, 'month').startOf('month')
+    setCurrentMonth(newMonth)
+    setCalendarMonth(newMonth)
+    setCalendarKey(prev => prev + 1)
+  }
+  
+  // Sincronizar calendarMonth con currentMonth cuando cambia selectedDate
+  useEffect(() => {
+    if (selectedDate && !selectedDate.isSame(calendarMonth, 'month')) {
+      const newMonth = selectedDate.startOf('month')
+      setCalendarMonth(newMonth)
+    }
+  }, [selectedDate])
+
+  // Forzar remontaje del calendario cuando cambia calendarMonth (usando useMemo para la key)
+  const calendarMonthKey = useMemo(() => calendarMonth.format('YYYY-MM'), [calendarMonth])
+  
+  useEffect(() => {
+    setShouldRenderCalendar(false)
+    // Temporalmente mover selectedDate al nuevo mes para forzar que el calendario lo muestre
+    const newSelectedDate = calendarMonth.date(Math.min(selectedDate.date(), calendarMonth.daysInMonth()))
+    setSelectedDate(newSelectedDate)
+    const timer = setTimeout(() => {
+      setShouldRenderCalendar(true)
+    }, 100)
+    return () => clearTimeout(timer)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [calendarMonthKey])
 
   // Cargar participantes del día seleccionado
   const loadDayParticipants = async (date) => {
@@ -355,28 +610,225 @@ const CalendarioPage = () => {
       >
 
         {/* Calendario */}
-        <Card>
-          <CardContent>
-            <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="es">
-              <StaticDatePicker
-                value={selectedDate}
-                onChange={handleDateChange}
-                slots={{
-                  day: CustomDay,
-                }}
-                slotProps={{
-                  actionBar: {
-                    actions: [],
-                  },
-                }}
+        <Card
+          sx={{
+            borderRadius: 3,
+            boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
+            backgroundColor: '#FFFFFF',
+            position: 'relative',
+          }}
+        >
+          <CardContent sx={{ p: 3, position: 'relative' }}>
+            {/* Header personalizado fuera del DatePicker */}
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                width: '100%',
+                padding: '0 8px',
+                mb: 3,
+                position: 'relative',
+                zIndex: 100,
+              }}
+            >
+              <Box
                 sx={{
-                  '& .MuiPickersCalendarHeader-root': {
-                    paddingLeft: 2,
-                    paddingRight: 2,
-                    paddingTop: 2,
+                  position: 'absolute',
+                  left: 8,
+                  zIndex: 1000,
+                }}
+              >
+                <IconButton
+                  onClick={(e) => {
+                    e?.preventDefault?.()
+                    e?.stopPropagation?.()
+                    handlePrevMonth(e)
+                  }}
+                  sx={{
+                    color: '#6B7280',
+                    backgroundColor: 'rgba(0, 0, 0, 0.04)',
+                    borderRadius: 2,
+                    width: 40,
+                    height: 40,
+                    padding: 0,
+                    pointerEvents: 'auto !important',
+                    cursor: 'pointer',
+                    position: 'relative',
+                    zIndex: 1001,
+                    '&:hover': {
+                      backgroundColor: 'rgba(0, 0, 0, 0.08)',
+                    },
+                  }}
+                >
+                  <ChevronLeftIcon fontSize="small" />
+                </IconButton>
+              </Box>
+              
+              <Box
+                sx={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flex: 1,
+                  width: '100%',
+                }}
+              >
+                <Typography
+                  variant="h6"
+                  sx={{
+                    fontSize: '1.5rem',
+                    fontWeight: 600,
+                    color: '#000000',
+                    fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
+                    textTransform: 'capitalize',
+                    lineHeight: 1.2,
+                    mb: 0.5,
+                  }}
+                >
+                  {currentMonth.locale('es').format('MMMM')}
+                </Typography>
+                <Typography
+                  variant="body2"
+                  sx={{
+                    fontSize: '0.875rem',
+                    fontWeight: 400,
+                    color: '#9CA3AF',
+                    fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
+                  }}
+                >
+                  {currentMonth.format('YYYY')}
+        </Typography>
+              </Box>
+              
+              <Box
+                sx={{
+                  position: 'absolute',
+                  right: 8,
+                  zIndex: 1000,
+                }}
+              >
+                <IconButton
+                  onClick={(e) => {
+                    e?.preventDefault?.()
+                    e?.stopPropagation?.()
+                    handleNextMonth(e)
+                  }}
+                  sx={{
+                    color: '#6B7280',
+                    backgroundColor: 'rgba(0, 0, 0, 0.04)',
+                    borderRadius: 2,
+                    width: 40,
+                    height: 40,
+                    padding: 0,
+                    pointerEvents: 'auto !important',
+                    cursor: 'pointer',
+                    position: 'relative',
+                    zIndex: 1001,
+                    '&:hover': {
+                      backgroundColor: 'rgba(0, 0, 0, 0.08)',
+                    },
+                  }}
+                >
+                  <ChevronRightIcon fontSize="small" />
+                </IconButton>
+              </Box>
+            </Box>
+            
+            <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="es">
+              <Box
+                key={`wrapper-${currentMonth.format('YYYY-MM')}-${calendarKey}`}
+                sx={{
+                  position: 'relative',
+                  width: '100%',
+                  minHeight: '400px',
+                }}
+              >
+                {shouldRenderCalendar && (
+                  <DateCalendar
+                    key={`calendar-${calendarMonth.format('YYYY-MM-DD')}-${calendarKey}`}
+                    value={selectedDate}
+                    onChange={handleDateChange}
+                    onMonthChange={(newMonth) => {
+                      // Sincronizar si el cambio viene del picker interno (navegación por días)
+                      const newMonthStart = newMonth.startOf('month')
+                      if (!newMonthStart.isSame(calendarMonth, 'month')) {
+                        setCurrentMonth(newMonthStart)
+                        setCalendarMonth(newMonthStart)
+                        setCalendarKey(prev => prev + 1)
+                      }
+                    }}
+                    slots={{
+                      day: CustomDay,
+                    }}
+                    sx={{
+                    width: '100%',
+                    '& .MuiDateCalendar-root': {
+                      overflow: 'visible !important',
+                      maxHeight: 'none !important',
+                      height: 'auto !important',
+                    },
+                  '& .MuiDayCalendar-root': {
+                    overflow: 'visible !important',
+                    maxHeight: 'none !important',
+                    height: 'auto !important',
                   },
-                  '& .MuiPickersCalendarHeader-labelContainer': {
-                    marginLeft: 0,
+                  '& .MuiDayCalendar-monthContainer': {
+                    overflow: 'visible !important',
+                    maxHeight: 'none !important',
+                    height: 'auto !important',
+                  },
+                  '& .MuiPickersSlideTransition-root': {
+                    maxHeight: 'none !important',
+                    height: 'auto !important',
+                    overflow: 'visible !important',
+                    transition: 'none !important',
+                    '& > *': {
+                      transition: 'none !important',
+                      transform: 'none !important',
+                      animation: 'none !important',
+                    },
+                  },
+                  '& .MuiDayCalendar-slideTransition': {
+                    transition: 'none !important',
+                    '& > *': {
+                      transition: 'none !important',
+                      transform: 'none !important',
+                      animation: 'none !important',
+                      position: 'relative !important',
+                      '&[aria-hidden="true"]': {
+                        display: 'none !important',
+                      },
+                    },
+                    '& > *:not([aria-hidden="true"])': {
+                      display: 'block !important',
+                    },
+                  },
+                  '& .MuiPickersFadeTransitionGroup-root': {
+                    transition: 'none !important',
+                    '& > *': {
+                      transition: 'none !important',
+                      animation: 'none !important',
+                      opacity: '1 !important',
+                      '&[aria-hidden="true"]': {
+                        display: 'none !important',
+                      },
+                    },
+                    '& > *:not([aria-hidden="true"])': {
+                      display: 'block !important',
+                      opacity: '1 !important',
+                    },
+                  },
+                  '& .MuiDateCalendar-viewTransitionContainer': {
+                    '& > *[aria-hidden="true"]': {
+                      display: 'none !important',
+                      opacity: '0 !important',
+                    },
+                    '& > *:not([aria-hidden="true"])': {
+                      display: 'block !important',
+                      opacity: '1 !important',
+                    },
                   },
                   // Ocultar el campo de texto "Select Date" que aparece arriba
                   '& .MuiPickersToolbar-title': {
@@ -391,31 +843,59 @@ const CalendarioPage = () => {
                   '& .MuiPickersInput-root': {
                     display: 'none !important',
                   },
+                  '& h4': {
+                    display: 'none !important',
+                  },
+                  '& .MuiTypography-h4': {
+                    display: 'none !important',
+                  },
+                  '& .MuiPickersCalendarHeader-root': {
+                    display: 'none !important',
+                    visibility: 'hidden !important',
+                    height: '0 !important',
+                    minHeight: '0 !important',
+                    padding: '0 !important',
+                    margin: '0 !important',
+                  },
+                  '& .MuiPickersCalendarHeader-labelContainer': {
+                    display: 'none !important',
+                  },
+                  '& .MuiPickersCalendarHeader-switchViewButton': {
+                    display: 'none !important',
+                  },
                   '& .MuiDayCalendar-weekContainer': {
-                    margin: '0 8px',
+                    margin: '0 !important',
+                    padding: '0 !important',
+                  },
+                  '& .MuiDayCalendar-weekDayLabel': {
+                    fontSize: '0.75rem',
+                    fontWeight: 400,
+                    color: '#9CA3AF',
+                    width: '100%',
+                    fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
+                    padding: '8px 0',
+                  },
+                  '& .MuiDayCalendar-header': {
+                    paddingBottom: 1,
+                    marginBottom: 1,
                   },
                   '& .MuiPickersDay-root': {
-                    fontSize: '0.875rem',
-                    width: 36,
-                    height: 36,
-                    '&.Mui-selected': {
-                      backgroundColor: 'primary.main',
-                      color: 'white',
-                      fontWeight: 600,
-                      '&:hover': {
-                        backgroundColor: 'primary.dark',
-                      },
-                      '&::after': {
-                        backgroundColor: 'white !important',
-                      },
-                    },
-                    '&.MuiPickersDay-today': {
-                      border: '1px solid',
-                      borderColor: 'primary.main',
+                    fontSize: '0.9375rem',
+                    fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
+                    margin: '2px',
+                    '&:focus': {
+                      backgroundColor: 'transparent',
                     },
                   },
                 }}
-              />
+                  />
+                )}
+                {!shouldRenderCalendar && (
+                  <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '400px' }}>
+                    <CircularProgress size={24} />
+                  </Box>
+                )}
+              </Box>
             </LocalizationProvider>
           </CardContent>
         </Card>
@@ -450,8 +930,17 @@ const CalendarioPage = () => {
               margin: '0 auto 20px',
             }}
           />
-          <Typography variant="h6" sx={{ mb: 2, textTransform: 'capitalize' }}>
-            {selectedDate.format('dddd, D [de] MMMM [de] YYYY')}
+          <Typography variant="h6" sx={{ mb: 2 }}>
+            {(() => {
+              const diaSemana = selectedDate.locale('es').format('dddd')
+              const dia = selectedDate.format('D')
+              const mes = selectedDate.locale('es').format('MMMM')
+              const año = selectedDate.format('YYYY')
+              // Capitalizar primera letra del día y del mes
+              const diaSemanaCapitalizado = diaSemana.charAt(0).toUpperCase() + diaSemana.slice(1)
+              const mesCapitalizado = mes.charAt(0).toUpperCase() + mes.slice(1)
+              return `${diaSemanaCapitalizado}, ${dia} de ${mesCapitalizado} de ${año}`
+            })()}
           </Typography>
 
           {/* Contenido del bottom sheet */}
@@ -464,7 +953,7 @@ const CalendarioPage = () => {
               <EventIcon sx={{ fontSize: 48, color: 'text.secondary', mb: 2 }} />
               <Typography variant="body1" color="text.secondary">
                 No hay eventos asociados a este día
-              </Typography>
+            </Typography>
             </Box>
           ) : (
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
@@ -518,9 +1007,12 @@ const CalendarioPage = () => {
                                 {group.nombreAtleta}
                               </Typography>
                               {group.ubicacion && (
-                                <Typography variant="body2" color="text.secondary" sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                                  📍 {group.ubicacion}
-                                </Typography>
+                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                  <LocationOnIcon sx={{ fontSize: 18, color: 'text.secondary' }} />
+                                  <Typography variant="body2" color="text.secondary">
+                                    {group.ubicacion}
+                                  </Typography>
+                                </Box>
                               )}
                             </Box>
                             
@@ -563,18 +1055,18 @@ const CalendarioPage = () => {
                             {groupHasConflict && (
                               <Typography variant="caption" color="warning.main" sx={{ mt: 1, display: 'block' }}>
                                 ⚠️ Conflicto de horario detectado
-                              </Typography>
+            </Typography>
                             )}
                           </Box>
                         </Box>
-                      </CardContent>
-                    </Card>
+          </CardContent>
+        </Card>
                   )
                 })
               })()}
             </Box>
           )}
-        </Box>
+      </Box>
       </Drawer>
 
       {/* Diálogo para añadir eventos */}
