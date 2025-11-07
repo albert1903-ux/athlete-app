@@ -58,3 +58,4 @@ CREATE TRIGGER trigger_update_participantes_updated_at
   EXECUTE FUNCTION update_updated_at_column();
 
 
+
