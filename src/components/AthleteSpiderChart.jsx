@@ -38,6 +38,17 @@ const CATEGORY_ID_FALLBACK_LABELS = {
   '10': 'SUB23'
 }
 
+const normalizePruebaNombre = (value) => {
+  if (!value && value !== 0) return ''
+  return value
+    .toString()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, ' ')
+}
+
 function AthleteSpiderChart({ comparatorAthletes = [] }) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
@@ -52,6 +63,7 @@ function AthleteSpiderChart({ comparatorAthletes = [] }) {
     width: typeof window !== 'undefined' ? Math.max(300, window.innerWidth - 40) : 300,
     height: 400
   })
+  const [referenceMaxByPrueba, setReferenceMaxByPrueba] = useState({})
 
   const normalizeCategoriaKey = (value, id) => {
     if (value && typeof value === 'string') {
@@ -644,17 +656,20 @@ function AthleteSpiderChart({ comparatorAthletes = [] }) {
       return
     }
 
+    const referencesLoaded = Object.keys(referenceMaxByPrueba).length > 0
     const allValues = {}
 
     allPruebas.forEach((prueba) => {
       const valores = []
       let isTimeBased = true
       let unidad = ''
+      const referenceKeys = new Set()
 
       allAthletes.forEach((athlete) => {
         const atletaIdKey = String(athlete.atleta_id)
         const pruebaInfo =
           athleteData[atletaIdKey]?.categorias?.[selectedCategory]?.pruebas?.[prueba]
+
         if (pruebaInfo) {
           valores.push(pruebaInfo.valor)
           if (pruebaInfo.isTimeBased !== undefined) {
@@ -663,18 +678,52 @@ function AthleteSpiderChart({ comparatorAthletes = [] }) {
           if (!unidad && pruebaInfo.unidad) {
             unidad = pruebaInfo.unidad
           }
+
+          const posibleIds = [
+            pruebaInfo?.resultado?.prueba_id,
+            pruebaInfo?.resultado?.pruebaId,
+            pruebaInfo?.prueba_id,
+            pruebaInfo?.pruebaId
+          ].filter((id) => id !== null && id !== undefined)
+
+          posibleIds.forEach((id) => {
+            referenceKeys.add(String(id))
+          })
         }
       })
 
-      if (valores.length > 0) {
-        const min = Math.min(...valores)
-        const max = Math.max(...valores)
-        allValues[prueba] = {
-          min,
-          max,
-          isTimeBased,
-          unidad
+      const normalizedName = normalizePruebaNombre(prueba)
+      let referenceInfo =
+        referenceMaxByPrueba[prueba] ||
+        referenceMaxByPrueba[normalizedName]
+
+      if (!referenceInfo && referenceKeys.size > 0) {
+        for (const key of referenceKeys) {
+          if (referenceMaxByPrueba[key]) {
+            referenceInfo = referenceMaxByPrueba[key]
+            break
+          }
         }
+      }
+
+      if (!referenceInfo && referencesLoaded) {
+        console.warn('[SpiderChart] Referencia global no encontrada para la prueba', {
+          prueba,
+          normalizedName,
+          referenceKeys: Array.from(referenceKeys)
+        })
+      }
+
+      const min = valores.length > 0 ? Math.min(...valores) : null
+      const max = valores.length > 0 ? Math.max(...valores) : null
+
+      allValues[prueba] = {
+        min,
+        max,
+        isTimeBased,
+        unidad: referenceInfo?.unidad || unidad,
+        referenceMax: referenceInfo?.maxValor ?? null,
+        referenceInfo
       }
     })
 
@@ -692,20 +741,61 @@ function AthleteSpiderChart({ comparatorAthletes = [] }) {
 
         if (pruebaInfo) {
           const valor = pruebaInfo.valor
+          const referenceMax = range?.referenceMax
+          const referenciaValida = referenceMax !== null && referenceMax !== undefined && Number(referenceMax) > 0
 
-          if (range && range.max !== range.min) {
-            const normalized01 = (valor - range.min) / (range.max - range.min)
+          if (range && referenciaValida) {
+            let normalizedValue = 0
+
+            if (range.isTimeBased) {
+              normalizedValue = valor > 0 ? referenceMax / valor : 0
+            } else {
+              normalizedValue = valor >= 0 ? valor / referenceMax : 0
+            }
+
+            const normalizedClamped = Math.max(0, Math.min(1, normalizedValue))
+            entry[atletaIdKey] = normalizedClamped * 100
+
+            if (athlete.atleta_id === selectedAthlete?.atleta_id) {
+              console.log('[SpiderChart] Normalización', {
+                prueba,
+                atleta: athlete.nombre,
+                valor,
+                referencia: referenceMax,
+                rango: range,
+                resultado: entry[atletaIdKey]
+              })
+            }
+          } else if (
+            range &&
+            range.max !== range.min &&
+            range.max !== -Infinity &&
+            range.min !== Infinity
+          ) {
+            const clampedValor = Math.max(Math.min(valor, range.max), range.min)
+            const normalized01 = (clampedValor - range.min) / (range.max - range.min)
             const normalizedValue = range.isTimeBased ? 1 - normalized01 : normalized01
-            const MIN_VISUAL = 0
-            const MAX_VISUAL = 100
-            const visualValue = MIN_VISUAL + normalizedValue * (MAX_VISUAL - MIN_VISUAL)
-            const SHIFT = 0
-            const visualShifted = SHIFT + visualValue
-            entry[atletaIdKey] = Math.max(30, Math.min(100, visualShifted))
-          } else if (range && range.max === range.min) {
-            entry[atletaIdKey] = 100
+            entry[atletaIdKey] = Math.max(0, Math.min(100, normalizedValue * 100))
+
+            if (athlete.atleta_id === selectedAthlete?.atleta_id) {
+              console.warn('[SpiderChart] Normalización usando rango local por falta de referencia', {
+                prueba,
+                atleta: athlete.nombre,
+                valor,
+                rango: range,
+                resultado: entry[atletaIdKey]
+              })
+            }
           } else {
-            entry[atletaIdKey] = 100
+            entry[atletaIdKey] = 0
+
+            if (athlete.atleta_id === selectedAthlete?.atleta_id) {
+              console.warn('[SpiderChart] Sin referencia ni rango local para normalizar', {
+                prueba,
+                atleta: athlete.nombre,
+                valor
+              })
+            }
           }
 
           entry[`${atletaIdKey}_real`] = valor
@@ -719,7 +809,7 @@ function AthleteSpiderChart({ comparatorAthletes = [] }) {
     })
 
     setRadarData(radarDataArray)
-  }, [allPruebas, athleteData, allAthletes, selectedCategory])
+  }, [allPruebas, athleteData, allAthletes, selectedCategory, referenceMaxByPrueba])
 
   // Colores para los atletas usando el módulo compartido
   const athleteColors = useMemo(() => {
@@ -814,6 +904,70 @@ function AthleteSpiderChart({ comparatorAthletes = [] }) {
       return null
     }
   }, [allAthletes, athleteData, formatValue, selectedCategory])
+
+  useEffect(() => {
+    let cancelled = false
+
+    const loadReferenceMaxValues = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('pruebas')
+          .select('prueba_id, nombre, max_valor, max_texto, unidad_default')
+
+        if (error) {
+          console.error('Error al cargar referencias de pruebas:', error)
+          return
+        }
+
+        const referencesMap = {}
+
+        if (Array.isArray(data)) {
+          data.forEach((row) => {
+            const parsedMaxValor =
+              row?.max_valor !== null && row?.max_valor !== undefined
+                ? Number(row.max_valor)
+                : null
+
+            if (parsedMaxValor === null || Number.isNaN(parsedMaxValor)) {
+              return
+            }
+
+            const info = {
+              pruebaId: row?.prueba_id ?? null,
+              nombre: row?.nombre ?? '',
+              maxValor: parsedMaxValor,
+              maxTexto: row?.max_texto || null,
+              unidad: row?.unidad_default || ''
+            }
+
+            if (row?.nombre) {
+              referencesMap[row.nombre] = info
+              const normalizedKey = normalizePruebaNombre(row.nombre)
+              if (normalizedKey) {
+                referencesMap[normalizedKey] = info
+              }
+            }
+
+            if (row?.prueba_id !== null && row?.prueba_id !== undefined) {
+              referencesMap[String(row.prueba_id)] = info
+            }
+          })
+        }
+
+        if (!cancelled) {
+          setReferenceMaxByPrueba(referencesMap)
+        }
+      } catch (refError) {
+        console.error('Excepción al cargar referencias de pruebas:', refError)
+      }
+    }
+
+    loadReferenceMaxValues()
+
+    return () => {
+      cancelled = true
+    }
+  }, [])
 
   if (!selectedAthlete) {
     return (
