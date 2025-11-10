@@ -88,30 +88,6 @@ function AppContent() {
           <Typography variant="h6" component="div" sx={{ flexGrow: 1, fontSize: { xs: '1.1rem' } }}>
             {getPageTitle()}
           </Typography>
-          {isSeguimientoPage && (
-            <IconButton
-              onClick={handleOpenDialog}
-              sx={{
-                width: 40,
-                height: 40,
-                borderRadius: '50%',
-                backgroundColor: 'secondary.main',
-                color: 'white',
-                '&:hover': {
-                  backgroundColor: 'secondary.dark',
-                },
-                fontSize: '0.875rem',
-                fontWeight: 700,
-                ml: 1,
-                textTransform: 'none',
-                minWidth: 40,
-                padding: 0
-              }}
-              aria-label="añadir atleta para comparar"
-            >
-              VS
-            </IconButton>
-          )}
           {isAnalisisPage && (
             <Box sx={{ display: 'flex', gap: 1, ml: 1 }}>
               <IconButton

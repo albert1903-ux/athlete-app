@@ -21,40 +21,27 @@ import AthleteSearch from './AthleteSearch'
 
 const STORAGE_KEY_COMPARATORS = 'comparatorAthletes'
 
-function AthleteComparator({ onComparatorsChange }) {
-  const [comparators, setComparators] = useState([])
+function AthleteComparator({ onComparatorsChange, comparators: externalComparators }) {
+  const [comparators, setComparators] = useState(() =>
+    Array.isArray(externalComparators) ? externalComparators : []
+  )
   const [open, setOpen] = useState(false)
   const [tempSelectedAthlete, setTempSelectedAthlete] = useState(null)
   const [duplicateError, setDuplicateError] = useState(false)
 
-  // Cargar comparadores desde localStorage
+  // Sincronizar con comparadores proporcionados desde el exterior
   useEffect(() => {
-    try {
-      const stored = localStorage.getItem(STORAGE_KEY_COMPARATORS)
-      if (stored) {
-        const parsed = JSON.parse(stored)
-        const comparadoresArray = Array.isArray(parsed) ? parsed : []
-        setComparators(comparadoresArray)
-      }
-    } catch (error) {
-      console.error('Error al cargar comparadores desde localStorage:', error)
-      localStorage.removeItem(STORAGE_KEY_COMPARATORS)
+    if (Array.isArray(externalComparators)) {
+      setComparators(prev => {
+        const prevIds = prev.map(item => item.atleta_id).join('|')
+        const nextIds = externalComparators.map(item => item.atleta_id).join('|')
+        if (prevIds === nextIds) {
+          return prev
+        }
+        return externalComparators
+      })
     }
-  }, [])
-
-  // Guardar comparadores en localStorage cuando cambien
-  useEffect(() => {
-    try {
-      localStorage.setItem(STORAGE_KEY_COMPARATORS, JSON.stringify(comparators))
-      // Notificar al componente padre del cambio
-      if (onComparatorsChange) {
-        onComparatorsChange(comparators)
-      }
-    } catch (error) {
-      console.error('Error al guardar comparadores en localStorage:', error)
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [comparators])
+  }, [externalComparators])
 
   const handleOpen = () => {
     setTempSelectedAthlete(null)
@@ -73,7 +60,11 @@ function AthleteComparator({ onComparatorsChange }) {
       // Verificar que no esté ya añadido
       const exists = comparators.some(c => c.atleta_id === tempSelectedAthlete.atleta_id)
       if (!exists) {
-        setComparators(prev => [...prev, tempSelectedAthlete])
+        const updated = [...comparators, tempSelectedAthlete]
+        setComparators(updated)
+        if (onComparatorsChange) {
+          onComparatorsChange(updated)
+        }
         handleClose()
       } else {
         setDuplicateError(true)
@@ -86,7 +77,11 @@ function AthleteComparator({ onComparatorsChange }) {
   }
 
   const handleRemove = (atletaId) => {
-    setComparators(prev => prev.filter(c => c.atleta_id !== atletaId))
+    const updated = comparators.filter(c => c.atleta_id !== atletaId)
+    setComparators(updated)
+    if (onComparatorsChange) {
+      onComparatorsChange(updated)
+    }
   }
 
   if (comparators.length === 0) {
@@ -331,59 +326,9 @@ function AthleteComparator({ onComparatorsChange }) {
             minHeight: 0
           }}
         >
-          <Box sx={{ flex: 1, overflow: 'auto', mb: tempSelectedAthlete ? '140px' : 0 }}>
+          <Box sx={{ flex: 1, overflow: 'auto' }}>
             <AthleteSearch onResultClick={handleResultClick} />
           </Box>
-          
-          {/* Card sticky del atleta seleccionado */}
-          {tempSelectedAthlete && (
-            <Box
-              sx={{
-                position: 'sticky',
-                bottom: 0,
-                zIndex: 10,
-                backgroundColor: 'white',
-                borderTop: '1px solid',
-                borderColor: 'divider',
-                mt: 2,
-                pt: 2
-              }}
-            >
-              <Card 
-                sx={{ 
-                  bgcolor: 'secondary.light', 
-                  color: 'secondary.contrastText'
-                }}
-              >
-                <CardContent>
-                  <Typography variant="subtitle2" gutterBottom>
-                    Atleta seleccionado:
-                  </Typography>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
-                    <Typography variant="body1" fontWeight="bold">
-                      {tempSelectedAthlete.nombre}
-                    </Typography>
-                    {tempSelectedAthlete.licencia && tempSelectedAthlete.licencia !== 'N/A' && (
-                      <Chip 
-                        label={`Lic: ${tempSelectedAthlete.licencia}`} 
-                        size="small" 
-                        variant="outlined"
-                        sx={{ bgcolor: 'white', color: 'secondary.main' }}
-                      />
-                    )}
-                    {tempSelectedAthlete.club && tempSelectedAthlete.club !== 'N/A' && tempSelectedAthlete.club !== 'Sin club' && (
-                      <Chip 
-                        label={tempSelectedAthlete.club} 
-                        size="small" 
-                        variant="outlined"
-                        sx={{ bgcolor: 'white', color: 'secondary.main' }}
-                      />
-                    )}
-                  </Box>
-                </CardContent>
-              </Card>
-            </Box>
-          )}
           
           {/* Alerta de duplicado */}
           {duplicateError && (

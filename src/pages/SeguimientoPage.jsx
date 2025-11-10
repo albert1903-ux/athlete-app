@@ -1,28 +1,25 @@
 import { useState, useEffect, useCallback } from 'react'
 import Box from '@mui/material/Box'
-import Typography from '@mui/material/Typography'
 import AthleteSelector from '../components/AthleteSelector'
 import AthleteComparator from '../components/AthleteComparator'
 import AthleteSpiderChart from '../components/AthleteSpiderChart'
 import AthleteResultsChart from '../components/AthleteResultsChart'
+import { getComparatorCache, setComparatorCache } from '../store/comparatorStore'
 
 const SeguimientoPage = () => {
-  const [comparatorAthletes, setComparatorAthletes] = useState([])
+  const [comparatorAthletes, setComparatorAthletes] = useState(() => getComparatorCache())
 
   const handleComparatorsChange = useCallback((comparators) => {
     setComparatorAthletes(comparators)
+    setComparatorCache(comparators)
   }, [])
 
   // Cargar comparadores desde localStorage al montar y cuando cambien
   useEffect(() => {
     const loadComparators = () => {
       try {
-        const stored = localStorage.getItem('comparatorAthletes')
-        if (stored) {
-          const parsed = JSON.parse(stored)
-          const comparadoresArray = Array.isArray(parsed) ? parsed : []
-          setComparatorAthletes(comparadoresArray)
-        }
+        const cached = getComparatorCache()
+        setComparatorAthletes(cached)
       } catch (error) {
         console.error('Error al cargar comparadores desde localStorage:', error)
         localStorage.removeItem('comparatorAthletes')
@@ -70,6 +67,14 @@ const SeguimientoPage = () => {
         {/* Componente selector de atleta */}
         <Box sx={{ width: '100%' }}>
           <AthleteSelector />
+        </Box>
+
+        {/* Componente comparador de atletas (gestión de búsqueda y selección) */}
+        <Box sx={{ width: '100%' }}>
+          <AthleteComparator
+            comparators={comparatorAthletes}
+            onComparatorsChange={handleComparatorsChange}
+          />
         </Box>
 
         {/* Componente gráfico de araña */}
