@@ -6,7 +6,11 @@ import {
   Typography,
   CircularProgress,
   Alert,
-  Paper
+  Paper,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem
 } from '@mui/material'
 import {
   RadarChart,
@@ -21,6 +25,18 @@ import { supabase } from '../lib/supabase'
 import { initializeColorsForComparators, getColorForAthlete } from '../utils/athleteColors'
 
 const STORAGE_KEY = 'selectedAthlete'
+const CATEGORY_ID_FALLBACK_LABELS = {
+  '1': 'SUB8',
+  '2': 'SUB10',
+  '3': 'SUB12',
+  '4': '-',
+  '5': 'SUB14',
+  '6': 'ABS',
+  '7': 'SUB16',
+  '8': 'SUB18',
+  '9': 'SUB20',
+  '10': 'SUB23'
+}
 
 function AthleteSpiderChart({ comparatorAthletes = [] }) {
   const [loading, setLoading] = useState(false)
@@ -28,11 +44,125 @@ function AthleteSpiderChart({ comparatorAthletes = [] }) {
   const [selectedAthlete, setSelectedAthlete] = useState(null)
   const [athleteData, setAthleteData] = useState({})
   const [allPruebas, setAllPruebas] = useState([])
+  const [availableCategories, setAvailableCategories] = useState([])
+  const [selectedCategory, setSelectedCategory] = useState(null)
+  const [categoryLabels, setCategoryLabels] = useState({})
   const [radarData, setRadarData] = useState([])
   const [chartDimensions, setChartDimensions] = useState({
     width: typeof window !== 'undefined' ? Math.max(300, window.innerWidth - 40) : 300,
     height: 400
   })
+
+  const normalizeCategoriaKey = (value, id) => {
+    if (value && typeof value === 'string') {
+      return value.trim().replace(/\s+/g, '_').toUpperCase()
+    }
+    if (value !== null && value !== undefined) {
+      return String(value).trim().replace(/\s+/g, '_').toUpperCase()
+    }
+    if (id !== null && id !== undefined) {
+      return `CAT_${String(id).trim()}`
+    }
+    return 'SIN_CATEGORIA'
+  }
+
+  const extractCategoriaFromResultado = (resultado, categoriaMetadataMap) => {
+    if (!resultado) {
+      return { key: 'SIN_CATEGORIA', label: 'Sin categoría', categoriaId: null }
+    }
+
+    const categoriaId =
+      resultado.categoria_id ??
+      resultado.categoriaId ??
+      resultado.categoria ??
+      null
+
+    const metadata =
+      categoriaId !== null && categoriaMetadataMap
+        ? categoriaMetadataMap.get(categoriaId) || categoriaMetadataMap.get(String(categoriaId))
+        : null
+
+    const categoriaCodigo = resultado.categoria_codigo || metadata?.codigo || metadata?.codigo_categoria
+    const categoriaNombreCorto =
+      resultado.categoria_nombre_corto ||
+      metadata?.nombre_corto ||
+      metadata?.nombreCorto ||
+      null
+    const categoriaNombre =
+      resultado.categoria_nombre ||
+      metadata?.nombre ||
+      metadata?.nombre_largo ||
+      null
+
+    const fallbackLabel =
+      categoriaId !== null
+        ? CATEGORY_ID_FALLBACK_LABELS[String(categoriaId)] ||
+          CATEGORY_ID_FALLBACK_LABELS[categoriaId]
+        : null
+
+    const keyBase = categoriaCodigo || categoriaNombreCorto || categoriaNombre || fallbackLabel || categoriaId
+    const key = normalizeCategoriaKey(keyBase, categoriaId)
+    const label =
+      categoriaNombreCorto ||
+      categoriaNombre ||
+      categoriaCodigo ||
+      fallbackLabel ||
+      (categoriaId ? `Categoría ${categoriaId}` : 'Sin categoría')
+
+    return { key, label, categoriaId }
+  }
+
+  const parseResultadoValor = (resultado) => {
+    if (!resultado) return null
+
+    const candidates = [
+      resultado.valor_numerico,
+      resultado.valor,
+      resultado.valorBruto,
+      resultado.marca_valor,
+      resultado.marca
+    ]
+
+    for (const candidate of candidates) {
+      if (candidate === null || candidate === undefined || candidate === '') continue
+
+      if (typeof candidate === 'number') {
+        if (!Number.isNaN(candidate)) {
+          return candidate
+        }
+        continue
+      }
+
+      if (typeof candidate === 'string') {
+        const normalized = candidate.trim()
+        if (!normalized) continue
+
+        const withDot = normalized.replace(',', '.')
+        if (withDot.includes(':')) {
+          const parts = withDot.split(':')
+          let total = 0
+          for (const part of parts) {
+            const parsed = parseFloat(part)
+            if (Number.isNaN(parsed)) {
+              total = NaN
+              break
+            }
+            total = total * 60 + parsed
+          }
+          if (!Number.isNaN(total)) {
+            return total
+          }
+        } else {
+          const parsed = parseFloat(withDot)
+          if (!Number.isNaN(parsed)) {
+            return parsed
+          }
+        }
+      }
+    }
+
+    return null
+  }
 
   // Calcular dimensiones del gráfico
   useEffect(() => {
@@ -131,37 +261,40 @@ function AthleteSpiderChart({ comparatorAthletes = [] }) {
   // Obtener el mejor resultado de una prueba
   const getBestResult = (results, isTimeBased) => {
     if (!results || results.length === 0) return null
-    
-    const validResults = results
-      .map(r => {
-        let valor = null
-        if (r.marca_valor !== null && r.marca_valor !== undefined) {
-          valor = parseFloat(r.marca_valor)
-        } else if (r.marca !== null && r.marca !== undefined) {
-          const marcaStr = String(r.marca).trim().replace(',', '.')
-          // Convertir formato tiempo (MM:SS.mm) a segundos
-          if (marcaStr.includes(':')) {
-            const parts = marcaStr.split(':')
-            if (parts.length === 2) {
-              const minutos = parseFloat(parts[0]) || 0
-              const segundos = parseFloat(parts[1]) || 0
-              valor = minutos * 60 + segundos
-            } else {
-              valor = parseFloat(marcaStr)
-            }
-          } else {
-            valor = parseFloat(marcaStr)
-          }
+
+    let bestValue = null
+    let bestResultado = null
+
+    results.forEach((resultado) => {
+      const valor = parseResultadoValor(resultado)
+      if (valor === null || Number.isNaN(valor)) {
+        return
+      }
+
+      if (bestValue === null) {
+        bestValue = valor
+        bestResultado = resultado
+        return
+      }
+
+      if (isTimeBased) {
+        if (valor < bestValue) {
+          bestValue = valor
+          bestResultado = resultado
         }
-        return !isNaN(valor) ? valor : null
-      })
-      .filter(v => v !== null)
-    
-    if (validResults.length === 0) return null
-    
-    return isTimeBased 
-      ? Math.min(...validResults) // Menor tiempo es mejor
-      : Math.max(...validResults) // Mayor distancia/altura es mejor
+      } else {
+        if (valor > bestValue) {
+          bestValue = valor
+          bestResultado = resultado
+        }
+      }
+    })
+
+    if (bestValue === null || bestResultado === null) {
+      return null
+    }
+
+    return { valor: bestValue, resultado: bestResultado }
   }
 
   // Cargar resultados de un atleta
@@ -245,10 +378,61 @@ function AthleteSpiderChart({ comparatorAthletes = [] }) {
 
         if (!data || data.length === 0) return {}
 
-        // Agrupar por prueba y obtener el mejor resultado
-        const groupedByPrueba = {}
+        const categoriaIdSet = new Set()
+        data.forEach((resultado) => {
+          if (
+            resultado &&
+            resultado.categoria_id !== null &&
+            resultado.categoria_id !== undefined
+          ) {
+            categoriaIdSet.add(resultado.categoria_id)
+          } else if (
+            resultado &&
+            resultado.categoriaId !== null &&
+            resultado.categoriaId !== undefined
+          ) {
+            categoriaIdSet.add(resultado.categoriaId)
+          }
+        })
+
+        const categoriaMetadataMap = new Map()
+        if (categoriaIdSet.size > 0) {
+          try {
+            const { data: categoriasData, error: categoriasError } = await supabase
+              .from('categorias')
+              .select('categoria_id, nombre')
+              .in('categoria_id', Array.from(categoriaIdSet))
+
+            if (!categoriasError && Array.isArray(categoriasData)) {
+              categoriasData.forEach((categoria) => {
+                if (categoria && categoria.categoria_id !== undefined && categoria.categoria_id !== null) {
+                  categoriaMetadataMap.set(categoria.categoria_id, categoria)
+                  categoriaMetadataMap.set(String(categoria.categoria_id), categoria)
+                }
+              })
+            }
+          } catch (categoriaError) {
+            console.warn('No se pudo obtener información adicional de categorías:', categoriaError)
+          }
+        }
+
+        // Agrupar por categoría y prueba
+        const groupedByCategoria = {}
 
         data.forEach((resultado) => {
+          const { key: categoriaKey, label: categoriaLabel, categoriaId } = extractCategoriaFromResultado(
+            resultado,
+            categoriaMetadataMap
+          )
+          if (!groupedByCategoria[categoriaKey]) {
+            groupedByCategoria[categoriaKey] = {
+              key: categoriaKey,
+              label: categoriaLabel,
+              categoriaId,
+              pruebas: {}
+            }
+          }
+
           let pruebaNombre = 'Prueba desconocida'
           let unidad = ''
 
@@ -267,35 +451,77 @@ function AthleteSpiderChart({ comparatorAthletes = [] }) {
             unidad = resultado.marca_unidad || resultado.unidad || resultado.unidad_default || ''
           }
 
-          if (!groupedByPrueba[pruebaNombre]) {
-            groupedByPrueba[pruebaNombre] = {
+          if (!groupedByCategoria[categoriaKey].pruebas[pruebaNombre]) {
+            groupedByCategoria[categoriaKey].pruebas[pruebaNombre] = {
               nombre: pruebaNombre,
               unidad: unidad,
               resultados: []
             }
           }
 
-          groupedByPrueba[pruebaNombre].resultados.push(resultado)
+          const pruebaGroup = groupedByCategoria[categoriaKey].pruebas[pruebaNombre]
+          if (!pruebaGroup.unidad && unidad) {
+            pruebaGroup.unidad = unidad
+          }
+
+          pruebaGroup.resultados.push(resultado)
         })
 
-        // Calcular el mejor resultado para cada prueba
-        const bestResults = {}
-        Object.keys(groupedByPrueba).forEach(pruebaNombre => {
-          const grupo = groupedByPrueba[pruebaNombre]
-          const isTimeBased = isTimeBasedPrueba(pruebaNombre, grupo.unidad)
-          const bestResult = getBestResult(grupo.resultados, isTimeBased)
-          
-          if (bestResult !== null) {
-            bestResults[pruebaNombre] = {
-              nombre: pruebaNombre,
-              unidad: grupo.unidad,
-              valor: bestResult,
-              isTimeBased: isTimeBased
+        // Calcular mejor resultado por prueba dentro de cada categoría
+        const categoriasProcesadas = {}
+        const categoriaLabels = {}
+
+        Object.entries(groupedByCategoria).forEach(([categoriaKey, categoriaData]) => {
+          const pruebasProcesadas = {}
+
+          Object.entries(categoriaData.pruebas).forEach(([pruebaNombre, pruebaData]) => {
+            const isTimeBased = isTimeBasedPrueba(pruebaNombre, pruebaData.unidad)
+            const bestResult = getBestResult(pruebaData.resultados, isTimeBased)
+
+            if (bestResult) {
+              pruebasProcesadas[pruebaNombre] = {
+                nombre: pruebaNombre,
+                unidad: pruebaData.unidad,
+                valor: bestResult.valor,
+                isTimeBased,
+                resultado: bestResult.resultado
+              }
             }
+          })
+
+          if (Object.keys(pruebasProcesadas).length > 0) {
+            const categoriaId = categoriaData.categoriaId ?? null
+            const fallbackLabelFromId =
+              categoriaId !== null
+                ? CATEGORY_ID_FALLBACK_LABELS[String(categoriaId)] ||
+                  CATEGORY_ID_FALLBACK_LABELS[categoriaId]
+                : null
+            const resolvedLabel =
+              categoriaData.label && !/^Categoría\s+\d+$/i.test(categoriaData.label)
+                ? categoriaData.label
+                : fallbackLabelFromId || categoriaData.label || 'Sin categoría'
+
+            categoriasProcesadas[categoriaKey] = {
+              key: categoriaKey,
+              label: resolvedLabel,
+              categoriaId,
+              pruebas: pruebasProcesadas
+            }
+            categoriaLabels[categoriaKey] = resolvedLabel
           }
         })
 
-        return bestResults
+        const categoriaOrden = Object.keys(categoriasProcesadas).sort((a, b) => {
+          const labelA = categoriasProcesadas[a]?.label || a
+          const labelB = categoriasProcesadas[b]?.label || b
+          return labelA.localeCompare(labelB, 'es', { sensitivity: 'base' })
+        })
+
+        return {
+          categorias: categoriasProcesadas,
+          categoriaLabels,
+          categoriaOrden
+        }
       } catch (err) {
         console.error('Error al obtener resultados:', err)
         return null
@@ -318,38 +544,34 @@ function AthleteSpiderChart({ comparatorAthletes = [] }) {
       try {
         const allAthletes = [selectedAthlete, ...comparatorAthletes]
         const athleteResults = {}
+        const accumulatedCategoryLabels = {}
 
         // Cargar resultados de cada atleta
         for (const athlete of allAthletes) {
           const results = await fetchAthleteResults(athlete.atleta_id)
-          if (results) {
-            // Usar string como clave para consistencia
-            const atletaIdKey = String(athlete.atleta_id)
-            athleteResults[atletaIdKey] = {
-              nombre: athlete.nombre,
-              resultados: results,
-              atleta_id: athlete.atleta_id // Guardar también el ID original
-            }
+          const categorias = results?.categorias || {}
+          const categoriaOrden = results?.categoriaOrden || []
+          const categoriaLabels = results?.categoriaLabels || {}
+
+          // Usar string como clave para consistencia
+          const atletaIdKey = String(athlete.atleta_id)
+          athleteResults[atletaIdKey] = {
+            nombre: athlete.nombre,
+            categorias,
+            categoriaOrden,
+            atleta_id: athlete.atleta_id // Guardar también el ID original
           }
+
+          Object.assign(accumulatedCategoryLabels, categoriaLabels)
         }
 
         setAthleteData(athleteResults)
-
-        // Determinar qué pruebas mostrar
-        // Cuando hay comparadores, solo mostrar las pruebas del atleta principal
-        // (mismo criterio que el gráfico de línea)
-        // Si no hay comparadores, también mostrar solo las del atleta principal
-        const pruebasSet = new Set()
-        const selectedAthleteKey = String(selectedAthlete.atleta_id)
-        const selectedAthleteData = athleteResults[selectedAthleteKey]
-        if (selectedAthleteData) {
-          Object.keys(selectedAthleteData.resultados).forEach(prueba => {
-            pruebasSet.add(prueba)
-          })
+        if (Object.keys(accumulatedCategoryLabels).length > 0) {
+          setCategoryLabels((prev) => ({
+            ...prev,
+            ...accumulatedCategoryLabels
+          }))
         }
-
-        const pruebasList = Array.from(pruebasSet)
-        setAllPruebas(pruebasList)
       } catch (err) {
         console.error('Error al cargar datos:', err)
         setError(err.message || 'Error al cargar los resultados')
@@ -361,6 +583,49 @@ function AthleteSpiderChart({ comparatorAthletes = [] }) {
     loadAllData()
   }, [selectedAthlete, comparatorAthletes])
 
+  useEffect(() => {
+    if (!selectedAthlete) {
+      setAvailableCategories([])
+      setSelectedCategory(null)
+      setAllPruebas([])
+      return
+    }
+
+    const selectedAthleteKey = String(selectedAthlete.atleta_id)
+    const selectedAthleteData = athleteData[selectedAthleteKey]
+
+    if (!selectedAthleteData || !selectedAthleteData.categorias) {
+      setAvailableCategories([])
+      setSelectedCategory(null)
+      setAllPruebas([])
+      return
+    }
+
+    const categoriasDisponibles =
+      (selectedAthleteData.categoriaOrden && selectedAthleteData.categoriaOrden.length > 0)
+        ? selectedAthleteData.categoriaOrden
+        : Object.keys(selectedAthleteData.categorias)
+
+    setAvailableCategories(categoriasDisponibles)
+
+    if (!selectedCategory || !categoriasDisponibles.includes(selectedCategory)) {
+      setSelectedCategory(categoriasDisponibles[0] || null)
+    }
+  }, [athleteData, selectedAthlete, selectedCategory])
+
+  useEffect(() => {
+    if (!selectedAthlete || !selectedCategory) {
+      setAllPruebas([])
+      return
+    }
+
+    const selectedAthleteKey = String(selectedAthlete.atleta_id)
+    const pruebasMap =
+      athleteData[selectedAthleteKey]?.categorias?.[selectedCategory]?.pruebas || {}
+
+    setAllPruebas(Object.keys(pruebasMap))
+  }, [athleteData, selectedAthlete, selectedCategory])
+
   // Lista de todos los atletas (principal + comparadores) - DEFINIR ANTES DEL useEffect
   const allAthletes = useMemo(() => {
     if (!selectedAthlete) return []
@@ -369,98 +634,83 @@ function AthleteSpiderChart({ comparatorAthletes = [] }) {
 
   // Preparar datos para el gráfico de araña
   useEffect(() => {
-    if (allPruebas.length === 0 || Object.keys(athleteData).length === 0 || allAthletes.length === 0) {
+    if (
+      !selectedCategory ||
+      allPruebas.length === 0 ||
+      Object.keys(athleteData).length === 0 ||
+      allAthletes.length === 0
+    ) {
       setRadarData([])
       return
     }
 
-    // Recopilar todos los valores para normalización usando fórmula min-max estándar
-    // X' = (X - min(X)) / (max(X) - min(X))
-    // Esto normaliza todos los valores a 0-1, evitando distorsión visual
     const allValues = {}
-    allPruebas.forEach(prueba => {
+
+    allPruebas.forEach((prueba) => {
       const valores = []
       let isTimeBased = true
       let unidad = ''
-      
-      // Recopilar valores de todos los atletas que tienen esta prueba
-      Object.values(athleteData).forEach(athlete => {
-        if (athlete.resultados[prueba]) {
-          valores.push(athlete.resultados[prueba].valor)
-          isTimeBased = athlete.resultados[prueba].isTimeBased ?? true
-          unidad = athlete.resultados[prueba].unidad || unidad
+
+      allAthletes.forEach((athlete) => {
+        const atletaIdKey = String(athlete.atleta_id)
+        const pruebaInfo =
+          athleteData[atletaIdKey]?.categorias?.[selectedCategory]?.pruebas?.[prueba]
+        if (pruebaInfo) {
+          valores.push(pruebaInfo.valor)
+          if (pruebaInfo.isTimeBased !== undefined) {
+            isTimeBased = pruebaInfo.isTimeBased
+          }
+          if (!unidad && pruebaInfo.unidad) {
+            unidad = pruebaInfo.unidad
+          }
         }
       })
-      
+
       if (valores.length > 0) {
         const min = Math.min(...valores)
         const max = Math.max(...valores)
-        
-        // Guardar información de la prueba para normalización min-max
         allValues[prueba] = {
-          min: min,
-          max: max,
-          isTimeBased: isTimeBased,
-          unidad: unidad
+          min,
+          max,
+          isTimeBased,
+          unidad
         }
       }
     })
 
-    // Crear datos del gráfico
-    const radarDataArray = allPruebas.map(prueba => {
+    const radarDataArray = allPruebas.map((prueba) => {
       const range = allValues[prueba]
       const entry = {
-        prueba: prueba,
+        prueba,
         unidad: range?.unidad || ''
       }
 
-      // Añadir valor para cada atleta usando normalización min-max estándar
-      // X' = (X - min(X)) / (max(X) - min(X)) → valores entre 0 y 1
-      // IMPORTANTE: iterar sobre TODOS los atletas usando allAthletes para asegurar consistencia
-      allAthletes.forEach(athlete => {
+      allAthletes.forEach((athlete) => {
         const atletaIdKey = String(athlete.atleta_id)
-        const athleteDataEntry = athleteData[atletaIdKey]
-        
-        // SIEMPRE crear la entrada para este atleta, incluso si no tiene datos
-        if (athleteDataEntry && athleteDataEntry.resultados[prueba]) {
-          const valor = athleteDataEntry.resultados[prueba].valor
-          
-          // Si hay range (hay otros atletas con esta prueba), normalizar usando fórmula min-max
+        const pruebaInfo =
+          athleteData[atletaIdKey]?.categorias?.[selectedCategory]?.pruebas?.[prueba]
+
+        if (pruebaInfo) {
+          const valor = pruebaInfo.valor
+
           if (range && range.max !== range.min) {
-            // Aplicar fórmula min-max: X' = (X - min) / (max - min)
-            // Esto normaliza el valor a un rango 0-1
             const normalized01 = (valor - range.min) / (range.max - range.min)
-            
-            // Para pruebas de tiempo (menor es mejor), invertir: 1 - normalized01
-            // Para pruebas de distancia/altura (mayor es mejor), usar normalized01 directamente
             const normalizedValue = range.isTimeBased ? 1 - normalized01 : normalized01
-            
-            // Escalar al rango visual del gráfico (0-100)
-            // Mantener márgenes para mejor visualización (30-130 sería equivalente a 0.3-1.3)
-            // Usamos 0-100 para simplicidad, pero podemos usar 0-100 directamente
             const MIN_VISUAL = 0
             const MAX_VISUAL = 100
-            const visualValue = MIN_VISUAL + (normalizedValue * (MAX_VISUAL - MIN_VISUAL))
-            
-            // Desplazar solo la representación visual a 30–130 para dar aire,
-            // manteniendo 0 para "sin prueba".
+            const visualValue = MIN_VISUAL + normalizedValue * (MAX_VISUAL - MIN_VISUAL)
             const SHIFT = 0
             const visualShifted = SHIFT + visualValue
             entry[atletaIdKey] = Math.max(30, Math.min(100, visualShifted))
           } else if (range && range.max === range.min) {
-            // Si todos los valores son iguales, usar valor máximo visual (130)
             entry[atletaIdKey] = 100
           } else {
-            // Si no hay range (solo este atleta tiene esta prueba), usar 130 (mejor)
             entry[atletaIdKey] = 100
           }
-          
-          // Guardar el valor real para el tooltip
+
           entry[`${atletaIdKey}_real`] = valor
-          entry[`${atletaIdKey}_unidad`] = athleteDataEntry.resultados[prueba].unidad || (range?.unidad || '')
+          entry[`${atletaIdKey}_unidad`] = pruebaInfo.unidad || range?.unidad || ''
         } else {
-          // Si el atleta no tiene esta prueba, usar 0 para diferenciarlo visualmente
-          // de los atletas que sí tienen la prueba pero con resultados bajos
           entry[atletaIdKey] = 0
         }
       })
@@ -469,7 +719,7 @@ function AthleteSpiderChart({ comparatorAthletes = [] }) {
     })
 
     setRadarData(radarDataArray)
-  }, [allPruebas, athleteData, allAthletes])
+  }, [allPruebas, athleteData, allAthletes, selectedCategory])
 
   // Colores para los atletas usando el módulo compartido
   const athleteColors = useMemo(() => {
@@ -543,7 +793,9 @@ function AthleteSpiderChart({ comparatorAthletes = [] }) {
               
               if (valorReal === undefined || valorReal === null) return null
               
-              const isTimeBased = athleteData[atletaId]?.resultados[prueba]?.isTimeBased ?? true
+              const isTimeBased =
+                athleteData[atletaId]?.categorias?.[selectedCategory]?.pruebas?.[prueba]?.isTimeBased ??
+                true
               const valorFormateado = formatValue(valorReal, unidadReal, isTimeBased)
               
               return (
@@ -561,7 +813,7 @@ function AthleteSpiderChart({ comparatorAthletes = [] }) {
       }
       return null
     }
-  }, [allAthletes, athleteData, formatValue])
+  }, [allAthletes, athleteData, formatValue, selectedCategory])
 
   if (!selectedAthlete) {
     return (
@@ -615,9 +867,35 @@ function AthleteSpiderChart({ comparatorAthletes = [] }) {
   return (
     <Card sx={{ width: '100%' }}>
       <CardContent sx={{ px: { xs: 2 }, py: { xs: 2 } }}>
-        <Typography variant="h6" gutterBottom sx={{ fontSize: { xs: '1.1rem' } }}>
-          Mejores Marcas
-        </Typography>
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: { xs: 'column', sm: 'row' },
+            alignItems: { xs: 'flex-start', sm: 'center' },
+            gap: 2
+          }}
+        >
+          <Typography variant="h6" gutterBottom sx={{ fontSize: { xs: '1.1rem' }, mb: 0 }}>
+            Mejores Marcas
+          </Typography>
+          {availableCategories.length > 0 && (
+            <FormControl size="small" sx={{ minWidth: 160 }}>
+              <InputLabel id="radar-category-select-label">Categoría</InputLabel>
+              <Select
+                labelId="radar-category-select-label"
+                value={selectedCategory || ''}
+                label="Categoría"
+                onChange={(event) => setSelectedCategory(event.target.value)}
+              >
+                {availableCategories.map((categoriaKey) => (
+                  <MenuItem key={categoriaKey} value={categoriaKey}>
+                    {categoryLabels[categoriaKey] || categoriaKey}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          )}
+        </Box>
         
         <Box sx={{ mt: 2, width: '100%' }}>
           {chartDimensions.width > 0 && chartDimensions.height > 0 ? (
@@ -629,7 +907,7 @@ function AthleteSpiderChart({ comparatorAthletes = [] }) {
               />
               <PolarRadiusAxis 
                 angle={90} 
-                domain={[0, 130]}
+                domain={[0, 100]}
                 tick={{ fontSize: 10 }}
               />
               <Tooltip content={CustomTooltip} />
@@ -694,7 +972,9 @@ function AthleteSpiderChart({ comparatorAthletes = [] }) {
                   )
                 }
                 
-                const isTimeBased = athleteData[atletaIdKey]?.resultados[entry.prueba]?.isTimeBased ?? true
+                const isTimeBased =
+                  athleteData[atletaIdKey]?.categorias?.[selectedCategory]?.pruebas?.[entry.prueba]
+                    ?.isTimeBased ?? true
                 const valorFormateado = formatValue(valorReal, unidadReal, isTimeBased)
                 
                 return (
