@@ -298,7 +298,12 @@ function AthleteSearch({ onResultClick }) {
               {results.map((item, index) => (
                 <Box key={item.atleta_id || index}>
                   <ListItemButton 
-                    onClick={() => onResultClick && onResultClick(item)}
+                    onClick={() => {
+                      console.debug('[AthleteSearch] result clicked', item)
+                      if (onResultClick) {
+                        onResultClick(item)
+                      }
+                    }}
                     sx={{
                       alignItems: 'flex-start',
                       flexDirection: 'column',

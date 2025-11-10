@@ -29,6 +29,12 @@ function AthleteComparator({ onComparatorsChange, comparators: externalComparato
   const [tempSelectedAthlete, setTempSelectedAthlete] = useState(null)
   const [duplicateError, setDuplicateError] = useState(false)
 
+  console.debug('[AthleteComparator] render', {
+    open,
+    comparatorsCount: comparators.length,
+    tempSelectedAthlete
+  })
+
   // Sincronizar con comparadores proporcionados desde el exterior
   useEffect(() => {
     if (Array.isArray(externalComparators)) {
@@ -47,12 +53,14 @@ function AthleteComparator({ onComparatorsChange, comparators: externalComparato
     setTempSelectedAthlete(null)
     setDuplicateError(false)
     setOpen(true)
+    console.debug('[AthleteComparator] handleOpen')
   }
 
   const handleClose = () => {
     setTempSelectedAthlete(null)
     setDuplicateError(false)
     setOpen(false)
+    console.debug('[AthleteComparator] handleClose')
   }
 
   const handleSelect = () => {
@@ -66,15 +74,26 @@ function AthleteComparator({ onComparatorsChange, comparators: externalComparato
           onComparatorsChange(updated)
         }
         handleClose()
+        console.debug('[AthleteComparator] handleSelect', tempSelectedAthlete)
       } else {
         setDuplicateError(true)
+        console.debug('[AthleteComparator] duplicate athlete', tempSelectedAthlete)
       }
     }
   }
 
   const handleResultClick = (athlete) => {
     setTempSelectedAthlete(athlete)
+    console.debug('[AthleteComparator] handleResultClick', athlete)
   }
+
+  useEffect(() => {
+    if (!open && comparators.length > 0) {
+      const last = comparators[comparators.length - 1]
+      setTempSelectedAthlete(last)
+      console.debug('[AthleteComparator] sync tempSelectedAthlete with last comparator', last)
+    }
+  }, [open, comparators])
 
   const handleRemove = (atletaId) => {
     const updated = comparators.filter(c => c.atleta_id !== atletaId)
@@ -129,69 +148,12 @@ function AthleteComparator({ onComparatorsChange, comparators: externalComparato
           <DialogContent 
             dividers 
             sx={{ 
-              pb: 0,
-              position: 'relative',
+              pb: 2,
               flex: 1,
-              overflow: 'hidden',
-              display: 'flex',
-              flexDirection: 'column',
-              minHeight: 0
+              overflowY: 'auto'
             }}
           >
-            <Box sx={{ flex: 1, overflow: 'auto', minHeight: 0 }}>
-              <AthleteSearch onResultClick={handleResultClick} />
-            </Box>
-            
-            {/* Card sticky del atleta seleccionado */}
-            {tempSelectedAthlete && (
-              <Box
-                sx={{
-                  flexShrink: 0,
-                  backgroundColor: 'white',
-                  borderTop: '1px solid',
-                  borderColor: 'divider',
-                  pt: 1.5,
-                  pb: 1
-                }}
-              >
-                <Card 
-                  sx={{ 
-                    bgcolor: 'secondary.light', 
-                    color: 'secondary.contrastText'
-                  }}
-                >
-                  <CardContent>
-                    <Typography variant="subtitle2" gutterBottom>
-                      Atleta seleccionado:
-                    </Typography>
-                    {/* Nombre del atleta */}
-                    <Typography variant="body1" fontWeight="bold" sx={{ mb: 1 }}>
-                      {tempSelectedAthlete.nombre}
-                    </Typography>
-                    
-                    {/* Chips de licencia y club */}
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
-                      {tempSelectedAthlete.licencia && tempSelectedAthlete.licencia !== 'N/A' && (
-                        <Chip 
-                          label={`Lic: ${tempSelectedAthlete.licencia}`} 
-                          size="small" 
-                          variant="outlined"
-                          sx={{ bgcolor: 'white', color: 'secondary.main' }}
-                        />
-                      )}
-                      {tempSelectedAthlete.club && tempSelectedAthlete.club !== 'N/A' && tempSelectedAthlete.club !== 'Sin club' && (
-                        <Chip 
-                          label={tempSelectedAthlete.club} 
-                          size="small" 
-                          variant="outlined"
-                          sx={{ bgcolor: 'white', color: 'secondary.main' }}
-                        />
-                      )}
-                    </Box>
-                  </CardContent>
-                </Card>
-              </Box>
-            )}
+            <AthleteSearch onResultClick={handleResultClick} />
             
             {/* Alerta de duplicado */}
             {duplicateError && (
@@ -200,6 +162,49 @@ function AthleteComparator({ onComparatorsChange, comparators: externalComparato
               </Alert>
             )}
           </DialogContent>
+
+          {/* Card de feedback del atleta seleccionado */}
+          {tempSelectedAthlete && (
+            console.debug('[AthleteComparator] rendering selected athlete card', tempSelectedAthlete),
+            <Box sx={{ px: { xs: 2, sm: 3 }, pb: 2 }}>
+              <Card 
+                sx={{ 
+                  bgcolor: 'secondary.light', 
+                  color: 'secondary.contrastText'
+                }}
+              >
+                <CardContent>
+                  <Typography variant="subtitle2" gutterBottom>
+                    Atleta seleccionado:
+                  </Typography>
+                  {/* Nombre del atleta */}
+                  <Typography variant="body1" fontWeight="bold" sx={{ mb: 1 }}>
+                    {tempSelectedAthlete.nombre}
+                  </Typography>
+                  
+                  {/* Chips de licencia y club */}
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
+                    {tempSelectedAthlete.licencia && tempSelectedAthlete.licencia !== 'N/A' && (
+                      <Chip 
+                        label={`Lic: ${tempSelectedAthlete.licencia}`} 
+                        size="small" 
+                        variant="outlined"
+                        sx={{ bgcolor: 'white', color: 'secondary.main' }}
+                      />
+                    )}
+                    {tempSelectedAthlete.club && tempSelectedAthlete.club !== 'N/A' && tempSelectedAthlete.club !== 'Sin club' && (
+                      <Chip 
+                        label={tempSelectedAthlete.club} 
+                        size="small" 
+                        variant="outlined"
+                        sx={{ bgcolor: 'white', color: 'secondary.main' }}
+                      />
+                    )}
+                  </Box>
+                </CardContent>
+              </Card>
+            </Box>
+          )}
           
           <DialogActions sx={{ flexShrink: 0, py: 1.5 }}>
             <Button 
@@ -317,18 +322,12 @@ function AthleteComparator({ onComparatorsChange, comparators: externalComparato
         <DialogContent 
           dividers 
           sx={{ 
-            pb: 0,
-            position: 'relative',
+            pb: 2,
             flex: 1,
-            overflow: 'auto',
-            display: 'flex',
-            flexDirection: 'column',
-            minHeight: 0
+            overflowY: 'auto'
           }}
         >
-          <Box sx={{ flex: 1, overflow: 'auto' }}>
-            <AthleteSearch onResultClick={handleResultClick} />
-          </Box>
+          <AthleteSearch onResultClick={handleResultClick} />
           
           {/* Alerta de duplicado */}
           {duplicateError && (
@@ -337,6 +336,49 @@ function AthleteComparator({ onComparatorsChange, comparators: externalComparato
             </Alert>
           )}
         </DialogContent>
+
+        {/* Card de feedback del atleta seleccionado */}
+        {tempSelectedAthlete && (
+          console.debug('[AthleteComparator] rendering selected athlete card', tempSelectedAthlete),
+          <Box sx={{ px: { xs: 2, sm: 3 }, pb: 2 }}>
+            <Card 
+              sx={{ 
+                bgcolor: 'secondary.light', 
+                color: 'secondary.contrastText'
+              }}
+            >
+              <CardContent>
+                <Typography variant="subtitle2" gutterBottom>
+                  Atleta seleccionado:
+                </Typography>
+                {/* Nombre del atleta */}
+                <Typography variant="body1" fontWeight="bold" sx={{ mb: 1 }}>
+                  {tempSelectedAthlete.nombre}
+                </Typography>
+                
+                {/* Chips de licencia y club */}
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
+                  {tempSelectedAthlete.licencia && tempSelectedAthlete.licencia !== 'N/A' && (
+                    <Chip 
+                      label={`Lic: ${tempSelectedAthlete.licencia}`} 
+                      size="small" 
+                      variant="outlined"
+                      sx={{ bgcolor: 'white', color: 'secondary.main' }}
+                    />
+                  )}
+                  {tempSelectedAthlete.club && tempSelectedAthlete.club !== 'N/A' && tempSelectedAthlete.club !== 'Sin club' && (
+                    <Chip 
+                      label={tempSelectedAthlete.club} 
+                      size="small" 
+                      variant="outlined"
+                      sx={{ bgcolor: 'white', color: 'secondary.main' }}
+                    />
+                  )}
+                </Box>
+              </CardContent>
+            </Card>
+          </Box>
+        )}
         
         <DialogActions sx={{ flexShrink: 0, py: 1.5 }}>
           <Button 

@@ -42,48 +42,79 @@ function AthleteSelector() {
   })
   
   const [selectedAthlete, setSelectedAthlete] = useState(() => loadFromStorage())
-  const [tempSelectedAthlete, setTempSelectedAthlete] = useState(null)
+  const [tempSelectedAthlete, setTempSelectedAthlete] = useState(() => {
+    const stored = loadFromStorage()
+    return stored || null
+  })
+
+  console.debug('[AthleteSelector] render', {
+    open,
+    selectedAthlete,
+    tempSelectedAthlete
+  })
 
   // Guardar atleta seleccionado en localStorage cuando cambie
   useEffect(() => {
     if (selectedAthlete) {
       try {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(selectedAthlete))
+        console.debug('[AthleteSelector] stored athlete in localStorage', selectedAthlete)
       } catch (error) {
         console.error('Error al guardar atleta en localStorage:', error)
       }
     } else {
       // Limpiar localStorage si no hay atleta seleccionado
       localStorage.removeItem(STORAGE_KEY)
+      console.debug('[AthleteSelector] cleared athlete from localStorage')
     }
   }, [selectedAthlete])
 
   const handleOpen = () => {
-    setTempSelectedAthlete(null) // Reset temp selection al abrir
+    const candidate = selectedAthlete || loadFromStorage() || null
+    setTempSelectedAthlete(candidate)
     setOpen(true)
+    console.debug('[AthleteSelector] handleOpen', {
+      selectedAthlete,
+      tempSelectedAthlete: candidate
+    })
   }
 
-  const handleClose = () => {
-    setTempSelectedAthlete(null) // Reset temp selection al cerrar
+  const handleClose = (nextTempSelected = selectedAthlete) => {
+    setTempSelectedAthlete(nextTempSelected || null)
     setOpen(false)
+    console.debug('[AthleteSelector] handleClose')
   }
 
   const handleSelect = () => {
     if (tempSelectedAthlete) {
       setSelectedAthlete(tempSelectedAthlete)
-      handleClose()
+      handleClose(tempSelectedAthlete)
+      console.debug('[AthleteSelector] handleSelect', tempSelectedAthlete)
     }
   }
 
   const handleResultClick = (athlete) => {
     setTempSelectedAthlete(athlete)
+    console.debug('[AthleteSelector] handleResultClick', athlete)
   }
 
   const handleRemove = () => {
     setSelectedAthlete(null)
+    setTempSelectedAthlete(null)
     localStorage.removeItem(STORAGE_KEY) // Limpiar explícitamente el localStorage
     setOpen(true) // Abrir el popup al eliminar la selección
+    console.debug('[AthleteSelector] handleRemove')
   }
+
+  useEffect(() => {
+    if (open) {
+      const candidate = tempSelectedAthlete || selectedAthlete || loadFromStorage()
+      if (candidate && (!tempSelectedAthlete || tempSelectedAthlete.atleta_id !== candidate.atleta_id)) {
+        setTempSelectedAthlete(candidate)
+        console.debug('[AthleteSelector] sync tempSelectedAthlete while open', candidate)
+      }
+    }
+  }, [open, selectedAthlete])
 
   return (
     <Box sx={{ width: '100%' }}>
@@ -98,7 +129,7 @@ function AthleteSelector() {
               </Typography>
               <IconButton 
                 size="small" 
-                onClick={handleRemove}
+                onClick={handleOpen}
                 color="primary"
                 aria-label="Cambiar atleta"
                 sx={{ ml: 'auto' }}
@@ -179,20 +210,36 @@ function AthleteSelector() {
             minHeight: 0
           }}
         >
-          <Box sx={{ flex: 1, overflow: 'auto', minHeight: 0 }}>
+          <Box
+            sx={{
+              flex: 1,
+              overflowY: 'auto',
+              minHeight: 0,
+              pr: { xs: 1, sm: 2 },
+              pl: { xs: 1, sm: 2 },
+              pt: 1,
+              pb: open && tempSelectedAthlete ? 3 : 1,
+              display: 'flex',
+              flexDirection: 'column'
+            }}
+          >
             <AthleteSearch onResultClick={handleResultClick} />
           </Box>
-          
+
           {/* Card sticky del atleta seleccionado */}
-          {tempSelectedAthlete && (
+          {open && tempSelectedAthlete && (
+            console.debug('[AthleteSelector] rendering selected athlete card', tempSelectedAthlete),
             <Box
               sx={{
-                flexShrink: 0,
+                position: 'sticky',
+                bottom: 0,
+                width: '100%',
                 backgroundColor: 'white',
                 borderTop: '1px solid',
                 borderColor: 'divider',
-                pt: 1.5,
-                pb: 1
+                px: { xs: 2, sm: 3 },
+                py: 2,
+                zIndex: (theme) => theme.zIndex.appBar
               }}
             >
               <Card 

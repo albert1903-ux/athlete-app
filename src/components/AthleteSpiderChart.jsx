@@ -707,11 +707,7 @@ function AthleteSpiderChart({ comparatorAthletes = [] }) {
       }
 
       if (!referenceInfo && referencesLoaded) {
-        console.warn('[SpiderChart] Referencia global no encontrada para la prueba', {
-          prueba,
-          normalizedName,
-          referenceKeys: Array.from(referenceKeys)
-        })
+        // No se encontró referencia global para la prueba; se recurrirá a rangos locales si es posible.
       }
 
       const min = valores.length > 0 ? Math.min(...valores) : null
@@ -756,16 +752,7 @@ function AthleteSpiderChart({ comparatorAthletes = [] }) {
             const normalizedClamped = Math.max(0, Math.min(1, normalizedValue))
             entry[atletaIdKey] = normalizedClamped * 100
 
-            if (athlete.atleta_id === selectedAthlete?.atleta_id) {
-              console.log('[SpiderChart] Normalización', {
-                prueba,
-                atleta: athlete.nombre,
-                valor,
-                referencia: referenceMax,
-                rango: range,
-                resultado: entry[atletaIdKey]
-              })
-            }
+            // Se prioriza la referencia global para normalizar el valor.
           } else if (
             range &&
             range.max !== range.min &&
@@ -777,25 +764,8 @@ function AthleteSpiderChart({ comparatorAthletes = [] }) {
             const normalizedValue = range.isTimeBased ? 1 - normalized01 : normalized01
             entry[atletaIdKey] = Math.max(0, Math.min(100, normalizedValue * 100))
 
-            if (athlete.atleta_id === selectedAthlete?.atleta_id) {
-              console.warn('[SpiderChart] Normalización usando rango local por falta de referencia', {
-                prueba,
-                atleta: athlete.nombre,
-                valor,
-                rango: range,
-                resultado: entry[atletaIdKey]
-              })
-            }
           } else {
             entry[atletaIdKey] = 0
-
-            if (athlete.atleta_id === selectedAthlete?.atleta_id) {
-              console.warn('[SpiderChart] Sin referencia ni rango local para normalizar', {
-                prueba,
-                atleta: athlete.nombre,
-                valor
-              })
-            }
           }
 
           entry[`${atletaIdKey}_real`] = valor
