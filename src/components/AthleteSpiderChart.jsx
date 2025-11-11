@@ -250,7 +250,20 @@ function AthleteSpiderChart({ comparatorAthletes = [] }) {
     const unidadLower = unidad ? unidad.toLowerCase().trim() : ''
     
     // Pruebas de campo donde mayor es mejor
-    const distanceKeywords = ['longitud', 'altura', 'peso', 'disco', 'jabalina', 'martillo', 'pértiga', 'garrocha', 'triple']
+    const distanceKeywords = [
+      'longitud',
+      'altura',
+      'peso',
+      'pes',
+      'disco',
+      'jabalina',
+      'martillo',
+      'pértiga',
+      'perxa',
+      'garrocha',
+      'triple',
+      'vortex'
+    ]
     if (distanceKeywords.some(keyword => nombreLower.includes(keyword))) {
       return false
     }
