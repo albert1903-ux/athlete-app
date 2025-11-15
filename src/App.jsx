@@ -13,10 +13,12 @@ import AnalisisPage from './pages/AnalisisPage'
 import CalendarioPage from './pages/CalendarioPage'
 import MasPage from './pages/MasPage'
 import AddAthleteDialog from './components/AddAthleteDialog'
+import AddResultDialog from './components/AddResultDialog'
 
 function AppContent() {
   const location = useLocation()
   const [dialogOpen, setDialogOpen] = useState(false)
+  const [resultDialogOpen, setResultDialogOpen] = useState(false)
   const isSeguimientoPage = location.pathname === '/seguimiento'
   const isAnalisisPage = location.pathname === '/analisis'
   const isCalendarioPage = location.pathname === '/calendario'
@@ -37,12 +39,16 @@ function AppContent() {
     }
   }
 
-  const handleOpenDialog = () => {
-    setDialogOpen(true)
-  }
-
   const handleCloseDialog = () => {
     setDialogOpen(false)
+  }
+
+  const handleOpenResultDialog = () => {
+    setResultDialogOpen(true)
+  }
+
+  const handleCloseResultDialog = () => {
+    setResultDialogOpen(false)
   }
 
   const handleAddAthlete = (athlete) => {
@@ -88,6 +94,25 @@ function AppContent() {
           <Typography variant="h6" component="div" sx={{ flexGrow: 1, fontSize: { xs: '1.1rem' } }}>
             {getPageTitle()}
           </Typography>
+          {isSeguimientoPage && (
+            <IconButton
+              onClick={handleOpenResultDialog}
+              sx={{
+                width: 40,
+                height: 40,
+                borderRadius: '50%',
+                backgroundColor: 'secondary.main',
+                color: 'white',
+                '&:hover': {
+                  backgroundColor: 'secondary.dark'
+                },
+                ml: 1
+              }}
+              aria-label="añadir resultado"
+            >
+              <AddIcon />
+            </IconButton>
+          )}
           {isAnalisisPage && (
             <Box sx={{ display: 'flex', gap: 1, ml: 1 }}>
               <IconButton
@@ -153,6 +178,12 @@ function AppContent() {
         onAdd={handleAddAthlete}
       />
 
+      <AddResultDialog
+        open={resultDialogOpen}
+        onClose={handleCloseResultDialog}
+        onSuccess={handleCloseResultDialog}
+      />
+
       {/* Contenido principal con rutas */}
       <Box
         sx={{
@@ -192,3 +223,4 @@ function App() {
 }
 
 export default App
+

@@ -8,10 +8,22 @@ import { getComparatorCache, setComparatorCache } from '../store/comparatorStore
 
 const SeguimientoPage = () => {
   const [comparatorAthletes, setComparatorAthletes] = useState(() => getComparatorCache())
+  const [resultsRefreshKey, setResultsRefreshKey] = useState(0)
 
   const handleComparatorsChange = useCallback((comparators) => {
     setComparatorAthletes(comparators)
     setComparatorCache(comparators)
+  }, [])
+
+  useEffect(() => {
+    const handleResultadoCreado = () => {
+      setResultsRefreshKey((prev) => prev + 1)
+    }
+
+    window.addEventListener('resultadoCreado', handleResultadoCreado)
+    return () => {
+      window.removeEventListener('resultadoCreado', handleResultadoCreado)
+    }
   }, [])
 
   // Cargar comparadores desde localStorage al montar y cuando cambien
@@ -79,12 +91,18 @@ const SeguimientoPage = () => {
 
         {/* Componente gráfico de araña */}
         <Box sx={{ width: '100%' }}>
-          <AthleteSpiderChart comparatorAthletes={comparatorAthletes} />
+          <AthleteSpiderChart
+            key={`spider-${resultsRefreshKey}`}
+            comparatorAthletes={comparatorAthletes}
+          />
         </Box>
 
         {/* Componente gráfico de resultados */}
         <Box sx={{ width: '100%' }}>
-          <AthleteResultsChart comparatorAthletes={comparatorAthletes} />
+          <AthleteResultsChart
+            key={`results-${resultsRefreshKey}`}
+            comparatorAthletes={comparatorAthletes}
+          />
         </Box>
       </Box>
     </Box>
