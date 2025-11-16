@@ -1,0 +1,1500 @@
+atleta_id,nombre,fecha_nac,licencia
+1,Max Bosch Bosch,2014-03-13,CL3633
+2,Xavier Casamitjana Calvo,2014-12-17,CL2152
+3,Gerard Carballó Llobet,2014-01-14,CL95919
+4,Arlet Fores Arasa,2014-06-05,CL2117
+5,Clara Fuentes Fernandez,2014-03-22,CL2118
+6,Jana Montserrat Calvo Albareda,2014-05-27,CL2086
+7,Eleonora Fontaine Gomez,2014-07-27,CL2090
+8,Alvaro Solsona Tena,2015-02-03,CL5685
+9,Aina Brunet Mionteys,2014-01-27,CL5672
+10,Julia Brunet Monteys,2015-10-19,CL5673
+11,Nadia Ramal Souliman,2016-03-06,CL5756
+12,Jan Castello Miguel,2015-01-12,CL5700
+13,Marc Tocasuchyl Casabo,2015-11-11,CL10001
+14,Luca Perego.,2015-09-19,CL13667
+15,Leonardo Scaramal,2015-05-26,CL4808
+16,Jan Sandoval Igartua,2016-01-19,CL8906
+17,Lucca Barragan Gonzalez,2015-06-09,CL13983
+18,Teo Gaya Abeijon,2015-04-18,CL13556
+19,Santi Salvans Pintó,2015-07-02,CL9996
+20,Pau Pastor Bennassar,2014-01-10,CL5679
+21,Tian Gual Pocurull,2014-10-31,CL9779
+22,Alan Fumero Perez,2014-11-15,CL13554
+23,Eduard Pequerul Fuster,2014-10-24,CL13582
+24,Mattia Castagnoli.,2015-06-20,CL13658
+25,Lucas Garrido Perez,2015-06-11,CL13555
+26,Elias Bouattour Catala,2017-03-15,CL13656
+27,Erick Lopez Salgado,2018-07-03,CL13663
+28,Saulo Vega Perez,2017-01-29,CL13598
+29,Santiago-vikingur Cajal Bjarnason,2018-01-04,CL13544
+30,Lia Scherer Fernandez,2015-11-17,CL9998
+31,Daniela Landi Rivela,2016-03-05,CL13569
+32,Carolina Rodriguez Soria,2015-04-23,CL13589
+33,Elisabet Gratovil Segura,2015-03-20,CL13559
+34,Artur Castro Grandjean,2014-07-16,CL5689
+35,Adrian Rubio Mangas,2015-12-08,CL3114
+36,Joan Murcia Milan,2014-01-02,CL3110
+37,Olau Pujol Entrena,2015-10-07,CL3113
+38,Tian Pelaez,2014-04-12,Desconocido
+39,Haizea Elorriaga Sanchez,2014-02-10,CL94100
+40,Daniela Miron Rodriguez,2015-04-30,CL3109
+41,Tian Pelaez Rodriguez,2015-01-01,CL4143
+42,Lluc Martinez Padros,2014-01-14,CL3108
+43,Aleix Giner Morral,2015-02-11,CL4675
+44,Valentina Leon Benitez,2014-09-27,CL3119
+45,Bernat Freixa Saera,2015-05-28,CL6052
+46,Daniel Pilares Monroy,2014-06-16,CL261
+47,Kilian Paz Segura,2014-12-29,CL4056
+48,Ilyas El Moustakim Essabir,2014-04-29,CL271
+49,Daniel Cortinas Talavera,2015-05-12,CL7578
+50,Aleix Amat Murillo Salvador,2015-10-30,CL7587
+51,Eric Rejano Vazquez,2015-08-24,CL3579
+52,Nil Brito Sierra BM,2014-05-21,CL7592
+53,Mirta Franco Ballesteros,2014-01-04,CL7849
+54,Nahia Valero Medina,2015-08-18,CL8265
+55,Adrian Adamuz Jimenez,2016-02-02,CL11119
+56,Daniel Iñiguez Esteras,2016-05-26,CL11118
+57,Jordi Lopez Joyanes,2014-10-17,CL11140
+58,Tina Casamitjana Vrankova,2015-01-03,CL11123
+59,Quim Vendrell Martin,2014-07-23,CL8300
+60,Marcos Martin Vazquez,2015-02-27,CL266
+61,Aina Alba Navarra,2014-06-27,CL15197
+62,Carla Hijano Rodenas,2014-03-01,CL15207
+63,Daniela Hijano Rodenas,2014-02-09,CL15208
+64,Iker Montllor Echave,2015-08-11,CL1858
+65,Arnau Gomez Viudes,2014-11-24,CL95708
+66,Eric Mateo Gomez,2014-10-21,CL5176
+67,Marc Gomez Oviedo,2014-02-06,CL5974
+68,Aral Acha Nicolás,2014-05-06,CL5113
+69,Ian Algar Gonzalez,2016-11-12,CL6968
+70,Leo Gamez Cabello,2015-02-04,CL2236
+71,Emma Torrecillas Benet,2016-04-29,CL5522
+72,Sergi Perez Garcia,2014-09-08,CL95714
+73,Aleix Garrido Cornet,2015-01-06,CL1844
+74,Leo Muñoz Romero,2015-04-20,CL9246
+75,Carlota Tejada Moya,2014-10-17,CL7891
+76,Edén Torrecillas Benet,2017-10-25,CL5519
+77,Suñé Xavier Escribano,2016-09-20,CL10654
+78,Luka Quevedo Quinto,2018-03-30,CL13452
+79,Joan Rodríguez Fernández,2017-02-03,CL12939
+80,Sergi Carbonell García,2017-05-18,CL9310
+81,Maria Martin Gonzalez,2018-02-08,CL11866
+82,Maria López Pacheco,2017-02-23,CL12894
+83,Ona Garrido Cornet,2017-02-17,CL5525
+84,Martí Perez Garcia,2017-02-22,CL5602
+85,Ádam Gómez Iserte,2017-03-16,CL11466
+86,Biel López Pacheco,2015-03-25,CL9282
+87,Blai Momblona Garcia,2015-07-13,CL5217
+88,Aran Arrabal Perez,2015-10-24,CL12614
+89,Guillem Valles Vidal,2023-04-19,CL12892
+90,Arlet Cornet Campos,2016-02-22,CL6841
+91,Ian Sosa Escobar,2015-10-02,CL10763
+92,Pol Lambea Cazcarra,2015-10-19,CL4054
+93,Bruna Suñe Sanz,2014-12-15,CL1960
+94,Adrian Badia Muñoz,2015-08-02,CL1983
+95,Jonathan Koepf,2016-06-23,CL6218
+96,Adam Sanz Lopez,2016-02-24,CL5303
+97,Arsene Nasirov,2016-09-19,CL5087
+98,Jordi Tortosa Mariscal,2015-09-27,CL4998
+99,Adriana Gonzalez Centelles,2015-10-17,CL5002
+100,Aina Canals Morata BF,2014-10-09,CL8246
+101,Alba Boix Sans BF,2014-02-27,CL6744
+102,Mario Garcí Fernandez-arroyo,2015-09-11,CL9490
+103,Maria Prior Casado,2015-08-15,CL9419
+104,Piero Núñez Arrabal,2015-01-23,CL9946
+105,Hugo Andrés Castro BM,2015-04-18,CL9286
+106,Mateo Fedi Zambrano BM,2014-04-27,CL9287
+107,Nil Verdejo Zamora BM,2014-07-23,CL1928
+108,Martina Trocoli Miras BF,2014-12-23,CL11974
+109,Pau Querol González,2015-05-12,CL9168
+110,Micaela Rodríguez Mateos,2015-06-18,CL9941
+111,Laia Cosculluela Sore,2014-05-31,CL6216
+112,Amaia Cosculluela Sore,2016-05-13,CL6217
+113,Vega Burgalés Crespo,2016-05-22,CL10820
+114,Sofía Teixeira Bueno,2017-07-04,CL12585
+115,Núria Flores Dominguez,2017-01-08,CL12874
+116,Tom Fernández Petri,2015-09-13,CL13205
+117,Isaac Del Carmen De León,2014-10-26,CL9522
+118,Gala Hidrovo Toala,2015-09-11,CL12871
+119,Noè Fernández Petri,2017-05-23,CL13358
+120,Adrià Bravo Colet,2015-10-30,CL9427
+121,Pol Faura Llanza,2015-07-25,CL13506
+122,Sofia De Los Pinos Knez,2015-03-03,CL12715
+123,Nora Garcia Figueras,2016-09-24,CL9261
+124,Aminata Arcas Gassama,2014-01-26,CL1402
+125,Aminata Arcas BF,2014-01-26,CL8050
+126,Arlet Peña,2015-02-17,CL12193
+127,Marti Alcaide Llorente,2014-07-07,CL341
+128,Sergi Matamala Sarra,2015-06-02,CL5712
+129,Miquel Iranzo Cullell,2014-03-14,CL89
+130,Marc Ribas Serrano,2014-12-18,CL3893
+131,Alvaro Perez Godia,2014-06-11,CL4253
+132,Ingrid Moreno Moner,2014-10-24,CL1686
+133,Eugenia Diaz Ortega,2014-03-06,CL96832
+134,Hugo Lopez Herrera,2014-01-14,CL6791
+135,Carla Poncelas Juncarol,2015-11-08,CL6799
+136,Naira Castello Villa,2014-11-22,CL6812
+137,Cayetano Martinez Martinez,2014-03-08,CL6792
+138,Eloi Rueda Bautista,2016-03-25,CL12220
+139,Izan Rojo Guirado,2015-01-24,CL12905
+140,Adria Diaz Rebarter,2014-08-07,CL212
+141,Alicia Olloqui Ochoa,2014-03-21,CL4557
+142,Gala Rigall Noa,2014-06-15,CL6120
+143,Marc Font Nouguet,2015-06-20,CL6589
+144,Anna Bou Turienzo,2015-09-13,SENSE LLIC
+145,Anna Bou Turienzo,2015-09-13,CL10712
+146,Carla Diaz Rebarter,2016-06-07,CL12622
+147,Marian Cristina Villegas Inostroza,2017-01-02,CL14764
+148,VÍCTOR FINESTRES PÉREZ,2014-07-31,CL2753
+149,ELSA COLLE ROCA,2014-04-16,CL88007
+150,Pau Ferrer Loscos,2014-12-06,CL2147
+151,Leo Devahide Garcia,2015-08-06,CL76508
+152,Elia Subirats Meneses,2014-12-10,CL3619
+153,Mia Guerrero Ruiz,2015-12-17,CT689
+154,Eila Subirats Meneses,2014-12-10,CL6483
+155,Lluc Sanchez Valderrama,2017-07-02,CL9848
+156,Aran Roma Perez,2016-07-14,CL10038
+157,Eric Del Valle Huerga,2017-07-10,CL10046
+158,Axel Boyoho Ros,2014-05-12,CL9846
+159,Paula Mesa Ruiz,2015-11-08,CL9829
+160,Leo Sanchez Morral,2015-02-09,CL10206
+161,Jofre Pons Sargatal,2018-01-17,CL12655
+162,Yasser Baidar Enouri,2015-01-16,CL12896
+163,Daniela Escribano Cantos q,2015-04-02,CL10043
+164,Marc Ballart Corretja,2015-03-08,CL4639
+165,Vinyet Sañas Capdevila,2014-01-31,CL2636
+166,Richelle Abisayo Abisola,2015-04-15,CL8561
+167,Yolus Limon Martinez,2014-02-07,CL6618
+168,Obsa Capdevila Torras,2015-09-08,CL9243
+169,Judit Prat,2015-01-01,CL6656
+170,Ivet Rovira Llacer,2016-01-16,CL9478
+171,Judit Prat Arimany,2014-09-17,CL8195
+172,Ferriol Amblas Albert,2014-02-19,CL6615
+173,Eloi Montloiu Miralpeix,2014-09-26,CL9708
+174,Gil Callarisa Truyols,2016-02-15,CL10258
+175,Otger Sagrera Ramentol,2016-06-04,CL9379
+176,Marcel Parera Sallares,2016-03-05,CL11829
+177,Aina Ordeig Barri,2015-06-16,CL9241
+178,Laia Ordeig Barri,2015-06-16,CL12180
+179,Teresa Coll Vila,2014-11-22,CL9377
+180,Aina Gallifa Miralpeix,2016-09-22,CL9290
+181,Oriol Marin Cabarrocas,2017-04-12,CL9294
+182,Lukas Arrocha Valeikaite,2014-06-11,CL12949
+183,Romaysa Hemmit Barmo,2015-08-19,CL13624
+184,Miquel Novellas Plancheria,2017-02-07,CL10426
+185,Carla Godoy Garcia,2014-08-21,CL4579
+186,Noa Viale Fuentes,2014-04-13,CL3786
+187,Lia Viale Fuentes PBF,2014-05-13,CL4591
+188,Naila Guillen Fernandez,2014-03-15,CL7680
+189,Martin Moreno Esteruelas,2014-12-02,CL9057
+190,Lucia Garcia Martin,2014-02-20,CL8970
+191,Gyselle Lola Algarañaz,2016-03-28,CL16160
+192,NATXO DOMINGUEZ BREVIATI PBM,2015-01-01,CL89270
+193,NATALIA BLANQUE SAMPEDRO PBF,2015-01-01,CL93408
+194,Núria Galan Capdevila,2014-04-21,CL7641
+195,Sergio Patiño Fermiñan,2014-03-18,CL8779
+196,Martí Graell Silvestre,2014-11-18,CL9055
+197,Dana Martinez Amengual,2014-01-23,CL8774
+198,Natalia Blanqué Sampedro,2014-10-02,CL9080
+199,Nil Castejón Acerboni,2014-08-21,CL7880
+200,Tianshi Sánchez Morata,2014-09-14,CL8848
+201,Arau Gálvez Berti,2016-01-01,CL10842
+202,Omar Aguedo Messari,2016-01-01,CL4950
+203,Pau Santos Siles,2016-01-01,CL10418
+204,Greta Moreno Arraiz,2016-01-01,CL10193
+205,Alex Iglesias Barroso,2015-01-01,CL9363
+206,Magí Acevedo Carmona,2015-01-01,CL1143
+207,Aaron Bonilla martin,2016-01-01,CL9226
+208,Lucas Sebastian Iordache,2014-01-01,CL5332
+209,Ilan Diouf Verge,2014-01-01,CL9621
+210,Albert Barea,2014-01-01,CT1228
+211,Oumy Diouf Verge,2016-01-01,CT1031
+212,Lidia González Camacho,2014-01-01,CL9184
+213,Greta Estudillo Piqueras,2014-01-01,CL9043
+214,Pau Santos Siles,2017-01-01,CT2109
+215,Roc Torres Estruch,2017-01-01,CL9504
+216,Carolina Casas Fuster,2017-01-01,CL13735
+217,Maria Estudillo Piqueras,2017-01-01,CT2244
+218,Alex Iglesias Barroso,2015-03-01,CL12288
+219,Ibai Sagnier Benedicto,2015-12-07,CL12130
+220,Arnau Martin Vera,2015-01-01,CT2601
+221,Pau Porca Zugarramurdi,2015-01-01,CL11500
+222,Lucas Sebastián Iordache,2014-01-27,CL12124
+223,Hugo González Rodriguez,2014-06-20,CL12125
+224,Ivette Domingo Okomo,2015-10-01,CL13513
+225,Beth Torres Soto,2015-01-01,CL3783
+226,Vera Lobato Sánchez,2014-05-21,CL12128
+227,Sarah Kaba Kaba,2014-12-21,CL12129
+228,Julia Figueroa Solano,2014-09-22,CL11780
+229,Roc Torres Estruch,2017-01-01,CL10034
+230,Mirko Verchili Shen,2017-01-01,CL10032
+231,Teo Carreras Guarino,2017-01-01,CL12522
+232,Nil Blanco Barrachina,2017-01-01,CL14255
+233,Martín Gómez Ortega,2017-01-01,CL12590
+234,Ángel Figueroa Solano,2016-12-06,CL14374
+235,Albert Guillén Valls,2015-04-27,CL14391
+236,Arnau Martín Vera,2015-08-30,CL14400
+237,Arnau Pavia Díaz,2015-06-13,CL14408
+238,Arau Gálvez Berti,2016-03-19,CL14377
+239,Didac Recober Ribas,2015-01-01,CL14421
+240,Nael Fernández Urbano,2016-06-27,CL14371
+241,Hugo Leal Agudo,2015-11-20,CL14395
+242,Pau Porca Zugarramundi,2015-01-01,CL14245
+243,Mariam Sanogo Traore,2017-01-01,CL13387
+244,Aina Arroyo Ruíz,2015-05-19,CL14244
+245,Vega Muñoz Mesas,2017-01-01,CL13012
+246,Ivet Martinez Chanca Q,2017-01-01,CL12675
+247,Lluna Barea Riera,2015-03-04,CL11392
+248,Dana Arderiu Ventura,2015-09-26,CL14242
+249,Santiago Burgos De Vasconcelos q,2015-04-13,CL17189
+250,Marta Almagro Barroso,2015-12-09,CL14241
+251,Kenneth Pardo Balbuena,2014-12-25,CL2773
+252,Julen Cazorla Segura,2014-04-19,CL5752
+253,Axel Gabriel Velasco Williams,2016-11-23,CL6102
+254,Guillem Garcia Soler,2016-07-04,CL5730
+255,Eneko Martínez Borrego,2016-06-08,CL5768
+256,Liam Bailon Merino,2015-08-16,CL6342
+257,JOAQUIN CASTELLVI SOLER,2014-03-21,CL9629
+258,Nil Perez Molina,2014-11-07,CL10026
+259,Marc Fontanet Hernandez,2015-05-08,CL10123
+260,Felix Vidal Lope,2016-02-18,CL10019
+261,Guim Rocha Batlle,2016-01-27,CL10416
+262,GUIM DALMAU SERRA,2016-01-27,CL10125
+263,Valeria Navarro Serrano,2014-02-18,CL10120
+264,VINYET GARCIA JUNCOSA,2014-04-21,CL10448
+265,ROBINE HEIRWEGH,2014-01-22,CL5731
+266,Jana Perez Molina,2016-07-29,CL10027
+267,ALICE HEIRWEGH,2016-08-24,CL9950
+268,Arnua Castany Sanchez,2017-06-29,CL9957
+269,Alice Heirwegh,2016-06-24,CL10454
+270,Kilian Rodriguez Cartoixa,2016-10-11,CL10362
+271,Martina Lozano Bazaco,2016-11-17,CL10119
+272,Hodei Vivanco Marin,2015-03-21,CL3898
+273,Joaquin Castellvi Soler,2014-03-26,CL12475
+274,Maiol Rovira Escalona,2014-02-27,CL10311
+275,Marc Fernandez Soler,2015-06-30,CL5741
+276,Eduardo Castellvi Soler,2018-06-01,CL12474
+277,Jana Cubillo Arce,2015-09-13,CL5759
+278,Bruna Rovira Escalona,2016-02-15,CL10200
+279,Arnau Garriga Maireles,2014-01-04,CL14140
+280,Inés Berger,2016-05-21,CL13011
+281,Oliver Díaz Castro,2014-07-03,CL4539
+282,Carlos Martínez Bellerín BM,2014-11-27,CL9013
+283,Aniol Cabre Tome,2014-03-20,CL2148
+284,Diego Armando Vega Fermin,2015-03-25,CL3872
+285,Iago Borrajo Sabal,2014-07-07,CL2145
+286,Jupiter Villuendas Collado,2015-01-04,CL2711
+287,Liam Tovar Diaz,2014-02-20,CL2155
+288,Joel Gonzalez Tabuenca,2014-11-27,CL4426
+289,Pol Laporta Millat,2014-01-02,CL3873
+290,Lluc Loscos Basterra,2014-06-27,CL3870
+291,Claudia Delgado Busquets,2014-06-13,CL2146
+292,Laia Gonzalez Garcia,2014-05-19,CL3618
+293,Bernat Comellas Rofin,2014-09-10,CL5507
+294,Teo Monleon Llopart,2014-01-17,CL5013
+295,Nil Sanchez Roig,2014-09-15,CL5112
+296,Kilian Gomez Garcia,2016-01-08,CL7687
+297,Daniel Maldonado Hernando,2015-05-21,CL4972
+298,Evan Claure Herrero,2015-05-23,CL6151
+299,Leo Arrizabalaga Gutierrez,2016-01-16,CL3653
+300,Anna Kostyukeuych,2014-04-03,CL4666
+301,Rebeca Cuesta Saavedra,2014-01-01,CL7024
+302,Georgina Castany Barrio,2015-05-13,CL7026
+303,Filippa Schanninger Ponsa,2015-08-30,CL7033
+304,Marcel Andres Ravai,2016-01-18,CL7030
+305,Elena Hernandez Bellver,2014-03-17,CL9618
+306,Sara Alvarez Siaba,2014-01-03,CL9615
+307,Amaia Cirujeda Preciado BF,2015-06-07,CL11394
+308,Mar Bilurbina Da Silva Pereira,2015-03-08,CL10857
+309,Iria Estopa Berni,2015-08-16,CL11396
+310,Ana Calvache Garcia,2014-03-19,CL12235
+311,Alea Maria Ferrari De Moya,2014-03-01,CL9617
+312,Xiana Gago Quevedo,2015-03-26,CL2234
+313,Aran Alemany Burset,2017-11-24,CL11442
+314,Bruno Garcia Llado,2016-01-05,CL5032
+315,Arnau Guasch Aiguabella,2015-02-18,CL14620
+316,Oriol Ribas Coll,2015-12-14,CL14641
+317,Unai Del Rio Zamora,2015-03-03,CL14616
+318,Didac Tejero Lafuente,2017-08-10,CL11183
+319,Roc Domenech Diaz,2017-02-15,CL14621
+320,Alejandra Molina Castellano,2016-05-09,CL14623
+321,Aina Bru Marin,2016-06-03,CL11443
+322,Ayana Roque Zambrano,2016-02-24,CL14642
+323,Carmen Vega Gomez Rodriguez,2016-02-26,CL14740
+324,Gal·la Badia Caubergh,2016-04-12,CL14633
+325,Joana Tamayo Maymo,2017-08-24,CL14628
+326,Lucia Gonzalez Gonzalez,2018-07-22,CL14629
+327,Sol Estopa Berni,2018-09-03,CL14647
+328,Alba Estopa Berni,2018-09-03,CL14644
+329,Alex Flix Diaz,2017-05-09,CL13775
+330,Gerard Bellmunt Mostazo,2014-08-12,CL96312
+331,Luar Solbas Gutierrez,2014-08-27,CL1252
+332,Marti Serna Martinez,2014-04-11,CL94802
+333,Eidan Enero Villanueva,2014-03-20,CT1034
+334,Pol Mulinari Cerdà,2014-11-15,CT850
+335,Eric Saeta Nuñez,2014-10-07,CT803
+336,Adam Saffar Cherchaoui,2014-06-08,CT1390
+337,Aleix Nebot Farré,2016-04-22,CT1180
+338,Maria Rodriguez Moreno,2015-09-18,CT1280
+339,Laura Rodriguez Dos Santos,2015-07-23,CT1285
+340,Basma Berrezouk Cherrad,2015-09-28,CT1382
+341,Albert Navarro Diaz,2015-11-03,CL10330
+342,Hector Molina Hurtado,2015-10-13,CT1179
+343,Marc Ruiz Orus,2015-12-13,CT1472
+344,Roc Enrich Vives,2014-12-18,CL10334
+345,Arlet Alcaraz Arenas,2014-05-26,CL9786
+346,Biel Pellicer Grau,2016-09-07,CT1961
+347,Alex Cervilla Montoro,2016-02-12,CL10335
+348,Alex Valladares Lopez,2015-03-16,CT1016
+349,Adria Buixo Delgado,2015-08-07,CL10727
+350,Gal.La Mitjavila I Diaz,2014-09-17,CT1013
+351,Maria Chouache,2015-01-14,CT2305
+352,Quim Batalla Faura,2014-04-29,CT1032
+353,Daniela Perez Galindo,2014-11-21,CL10208
+354,Jan Palacios Sanchez,2015-08-11,CL12986
+355,Eric Palacios Sánchez,2015-08-11,CL12974
+356,Gerard Lecina Gascon,2016-10-23,CL13191
+357,Noa Palacios Sanchez,2015-08-11,CL12865
+358,Dante Del Amo Benedetti,2017-02-23,CT2628
+359,Leo Pendon Conillera,2017-10-12,CL12990
+360,Marc Sanchez De La Torre,2015-08-12,CL10010
+361,Sabrine El Jed Fethalah,2015-07-01,CT2537
+362,Abril Del Amo Benedetti,2015-05-13,CT2629
+363,Pol Salvat Paull q,2015-01-19,CT2548
+364,Dario Iglesias Olivenza,2014-02-26,CL1807
+365,Jordi Cervantes Zapata,2014-07-29,CL1934
+366,Gabriela Asuma,2014-07-11,CL1861
+367,Noa Bou Millan,2014-03-09,CL95592
+368,Joan Cardete Ventura,2014-09-28,CL5073
+369,Asier Saenz Rodriguez,2014-09-01,CL8918
+370,Nicolas Guirado Alba,2015-04-08,CL5319
+371,Unai Velazquez Fernandez q,2015-03-29,CL5180
+372,Aitana Acuña Mercado,2015-09-05,CL9356
+373,Coque Maestro Burrel,2014-07-29,CL2541
+374,Olivia Montala Pozo,2015-06-08,CL8304
+375,Laia Bernabe Garcia,2014-09-22,CL8466
+376,Pere Antunez Martinez,2014-09-14,CL4748
+377,Khloe Pereira Sanchez,2014-04-06,CL92374
+378,Valreia Lastras Radresa,2015-05-16,CL2827
+379,Julia Cerezo Diaz,2014-02-12,CL6960
+380,Bruno Martinez Romera,2014-12-10,CL4645
+381,Erik Ramos Sedano,2014-11-10,CL9392
+382,Ethan Sarle Soto,2014-06-25,CL2852
+383,Beerta Guisado Sola,2014-06-08,CL9706
+384,Nit Castro Lopez,2014-10-28,CL96546
+385,Roc Llorens Coll,2017-05-03,CL9482
+386,Aina Rubieles Pertegaz,2015-12-14,CL6991
+387,Carla Rubiales Pertegaz,2015-12-14,CL6962
+388,Mia Anglada Viñals,2014-06-29,CL4566
+389,Alex Pera Perea,2016-06-15,CL13179
+390,Ona Rios Barrachina,2015-10-01,CL12805
+391,Roger Vila Bernal,2014-10-18,CL12346
+392,Àlex Talavera Gesa,2014-08-28,CL3103
+393,Egan Muñiz Mateo,2015-07-26,CL9492
+394,Ona Lapuente Tomas,2016-07-02,CL7101
+395,Pau Gonzalez Lebrato,2018-05-15,CL10606
+396,Enzo Morales Martin,2015-05-16,CL7856
+397,Olaia Varon Chao,2018-09-19,CL11472
+398,Oriol Gonzalez Lebrato,2014-01-28,CL11476
+399,Adria Gomez Martinez,2014-05-22,CL15395
+400,Pau Pesarrodona Ramirez,2015-04-04,CL1830
+401,Paulina Olive Puigdellivol,2014-04-15,CL95647
+402,Berta Corrons Adelantado,2014-05-02,CL1824
+403,Paula Roncero Herrada,2014-06-23,CL95546
+404,Berta Aguilera Elson,2014-07-05,CL4067
+405,Jana Sierra Puigmarti,2015-02-26,CL2603
+406,Nahia Selgas Cifuentes,2014-04-11,CL1821
+407,Ainet Jubells Garcia,2015-03-30,CL1818
+408,Roger Beringues Serra,2014-02-04,CL5094
+409,Bruna Vallribera Rojo,2014-02-01,CL5161
+410,Bruc Simon Llobet,2015-01-05,CL1851
+411,Jan Trilla Marti,2016-09-01,CL5146
+412,Ernest Vall Puigdellivol,2016-02-03,CL4990
+413,Yolanda Collado Perramon,2015-11-05,CL8599
+414,Aina Pique Clarena,2015-11-13,CL5172
+415,Iveth Puente Ramirez,2015-01-09,CL5126
+416,Meritxell Ponti Barrabes,2016-07-13,CL5027
+417,Joan Rios Cuenca,2014-09-22,CL4988
+418,Aniol Macia Merly,2014-11-05,CL9239
+419,Marti Vila Vilanova,2014-01-12,CL9198
+420,Pol Pla Zubiaurre,2014-09-25,CL4445
+421,Tendry Cassa Cano,2014-12-15,CL9196
+422,Clara Ladron De Guevara Baltierrez,2014-12-15,CL5813
+423,Elsa Cinca Costa,2014-04-17,CL5028
+424,Marti Santasusana Garcia,2017-10-06,CL9230
+425,Quim Vizcarro Bascompta,2014-11-06,CL5130
+426,Paula Pujol Remesal,2014-05-07,CL8592
+427,Arnau Angelat Arocas,2017-06-08,CL9228
+428,Nil Garriz Graner,2016-11-20,CL9189
+429,Marc Mora Roldan,2015-09-02,CL5128
+430,Gisela Basany,2016-01-01,CL5131
+431,Laia Concustell Garizio,2016-06-02,CL11157
+432,Clara Maryse Cots Puigventos,2016-08-09,CL9195
+433,Andreu Reyes Llobet,2016-03-08,CL5170
+434,Chloe Gallardo Haudebert,2014-05-06,CL12111
+435,Emma Lopez Rodriguez,2014-10-17,CL12118
+436,Ariana Ladron De Guevara Baltierrez,2014-12-15,CL6097
+437,Queralt Leonarte Ramonet,2015-07-08,CL12564
+438,Ariadna Moreno Romero,2014-08-17,CL12658
+439,Hugo Lorenzo Carmona,2018-05-27,CL12558
+440,Nil Martinez Circuns,2017-07-09,CL12563
+441,Martina Villarreal Santamanria,2017-06-08,CL13233
+442,Julia Llado Molina,2014-07-23,CL12529
+443,Ot Martinez Rodriguez,2017-01-25,CL9533
+444,Bernat Pellicer Maestro,2017-11-29,CL13965
+445,Magali Codina De Anta,2017-05-30,CL12812
+446,Carlota Aguilera Elson,2017-10-14,CL9227
+447,Bet Planas Vives q,2015-12-16,CL1969
+448,Gisela Basany Fructuoso,2016-01-14,CL11465
+449,Lucas Antigua Bandin,2015-04-27,CL317
+450,Aleix Sanpons Parralejo,2014-09-01,CL14215
+451,Quim Ortega Martínez,2014-02-10,CL14213
+452,Noah Hernández Reisloh,2014-08-07,CL14214
+453,Pol Aguirre Milián,2014-01-21,CL14187
+454,Adriana Martel Arriaga,2014-01-03,CL14189
+455,Aina Prats Sole,2014-09-13,CL14193
+456,Emma Sophie Gutierrez Andronache,2014-01-24,CL14194
+457,Guillem Castelló París,2014-03-16,CL14233
+458,Erik Tomas Lopez,2014-09-08,CL15147
+459,Odei Urroz Osés,2014-05-16,CL15155
+460,Judith Carmona Cortada,2014-09-16,CL14868
+461,Erik Andrade Vilchez PBM,2014-08-11,CL5533
+462,Eric Boladeras Navarro PBM,2014-05-05,CL5382
+463,Gerard Rodriguez Ros PBM,2014-02-04,CL5333
+464,Leonardo Andrews Mclaughlin PBM,2014-07-26,CL5919
+465,Enzo Garcia Miranda PBM,2014-01-30,CL5550
+466,Simon Platas Garcia PBM,2014-03-03,CL5543
+467,Mario Del Sol Andrade PBM,2014-07-17,CL6327
+468,Pol Olivares Maateo PBM,2014-03-02,CL5547
+469,Lucas Arroyo Rojas PBM,2014-06-02,CL5536
+470,Unai Gonzalez Becerra PBM,2015-01-01,CL82315
+471,Jadish Valentina Torrealba González PBF,2015-01-01,CL5534
+472,Roc Diaz Segura,2014-10-26,CL5605
+473,Joanna Van Timmeren Garcia BF,2014-01-15,CL5579
+474,Nael Blanes Cruz,2015-04-16,CL9364
+475,Jofre Carazo Lopez,2014-02-06,CL9366
+476,Alex Segura Areste,2015-07-17,CL9368
+477,Lisa Eickhold Anento,2014-07-22,CL9375
+478,David Molleja Toiber,2015-01-21,CL9637
+479,Marc Manzano Vericat,2015-11-19,CL9638
+480,Xavi Extremera Baños,2015-12-07,CL9372
+481,Iris Gonzalez Lluch,2015-03-13,CL9370
+482,Eric Guerrero Garrido,2015-11-08,CL9885
+483,Piero Gilardi,2014-10-08,CL9361
+484,Jon Fresneda Moreno,2015-10-16,CL9360
+485,Irakli Chkhvimiani,2015-04-01,CL10513
+486,Ivan Tiurin,2015-12-29,CL12829
+487,Daryl Ibañez Vargas,2016-03-17,CL13342
+488,Milo Leisch Campillo,2016-07-08,CL13347
+489,Ernest Vidiella Mallen,2014-04-29,CL2590
+490,Mateo Fernandez Bofill,2014-01-06,CL2627
+491,Luca Alcaide Sanchez,2014-08-23,CL2588
+492,Agusti Suau Carnice,2014-01-28,CL2591
+493,Martina Lucas Guerrero,2014-04-29,CL8438
+494,Guillem Rubio Prieto BM,2014-04-08,CL2589
+495,Adam Canal Rodriguez,2014-10-30,CL8196
+496,Marc Rico Acevedo,2014-04-05,CL8476
+497,Carlos Piñeiro Martinez,2015-05-18,CL10587
+498,Valle Gacho Meneses,2014-01-30,CL8229
+499,Walid Imsaadane,2015-09-25,CL10590
+500,Aleix Fraile Roura q,2015-11-14,CL14286
+501,Lluc Milla Gou,2014-02-07,CL6698
+502,Leo Aubron,2014-09-03,CL6574
+503,Joaquin Madiba Fraga Prevot BM,2014-09-03,CL8810
+504,Nicolas Hernandez Bueno,2014-11-27,CL6576
+505,Uriel Osorio Ruiz,2015-05-25,CL10602
+506,Hugo Benitez Lopez,2017-10-02,CL13332
+507,Rafael Lamas Cosentino,2017-10-14,CL13331
+508,Max Anguita Guerrero,2014-10-29,CL96204
+509,Jan Hanzich Pipitone,2015-05-29,CL4177
+510,Mario Montes Cortes,2015-09-10,CL4436
+511,Jana Arjona Nuñez,2016-08-02,CL5039
+512,Julen Mateos De Fez,2015-07-06,CT1675
+513,Axel Gascon Cruz,2015-12-09,CL2009
+514,Nicolas De Diego Pennisi,2014-06-03,CL4810
+515,Pau Raga Carazo,2016-05-21,CL6689
+516,Rayán Zubidat,2017-02-02,CL9437
+517,Josep Raga Carazo,2014-04-10,CL92542
+518,Oriol Recio Cunill,2015-05-01,CL9513
+519,Gael Ruiz Grandin,2015-07-14,CL6488
+520,Adrian Ruiz Grandin,2015-07-14,CL6487
+521,Mireia Leiva Martinez,2015-10-26,CL5048
+522,Leire Ortega Lopez,2014-11-29,CL5248
+523,Luca Alonso Olivero,2018-01-20,CL11662
+524,Toni Casanovas Torres,2017-03-10,CL7455
+525,Alex Almazan Escobosa,2017-06-27,CL14655
+526,Eric Almazan Escobosa,2017-06-27,CL14656
+527,Àlex Márquez Ibiza,2014-09-28,CL3531
+528,Raisa Andreea Spinu BF,2014-02-05,CL8898
+529,Gerard Suari Prato,2014-03-13,CL9127
+530,Marçal Soldevila Paris,2015-11-11,CT1769
+531,Aran Porcel Gou,2016-09-25,CL8842
+532,Arnau Fite Prunera,2016-05-20,CT1741
+533,Aina Guiu Castro,2015-07-07,CL5324
+534,Pep Aige Farrús,2015-08-17,CL5322
+535,NOUR AL ISSLAM DIOP,2016-12-17,CT25658
+536,Vera Rami Torras,2014-08-03,CT1770
+537,FATIMA IMAD KHETTABI,2016-08-30,CT1752
+538,Andra Achim,2016-07-28,CL10599
+539,Nil Majoral Porta,2015-06-09,CL13742
+540,Aleix Vlagañon Hidalgo,2016-01-12,CL13786
+541,Bru Arbonés Moyà,2018-09-01,CL10748
+542,Leo Montoy Guiu,2018-02-13,CL13785
+543,Lara López Camón,2017-02-28,CL13789
+544,ARLET SAEZ CARBONELL,2016-06-07,CT2574
+545,Alba Espinal Brualla,2015-01-31,CL13326
+546,Aina Fillat Figueras q,2014-04-23,CL12359
+547,Mario Rodriguez Garrido,2014-07-07,CL3515
+548,Marc Gonzalez Quero,2015-01-11,CL2247
+549,Marc Viñas Lopez,2015-12-18,CL5661
+550,Roger Cabestany Navarro,2015-08-13,CL2246
+551,Ivet Corral Soriano,2015-06-09,CL5277
+552,Abril Garcia Morales,2015-11-07,CL5436
+553,Alex Sanchez Romero,2015-07-31,CL10053
+554,Josep Ferrer Garcia,2016-04-03,CL10078
+555,Leo Trunas Grao,2014-09-03,CL3519
+556,Max Gaitan Prats,2015-02-12,CL2259
+557,David Hernandez Alcantara,2014-12-30,CL7395
+558,Kilian Fresneda Perez,2015-06-28,CL10061
+559,Pol Muntada Sole,2014-03-01,CL4585
+560,Laia Castellanos Yanes,2016-04-11,CL10076
+561,Bruna Campi Molina,2015-04-13,CL3516
+562,Bru Casanovas Permanyer,2014-11-10,CL2428
+563,Lluna Oller Perna,2014-05-10,CL5281
+564,Nicole Lozano Mañas,2018-09-13,CL13507
+565,Marc Garcia Cozar,2017-04-28,CL10073
+566,Bruno San Andres Guirado,2017-09-08,CL11704
+567,Gerard Martinez Reig,2017-07-25,CL10030
+568,Arnau Sabalete Gil,2015-04-09,CL10057
+569,Aran Saenz Sanchez,2016-01-01,CL8587
+570,Bernat Oliveras Estefanell,2015-11-19,CL6676
+571,Miquel Salvado Fugaroles,2015-07-30,CL2420
+572,Oriol Trujillo Pastells,2015-05-15,CL3182
+573,Iyad Nahal,2015-10-02,CL6654
+574,Maria Vizcaino Moron,2014-05-25,CL10229
+575,Carlos Orgaz Romo,2016-02-08,CL6682
+576,Ibai Romo Pla,2015-05-11,CL2417
+577,Nicolas Fernandez Moreno,2014-07-11,CL3895
+578,Ivet Fonoll Sanchez,2015-12-21,CL6678
+579,Ibai Orbea Parer,2017-03-21,CL10234
+580,Alex Muntasell Moreno,2016-09-28,CL10554
+581,Max Pacheco Moron,2016-08-29,CL6681
+582,Biel Pacheco Moron,2014-08-29,CL96782
+583,Elias Orgaz Romo,2018-10-04,CL13035
+584,Anna Fernandez Cos,2015-01-27,CL6657
+585,Jofre Calm Galdeano,2015-12-19,CL4628
+586,Guillem Garcia Morea,2015-05-19,CL2274
+587,Leo Rienda Martin,2015-02-09,CL4980
+588,Nora Real Arza,2016-06-21,CL4610
+589,Telma Barea Rojas,2015-09-29,CL4985
+590,Mara Gea Gonzalez,2015-05-07,CL2241
+591,Stacy Nadales William,2015-04-11,CL10318
+592,Francisco Osuna Sanchez,2014-01-14,CL10346
+593,Lucia Portugues Arnau,2015-08-11,CL12460
+594,Teo Barea Rojas,2015-05-29,CL4984
+595,Danid Dengra Catala,2014-01-10,CL14229
+596,Bruno Orriols Morillas,2014-01-07,CL8406
+597,Robinson Rojas Gimenez,2016-08-02,CL6881
+598,Joan Casado Ballesteros,2016-03-01,CL8038
+599,Claudia Trujillo Garcia,2016-03-06,CL8036
+600,Alia Muriel Lopez,2015-03-21,CL6885
+601,Claudia Trujillo,2016-01-01,CL6603
+602,Elena Paez Moreno,2014-11-25,CL89447
+603,Daniella Fernandez Peralta,2014-09-06,CL779
+604,Helga Aranda Colomer,2014-01-03,CL6565
+605,Eric Quindos Atanes,2014-02-04,CL8146
+606,Gael Blanzaco Poncelas,2014-11-03,CL8164
+607,Pau Pujadas Escabros,2014-06-10,CL8156
+608,Nil Pelao Fernandez,2014-09-02,CL8162
+609,Martina Xifre Orti,2014-09-29,CL8959
+610,Alexandru-daniel Bunea BM,2014-02-26,CL11873
+611,Antoni Terron Cid BM,2015-04-12,CL10487
+612,Aleu Renau Oliveres,2014-11-20,CL11679
+613,Nuria Conesa Rodriguez,2014-06-12,CL8158
+614,Arnau Rovira Garcia,2015-04-09,CL10306
+615,Jhan Vigo Poulastrou,2014-08-11,CL8881
+616,Gerard Alonso Galletero,2014-06-26,CL11973
+617,Marc Llamas Soriano,2014-04-15,CL12292
+618,Andrei Angeru,2014-07-14,CL13692
+619,Gael Nieto Sanchez,2015-02-26,CL13691
+620,Liam Ciscar Cuzco,2015-03-13,CL13469
+621,Marc Alonso Gatellero,2014-06-26,CL11972
+622,Alex Montes Cardona q,2015-05-29,CL12730
+623,Marc Alexander Iacob,2016-04-21,CL16577
+624,Iris Agirre Mendez,2015-10-16,CL12708
+625,Vega Teran Rodriguez,2016-09-02,CL13620
+626,Sofia Hernando Carrera,2014-11-20,CL7338
+627,Paula Lopez Mateo,2014-08-26,CL7347
+628,Aitor Vizcaino Rodriguez BM,2015-02-22,CL11589
+629,Aleix Villa Del Castillo BM,2014-06-06,CL10949
+630,Guillem Resina Chamorro BM,2014-03-03,CL10954
+631,Gael Faisal Alvarez BM,2015-01-29,CL10950
+632,Luque Fernandez Aguilar BM,2014-11-06,CL7349
+633,Joel Ramos Arenas BM,2015-03-19,CL11588
+634,Hugo Bernal Martinez BM,2015-05-13,CL11591
+635,Mario Gonzalez Serrano BM,2014-02-16,CL7341
+636,Miquel Andres Blanco BM,2015-02-02,CL11594
+637,Ruben Vinagre Gil BM,2014-05-28,CL10959
+638,Julia Martin Ferrer BF,2014-04-02,CL10955
+639,Sabina Iriarte Gonzalez BF,2015-10-14,CL11593
+640,Aleix Barros Caballero,2014-05-26,CL10996
+641,Raul Vazquez Nuñez,2014-03-10,CL7348
+642,Lucas Blasco Cardenas,2014-10-26,CL7345
+643,Zoe Beltran Miro,2014-11-14,CL11001
+644,Abril Jimenez Barba,2014-09-26,CL10953
+645,Ana Velazquez Martin,2016-08-18,CL14975
+646,Maria González Bravo q,2015-12-20,CL16430
+647,Paula Gutierrez Cuesta,2014-06-03,CL5476
+648,Aysel Sanchez Chito,2014-12-01,CL5468
+649,Marc Valderrama Vazquez,2015-01-29,CL6842
+650,Lucia Sangenis Canovas BF,2014-06-05,CL6373
+651,Lucia Jimenez Jimenez BF,2014-01-27,CL5211
+652,Biel Pato Rojas BM,2014-02-12,CL10710
+653,Biel Vicente Castells BM,2015-03-16,CL9417
+654,Biel Beltran Dominguez BM,2015-11-08,CL9408
+655,Bru Berrocal Jimenez BM,2014-04-12,CL9744
+656,David Markov Yakhymovych BM,2014-04-26,CL9555
+657,Daniel Rico Ortiz BM,2014-02-13,CL5416
+658,Bruno Espejel Serrano BM,2014-11-07,CL9442
+659,Bruno Romero Carreño BM,2015-12-28,CL9416
+660,Enzo Marzan Lukonga BM,2015-08-13,CL9862
+661,Leo Benito Almansa BM,2014-03-14,CL5469
+662,Jorge Prieto Gonzalez BM,2014-01-12,CL5472
+663,Marti Alcantara Reguero BM,2015-06-14,CL9406
+664,Roger Pastrana Yagüe BM,2015-08-06,CL9414
+665,Unai Garcia Gracia BM,2014-03-11,CL9439
+666,Aina Gomez Prieto BF,2015-07-14,CL9412
+667,Arlet Queiruga Dominguez BF,2015-11-20,CL9457
+668,Ana Maria Ungureanu BF,2015-06-28,CL9748
+669,Lis Suarez De Julian BF,2014-09-25,CL5512
+670,Martina Pareja Marin BF,2014-10-02,CL5189
+671,Ona Pros Porras BF,2015-05-19,CL9415
+672,Martina Perez-vico Rovi BF,2015-02-12,CL10358
+673,Nora Villa Castaño BF,2015-07-29,CL9418
+674,Tsarina De Sola Logvinenko BF,2015-10-25,CL9411
+675,Goku Exposito Garcia,2015-07-17,CL9860
+676,Thierno Abraham Diallo Diallo,2015-09-17,CL9746
+677,Samir Ghali Junyent,2015-03-10,CL11070
+678,Laia Prieto Murillo,2014-06-10,CL12250
+679,Mario Fernandez Fernandez,2014-04-28,CL5528
+680,Elena Vilalta Conesa,2015-08-14,CL16444
+681,Erik Aguilar Quiñonez,2015-08-09,CL12030
+682,Marti Fortuny Oliva BM,2014-06-23,CL726
+683,Jan Perez Sanahuja BM,2014-10-18,CL733
+684,Sergi Serra Hortoneda BM,2014-11-26,CL7293
+685,Bianca Potau Badea PBF,2015-03-03,CL736
+686,Sira Salgado Ferre,2014-04-01,CL7271
+687,Jan Morgado Campano BM,2014-08-07,CL731
+688,Eric Belencoso Boada BM,2014-05-11,CL2865
+689,Gil Alvarez Andreu BM,2014-03-13,CL7268
+690,Nil Menero Porcel BM,2014-04-22,CL2867
+691,Ona Gelambí Domènech BF,2014-03-17,CL7270
+692,Estrella Trinidad Peña BF,2014-02-22,CL7267
+693,Pol Rico Lopez BM,2014-08-14,CL9960
+694,Hector Marin Barrientos BM,2014-02-06,CL10294
+695,Marti Mejias Jane BM,2015-08-15,CL7280
+696,Martina Forn Targa BF,2014-01-01,CL7265
+697,Raimon Alonso Boronat,2014-05-25,CL9069
+698,Heura Recasens Casamitjana,2014-01-09,CL13500
+699,Eugeni Burria Lucas BM,2014-06-18,CL8011
+700,Mar Lancina Herrera BF,2014-06-03,CL8004
+701,Aaron Ceusan BM,2014-09-14,CL10171
+702,Pere Mata Garcia BM,2015-03-03,CL10987
+703,Quim Gonzalez Carrasco BM,2015-01-07,CL10990
+704,Ulisses Esteban Martin BM,2015-11-25,CL11090
+705,Jana Pallares Sanchez BF,2014-12-08,CL10494
+706,Noa Torrens Puiggros BF,2015-10-23,CL10983
+707,Zoe Tebas Gabarron BF,2014-01-10,CL11272
+708,Marta Marin Romeu,2014-11-08,CL8017
+709,Arlet Saumell Valiente,2014-06-27,CL12207
+710,Adrià Martin GomerA,2015-05-17,CL8242
+711,Hugo Perez Portero,2015-11-09,CL11086
+712,Sam Ramirez Rafael,2016-07-28,CL15811
+713,Judit Magem Claver,2015-07-22,CL13761
+714,Marià Vila Mir PBM,2015-11-23,CL6702
+715,Júlia Gilabert Mitjavila BF,2014-09-30,CL5959
+716,Mariona Serra Viladrich PBF,2016-03-09,CL8299
+717,Lluis Garcia Bailac,2015-10-30,CL13996
+718,Neus Pellicer Torrescasana,2015-07-07,CL6703
+719,Alba Capell Quirós BF,2014-05-24,CL5031
+720,Eloy Lorenzo Fernandez,2015-05-01,CL8293
+721,Carla Santacruz Alacid,2015-03-02,CL8216
+722,Aleix Carmona Arquillo,2014-01-25,CL8366
+723,Laia Cid Marcos,2015-07-21,CL8295
+724,Aran Santos De La Fuente,2015-06-08,CL8235
+725,Didac Sanjust Costa,2017-07-06,CT2118
+726,Enzo Rodriguez Ruiz BM,2015-03-31,CT2094
+727,Biel Nou Grau,2014-04-08,CT2069
+728,Tian Guixa Font,2014-09-01,CT1342
+729,Kawthar Amraoui El Mahboubi,2014-12-02,CL291
+730,Noa Berbel Soñe,2015-02-06,CT2107
+731,Dylan Martinez Gerewu,2016-10-08,CT2072
+732,Cesar Iglesias Martin,2015-10-05,CT2505
+733,Gerard Torres Tamayo,2016-11-10,CT2121
+734,Toni Garcia Rodriguez BM,2015-12-19,CT2842
+735,Guiu Colomer Enriquez BM,2015-10-13,CT2167
+736,Tao Stoyou Sousa BM,2015-04-20,CT2507
+737,Eric Gil Lopez BM,2016-12-07,CT2115
+738,Joan Sanchez Llobet BM,2017-08-03,CT2773
+739,Marti Martinez Gerewu BM,2019-08-17,CT2824
+740,Jana Tudó Gili BF,2015-01-27,CT2064
+741,Irene Hernandez Mercado BF,2015-10-14,CT2106
+742,Nora Gutierrez Eldredge BF,2016-07-14,CT2831
+743,Dariia Kushnir BF,2016-03-22,CT2713
+744,Martina Rosado Martinez BF,2017-12-27,CT2772
+745,Emma Gutierrez Eldredge BF,2019-09-17,CT2840
+746,Magi Ruiz Colomer BM,2014-09-17,CL5378
+747,Jordi Pons Timonet,2014-03-25,CL11963
+748,Guillem Costa Gonzalez,2014-05-21,CL5376
+749,Núria Rutllant Peracaula,2014-03-18,CL4053
+750,Biel Pato Rojas BM,2014-02-12,CL8269
+751,Eloi Rius Megias,2014-06-09,CL7761
+752,Joel Ruiz Rios,2015-07-11,CL16153
+753,Iria Novoa Gil,2014-07-27,CL3266
+754,Ona Bolart Cespedes,2014-02-02,CL6361
+755,Roger Segura Pallares,2014-04-07,CL7925
+756,Lluc Monclus Pla,2014-01-23,CL7923
+757,Laura Gracia Sanahuja,2014-06-27,CL7920
+758,Julia Alegret Mora,2014-07-27,CL15531
+759,Marc Blanch Llombart,2015-11-30,CL12094
+760,Biel Ferre Rius,2015-03-18,CL12093
+761,Marta Faiges Pons,2016-04-10,CL17038
+762,Aran Vallès Burgarolas,2014-09-27,CL7815
+763,Abril Grases Doblas,2014-03-15,CL7813
+764,Pol Almudéver Bassols,2014-11-12,CL11814
+765,Elsa Pañella Bernet,2016-10-20,CL16734
+766,Roger Dalmau Masferrer,2014-04-06,CL7154
+767,Martí Català Noguera,2014-09-08,CL4100
+768,Pol Valdes Vizcaino,2014-06-17,CL8350
+769,Marc Pizarro Blazquez,2014-07-30,CL7219
+770,Hugo Garcia Barranco,2015-01-21,CL8353
+771,Carles Cabanas Perez,2015-11-05,CL8371
+772,Jofre Espin Diaz,2016-05-24,CL11329
+773,Gener Rocañin Manzanares,2017-04-06,CL11337
+774,Guim Fors Arcos,2014-10-04,CL11345
+775,Otger Fors Arcos,2014-10-04,CL11347
+776,Alba Riera Belzunce,2014-09-15,CL7158
+777,Paula Baró Zamora,2014-10-23,CL11341
+778,Noa Fernandez Fernandez,2014-06-07,CL4902
+779,Bruno Acosta Milan BM,2015-12-07,CL11335
+780,Dani Corado Cortez BM,2014-09-16,CL11966
+781,Arya Sanchez Pérez BF,2014-02-25,CL11673
+782,Eric Montero Contreras,2015-12-19,CL11332
+783,Fiorella Passarelli,2015-03-04,CL11340
+784,Aura Castañé Muntañà,2015-03-08,CL11427
+785,Marc Valdes Vizcaino,2018-02-22,CL12938
+786,Leo Fuentes Guzman,2014-12-27,CL12815
+787,Marcel Bellon Fernandez,2014-08-10,CL8215
+788,Arlet Gonzalez Guardiet,2014-02-21,CL7648
+789,Andy Osarumwense Cuevas,2015-09-04,CL11127
+790,Alba Capell Quiros,2014-05-24,CL10652
+791,Mariona Guilera Masclans,2015-02-02,CL8949
+792,Guim Sanz,2014-01-01,CL9515
+793,Marti Sanchez Cabo,2015-12-17,CL11631
+794,Noah San Miguel Sanchez,2014-06-17,CL11629
+795,Julia Irurtia Carrasco,2014-01-28,CL9558
+796,Martina Canela Valles,2015-01-20,CL11676
+797,Bet Saumell Fortuny,2015-03-03,CL11675
+798,Elsa Mata Miguel,2015-05-16,CL12357
+799,Aina Guardiet Douri,2015-05-26,CL11748
+800,Aitana Soldan Anglada,2015-07-27,CL11630
+801,Jordi Arnan Tutusaus,2014-03-06,CL12176
+802,Txell Violan Colomer,2014-12-10,CL7145
+803,Eder Varela Lopez,2015-05-25,CL16549
+804,Noa Requena Rodriguez q,2015-05-05,CL14941
+805,Liz Garcia Le Guilloux,2015-09-10,CL12453
+806,Daniel Hens Sanprieto,2014-11-05,CL8381
+807,Pau Dura Garcia,2015-05-18,CL6469
+808,Ona Domenech Capella,2014-08-02,CL6467
+809,Mia Mercedes Jager Gracia,2014-04-09,CL2394
+810,Abril Rojas Vila,2014-09-06,CL2993
+811,Jan Mendoza Guzman,2017-01-28,CL9894
+812,Neus Gil Carreira,2017-09-01,CL13734
+813,Khris Perez Hernandez,2016-04-14,CL9897
+814,Sense dades,2014-01-01,CL5656
+815,Max Ripollés Espada,2014-12-29,CL12369
+816,Anna Rodriguez,2016-01-01,CL13239
+817,Martí Estellers Ribalta,2014-07-14,CL2659
+818,Nadia Martínez Agudo,2014-01-01,CL4650
+819,Jan Sepulveda Garcia,2014-06-24,CL7066
+820,Pablo Monreal Melgarejo,2014-01-31,CL7039
+821,Laura Martinez Carceles,2014-04-15,CL7069
+822,Aina Timoneda Garcia,2014-07-14,CL7055
+823,Hugo Garcia Marquez,2014-12-12,CL7076
+824,Unai Arias Sanchez,2014-02-10,CL7012
+825,Diego Olmedo Castro,2015-03-03,CL10972
+826,Enzo Hermoso Martinez,2014-11-23,CL7048
+827,Carla Lopez Aguado,2014-10-14,CL10964
+828,Sara Duran Lopez,2015-01-07,CL11176
+829,Ainhoa Maroto Escuder,2015-02-01,CL10967
+830,Alvaro Dominguez Alonso,2015-02-27,CL11161
+831,Julen Maestre Cereijo,2015-06-21,CL10963
+832,Toni Sanchez Gamez,2014-05-10,CL7070
+833,Arnau Balius Sanjuan,2016-05-20,CL13185
+834,Fasika Pita Garcia,2014-04-13,CL11702
+835,Oscar Somolinos Castro,2016-01-09,CL15376
+836,Dana Laguna Muñoz,2016-03-29,CL14223
+837,Roy Garcia De Dios,2015-06-21,CL15491
+838,Nil Moreno Canillas,2014-01-15,CL14137
+839,Julia Linares Barreras,2014-06-25,CL10979
+840,Julia Baez Casino,2014-01-14,CL11193
+841,Roc Alfonso Martinez,2014-04-12,CL4783
+842,Blai Riera Poquet,2014-05-14,CL6033
+843,Eric Segarra Farnos,2015-04-14,CL8689
+844,Mireia Lloret Aragones,2014-04-16,CL8690
+845,Neus Vinaixa Tartera,2014-05-21,CL3562
+846,Ingrid Perez Abelló,2014-10-21,CL5628
+847,Ona Gratovill Sanchez,2016-08-31,CL8679
+848,Oriol Franco Caldaras,2015-09-12,CL10666
+849,Marina Cebollero Staorskina,2014-08-08,CL94264
+850,India Martin Cuadrado BF,2014-04-04,CL7608
+851,Lina Barkaoui El Bakkar BF,2014-03-08,CL8723
+852,Nil Torres Prats BM,2014-10-05,CL7611
+853,Edgar Lopez Pizarro BM,2014-04-01,CL8728
+854,Marc Sempere Amezcua BM,2014-01-11,CL7612
+855,Ernest Gellida Barrio BM,2014-08-26,CL7613
+856,Pol Diaz Cristino BM,2014-02-03,CT2082
+857,Antonio Balazote BM,2014-05-01,CL11067
+858,Biel Gordillo Rodriguez BM,2014-02-19,CL11068
+859,Gerard Lopez Romero BM,2014-11-26,CL7619
+860,Blai Lligadas Turon BM,2015-03-11,CL11069
+861,Hugo De Cal Medina BM,2014-06-29,CL5865
+862,Iu Grane Barcelo BM,2015-10-26,CL11071
+863,Thiago Silva Aranda BM,2015-02-15,CL11075
+864,Pau Llado Aparicio BM,2015-12-17,CL11065
+865,Pep Sarle Cornado BM,2015-09-09,CL11072
+866,Victor Martinez Perales BM,2015-08-29,CL11074
+867,Sara Lopez Garcia BF,2015-01-19,CL11066
+868,Merce Bages Vellve BF,2014-12-14,CL11064
+869,Montserrat Marques Cruz AF,2015-01-27,CL11596
+870,Sergi Aguza Piqueras,2016-04-21,CL15055
+871,Isona Masip Sala,2016-09-22,CL15059
+872,Olivier Casas Muiño,2015-08-10,CL11597
+873,Roc Velez Maderuelo,2014-04-14,CL8042
+874,Adrià Cano Falcon,2014-06-13,CL8967
+875,Isaac Martinez Den Ouden,2016-02-17,CL4750
+876,Daniel Romero Diaz,2014-02-22,CL11618
+877,Abril Vendrell Molina,2014-09-09,CL4616
+878,Adaugo Oleh Anekore,2014-08-28,CL8907
+879,Paula Sanchez Domingo,2014-04-19,CL7121
+880,Aina Pulido Sanchez,2015-07-31,CL9622
+881,Nghia Aguilar Gartua BM,2015-03-29,CL9519
+882,Dunia Lara Garcia BF,2014-10-17,CL11856
+883,Naiala Martinez Molina BF,2015-03-31,CL11855
+884,Elsa Lara Garcia,2014-10-17,CL12456
+885,Bruno Calvo Fernandez,2015-06-19,CL13384
+886,Guillem Jimenez Cantero,2016-07-16,CL12984
+887,Sergi Molero Segura,2016-09-27,CL13026
+888,Daniel Linares Antelo,2014-07-10,CT1736
+889,Chloé Fernández Escobedo,2014-05-11,CT1735
+890,Ilai Palomino Guivernau BM,2015-05-07,CT1943
+891,Pau Lama Binefa BM,2015-02-02,CT1938
+892,Carlota De Cal Barbera BF,2014-01-19,CT1936
+893,Nasser El Boukiadi Abdel-lam,2015-07-01,CL5901
+894,Ivet Verge Sentis BF,2014-04-21,CT1840
+895,Asier Ezequiel Santos Ferrer,2015-02-20,CT2357
+896,Francisco Carbonell Lopez-zuaro,2018-03-03,CT2460
+897,Evelyn Costache,2018-06-09,CT2523
+898,Ona Sanchez Sanchez Terre,2015-09-25,CL10603
+899,Eydan Muñiz Ballestero BM,2015-01-17,CL9565
+900,Maya Oselome Omofuegbe BF,2014-01-11,CL5885
+901,Lia Fernandez Caillat,2015-04-24,CL13288
+902,Èlia Bayón Fernández BF,2015-05-18,CL11320
+903,Pol Crusells Guasch AM,2014-08-11,CL10929
+904,Loukas Dimitrios Lazaridis Vizcaino BM,2014-04-27,CT1002
+905,Olivia Mohedano Zarranz AF,2015-02-19,CL11945
+906,Leyre López López AF,2015-07-24,CL12000
+907,Federico Tibamoza Lozano,2016-02-05,CL14063
+908,Celia Gomez Obeso,2016-02-22,CL11807
+909,Aniol Conill Colonques,2015-04-08,CL7191
+910,Biel Aput Gracia,2015-05-20,CL7196
+911,Alexis Chaverra Macias,2017-04-07,CL12058
+912,Laia Prieto Magrans,2014-11-17,CL10211
+913,Clàudia Pajares París,2015-03-07,CL7200
+914,Valentina Lacroix Perez,2015-09-23,CL11381
+915,Khan Balcells Ishnyakov,2015-10-05,CL13337
+916,Enzo Bartoli Macia,2016-06-10,CL10309
+917,Ion Ortega Vargas,2015-06-02,CL13830
+918,Joana Lopez Serra,2015-03-17,CL5538
+919,Elena Ferran Fores AF,2015-08-14,CL3301
+920,Bruna Torné Real,2015-10-02,CL11648
+921,Nil Portas Juanola,2015-08-23,CL12061
+922,Francesc Folquet Routier,2014-08-12,CL12007
+923,Nora Rodríguez Mas De Xaxars,2015-08-19,CL12056
+924,Arlette Collell Hernandez,2014-01-23,CL6667
+925,Bruno Manassero Martin,2014-01-16,CL11468
+926,Mariona Bosch Bejarano,2015-01-21,CT2083
+927,Pol Barneto Iglesias,2015-10-23,CL11116
+928,Noah Comí Escandell,2014-02-10,CL10868
+929,Luis Felix Sanchez Monzon,2015-01-03,CT2122
+930,Prosper Aran Okutu,2014-06-15,CL13260
+931,Irene Cortasa Elias,2015-07-17,CT2573
+932,Carles Godino Fernandez,2016-10-31,CL13722
+933,Axel Sanchez Barberan,2016-08-18,CL13723
+934,Jadel Vizcaya Ezeogu,2017-06-11,CL12376
+935,Kilian Malmierca Maldonado,2017-07-17,CL13731
+936,Helio Moran Granado,2017-01-01,CL6040
+937,Roc Herrera Rodriguez,2017-03-24,CL12374
+938,Mario Casanova Trejo,2016-12-28,CL12833
+939,Eros Carballo Crestemayer,2016-04-14,CL13719
+940,Iker Sanchez Navarro,2016-05-18,CL9493
+941,Aray Espinosa Flor,2017-11-21,CL12370
+942,Bernat Vall-llosada Casajoana,2015-05-13,CL6053
+943,Miquel Fortuny Gonzalez,2015-01-31,CL13720
+944,Roc Armengol Llopart,2015-01-29,CL10396
+945,Mario Juliá De Sousa,2014-12-19,CL10399
+946,Alma Arroyo Pujadas,2016-01-06,CL10402
+947,Lucia Juliá De Sousa,2016-06-10,CL10409
+948,Gaia Freixa Saera,2018-09-11,CL13727
+949,Dounia Ouahhoud El Massaoudi,2017-10-18,CL13871
+950,Ginebra Garcia Emboumbou,2018-06-01,CL13728
+951,Leire Malmierca Maldonado,2017-07-17,CL13730
+952,Ana Linero Fructuoso,2014-10-21,CL12375
+953,Gina Cabrera Perez,2015-08-19,CL10397
+954,Indira Fernandez Morea,2014-08-15,CL9502
+955,Inés Egido Hernández,2015-10-22,CL6319
+956,Cesc Fraile Parramon,2017-06-02,CL11219
+957,Ariadna Ribera Sanchez,2015-07-15,CL12028
+958,Evan Zurdo Diaz,2016-10-25,CL12868
+959,Didac Vidal Penna q,2015-03-30,CL12539
+960,Derek Nogales Platero,2016-08-23,CL13421
+961,Ana Ciobanu,2014-09-24,CL15085
+962,Pablo Guarner López,2017-06-04,CT2631
+963,Èric Galbany Garriga,2015-11-21,CT2443
+964,Laia Da Silva Gendra,2014-09-02,CT1803
+965,Berta Da Silva Gendra,2016-10-10,CT2848
+966,Riccardo Curti,2014-01-09,CL15051
+967,Oriol Requena Marti,2014-10-19,CL3989
+968,Carla De La Fuente Llorca,2015-03-10,CL12810
+969,Maria López Pacheco,2016-01-01,CL12942
+970,Judit Prat,2015-01-01,CL11745
+971,Gissele Cabrera Roca PBF,2014-09-13,CL4535
+972,Denisse Cabrera Roca PBF,2015-09-22,CL4537
+973,Abril Ruiz Vazquez,2015-04-23,CL10163
+974,Mar Isturiz Serrasolsas,2014-10-02,CL12526
+975,Carla Castillejo Delgado,2016-01-23,CL13187
+976,Vinyet Arbonés Moyà,2014-03-16,CT1945
+977,Rebeca-elena Spinu,2016-05-19,CL8899
+978,Ariadna Massons,2016-05-10,CL10833
+979,Lucia Lobo Gonzalez BF,2014-08-23,CL5470
+980,Paula Pico Garcia BF,2014-12-24,CL5467
+981,Ares Delgado Villalba,2015-10-03,CL12016
+982,Ivet Mir Villalba,2015-04-08,CL6707
+983,Iris Pallars Rovira,2015-07-22,CL6701
+984,Clara López Llombart,2017-01-04,CL13002
+985,Emma Moreno Calvo,2015-01-28,CL10974
+986,Leire Jimenez Roda,2014-03-28,CL7120
+987,Amalia Torrano Sanchez,2014-03-28,CL12935
+988,Astrid Luna Jimenez,2016-08-10,CL12982
+989,Marina Garcia Cardona,2016-03-26,CL12985
+990,Marina Dalmau Carrasco,2015-02-11,CL11318
+991,Ivette Recio Martoti,2015-01-31,CL11315
+992,Clara Piedra Ruz,2014-11-30,CL11316
+993,Aicha Djalo,2014-11-18,CL10186
+994,Lucia Jimenez Turner,2014-07-15,CT2620
+995,Amara Skilou Ziani,2014-05-11,CL96278
+996,Aroha Colchon Lopez,2015-10-30,CL9937
+997,Eira Cobo Tarradas,2015-04-24,CT2786
+998,Laia Arias Sole,2014-07-19,CL9136
+999,Queralt Matamala Coll,2018-10-08,CL13367
+1000,Jana Nejjar,2017-06-04,CL13003
+1001,Lina Mechaal El Hamdaoui,2018-04-09,CL13001
+1002,Melany Karni Alvarado,2015-12-09,CL13369
+1003,Biatriz Moreira Rebelo,2015-02-20,CL16329
+1004,Jana Sabater Sanchez,2014-04-23,CL5947
+1005,Yasmina Azar Zaydi,2014-02-28,CL14060
+1006,Aina Gomez Rosa,2014-05-31,CL15342
+1007,Aitana Garcia Serrano,2014-11-19,CL12020
+1008,Elna Bonsjoms Macarro,2014-10-14,CT1222
+1009,Gina Rovira Boix,2014-01-07,CL2744
+1010,Ferran Basart Lopez,2014-04-24,CL3176
+1011,Marti Fonseca Sernis,2014-09-06,CL2149
+1012,Alex Sola Castaño,2015-11-06,CL11120
+1013,Denis Múñoz Zapata,2015-11-05,CL9267
+1014,Guillem Pagès Ciurans,2014-02-12,CL8797
+1015,Biel Berloso Pujol,2014-03-27,CL9714
+1016,ADÁN BUÑALES MARTINEZ,2015-06-23,CL12018
+1017,Ionatan Popa Sirb,2015-01-12,CL8356
+1018,Cesc Guillén Aldavert,2016-03-16,CT1946
+1019,Mael Dominguez,2015-10-28,CL12318
+1020,Jan Isidro,2015-09-10,CL12320
+1021,Pol Soler Perez,2014-06-09,CL12317
+1022,Victor Beas Buró,2014-12-29,CL12443
+1023,Alvaro Bon Dia Bujalance,2016-06-01,CL10828
+1024,Joan Casado Ballesteros,2016-03-01,CL12319
+1025,Joel Vila Madrid BM,2014-08-30,CL7334
+1026,Biel Galceran Ros BM,2014-02-09,CL5471
+1027,Francisco Gascon Gallego BM,2014-01-15,CL5414
+1028,Fabio Duran Iranzo BM,2014-10-21,CL5413
+1029,Marc Jimenez Garcia BM,2014-06-11,CL5473
+1030,Victor Garcia Moreno BM,2014-03-22,CL5594
+1031,Martin Aldrey Lopez BM,2014-11-26,CL5475
+1032,Aniol Admetlla Cabané,2018-10-30,CL3641
+1033,Josep Colom Castillo,2015-05-25,CL12216
+1034,Llull Lacruz Alemany,2014-05-06,CL12312
+1035,Biel Puig Vila,2017-11-15,CL10180
+1036,Enzo Arrebola Calderon,2015-10-03,CL11172
+1037,Marc Garcia Cazorla,2015-04-13,CL10976
+1038,Iker Ortega Herrera,2014-04-23,CL7043
+1039,Roc Miralles Redondo,2014-06-05,CL12183
+1040,Adria Garcia Martin,2016-08-17,CL12936
+1041,Francisco Marin Centurion,2016-04-19,CL12937
+1042,Gorka González Inglés,2016-03-19,CL13004
+1043,Max Mullera Saracíbar,2016-09-20,CT2785
+1044,Dylan Casquet,2016-01-02,CL5939
+1045,Pol Cabrera Garriga,2015-12-16,CL13000
+1046,Alexis Hassaine Ramon,2015-07-06,CT1726
+1047,Pau Corominas Bayer,2014-10-16,CT813
+1048,Roc Schafer Castro,2017-04-14,CL13005
+1049,Leo Valero Guijarro,2017-02-09,CL13006
+1050,Quim Alsina Moreno,2015-08-24,CL5936
+1051,Enzo Hormigo Flores,2016-08-19,CL13368
+1052,Mateo Padilla Portales,2016-10-31,CL12019
+1053,Aritz Marin Muñoz,2016-11-29,CL14546
+1054,Max Gambus Sanchez,2017-07-10,CL16062
+1055,Biel Roura Constantins,2016-02-18,CL9760
+1056,Pep Quintano Tulsa,2015-06-14,CL15451
+1057,Quim Quintano Tulsa,2017-09-21,CL15454
+1058,Roc Salavedra Gener,2016-05-20,CL13132
+1059,Nil Calls Perez,2015-11-18,CL13128
+1060,Carlos Diaz German,2017-10-09,CL13138
+1061,Elias Lahemama .,2017-05-09,CL13140
+1062,Uma Hajdarevic Bella PBF,2014-11-06,CL2995
+1063,Michael Bio Atta,2014-10-08,CL4853
+1064,Nicolas Herrera Martos,2014-04-25,CL95644
+1065,Aleix Rubio Cuadros,2014-06-06,CL5072
+1066,Albert Sabe Dugo,2014-04-28,CL5214
+1067,Ndeye Badji Sane,2014-10-08,CL1860
+1068,Paula Delgado Jimenez,2015-07-17,CL5061
+1069,Nil Miranda Casas PBM,2015-06-25,CL3247
+1070,Izan Garcia Gallego PBM,2014-05-10,CL96365
+1071,Guillem Ribe Serradesanferm,2017-01-13,CL12902
+1072,Joel Zamora Hernandez .,2014-05-09,CL7574
+1073,Arai Sans Muray .,2015-06-08,CL7583
+1074,Adrian Lopez Fuentes .,2014-10-03,CL4447
+1075,Iago Vacas Pérez .,2014-04-13,CL12811
+1076,Dina Toufali Ettoufali .,2015-04-24,CL13757
+1077,Laia Marín Riera .,2015-03-31,CL14057
+1078,Eric Permanyer Sánchez .,2016-01-18,CL12663
+1079,Ona Santacatalina Romero .,2014-12-24,CL12714
+1080,Marc Yague Paredes .,2016-09-30,CL9272
+1081,Victor Velez Martinez,2014-04-16,CL8092
+1082,Valeria Gonzalez San Andres,2014-02-18,CL8097
+1083,Ana Parrado Lopez,2014-02-28,CL8096
+1084,Rania Ouzghoub Canadell .,2015-01-06,CL10040
+1085,Berta Diez Arjona .,2015-09-24,CL14472
+1086,Gina Carbonell Armengol .,2014-04-02,CL6616
+1087,Monica Roca Isart .,2014-04-02,CL6614
+1088,Asia Vilar Masnou .,2015-10-30,CL13231
+1089,Laia Rodriguez Navarro .,2016-03-30,CL10105
+1090,Nadia Martínez Agudo .,2014-06-27,CL8413
+1091,Álex Jiménez Villa,2017-02-21,CL8947
+1092,Tiziano Valero beltran .,2015-01-01,CL9592
+1093,Victor Adivinacion pous .,2015-01-01,CL13509
+1094,Luca Serret Botta .,2015-01-01,CL1835
+1095,Lidia González Camacho .,2014-04-11,CL11393
+1096,Ivette Domingo Okomo .,2016-04-29,CL14363
+1097,Iker Montllor Echave .,2015-08-11,CL12427
+1098,Alba Escuredo Soriano .,2016-04-12,CL14364
+1099,Berta Bonilla Beltrán .,2015-02-17,CL11322
+1100,Beñat Rahenbrock Amezua,2014-10-26,CL5504
+1101,Roger Bellés Colobran .,2014-08-22,CL10223
+1102,Alicia Pardino Sanclemente .,2015-10-06,CT2546
+1103,Alan Perales Garcia .,2014-07-15,CL1809
+1104,Edgar Pedrosa Jaen .,2014-03-07,CL12653
+1105,Leo Puertolas Vila,2014-06-05,CL6937
+1106,Gael Aguilar Hernandez .,2015-07-07,CL13520
+1107,Pau Rovira Zaragoza .,2016-09-04,CL12429
+1108,Alex Orriols Ojeda .,2014-09-10,CL12803
+1109,Paula Montalban Gonzalez .,2015-05-21,CL12820
+1110,Jana Calvet Marcos,2014-02-28,CL5262
+1111,Andrey Ismagilov .,2014-11-15,CL14212
+1112,Ethan Serra Garcia .,2014-11-19,CL15145
+1113,Teo Dotú Aznar .,2014-01-21,CL14875
+1114,Víctor Ramos Merino .,2014-11-12,CL15131
+1115,Valentina Domenech Borgia .,2014-07-07,CL14874
+1116,Oscar Torremade Perez .,2015-01-02,CL9635
+1117,Claudia Sanchez Azabal .,2016-06-22,CL13642
+1118,Naia Riego Guillem .,2014-06-17,CL2592
+1119,Arnau Tarrago Jara .,2015-05-15,CL11659
+1120,Marti Del Rio Palliso . q,2015-09-19,CL14283
+1121,Noa Godino Rodriguez .,2016-12-01,CL15475
+1122,Pol Gonzalez Hernandez .,2014-05-07,CL6738
+1123,Clara Freire Moll .,2014-07-01,CL6575
+1124,Clara Querol Fuentes .,2014-01-01,CL8315
+1125,Bruno Jimenez Lopez .,2014-06-11,CL6503
+1126,Julio Gonzalez Martin,2014-09-12,CL2054
+1127,Daniel Gine Requena .,2014-11-22,CL12642
+1128,Mateo Ibañez Segui .,2014-09-23,CL96975
+1129,Roc Bombardo Colomer .,2014-05-19,CL4785
+1130,Anuar Real Moya .,2016-07-22,CL10230
+1131,Leo Ventura Rodriguez . q,2015-06-06,CL16959
+1132,Sasuke Sabate Vazquez .,2014-05-02,CL8147
+1133,Sofia Diez Borja .,2016-12-30,CL15005
+1134,Nora Yeste Ortiz .,2016-10-16,CL13390
+1135,Jannat Essahraouy Ezzari .,2014-08-21,CL13815
+1136,Elsa Ronco Fernandez . q,2015-06-30,CL13819
+1137,Martina Prieto Moreno .,2015-11-13,CL11091
+1138,Axel Vidal Rey . q,2015-10-01,CL14692
+1139,Khadija Madani Assimi . q,2015-01-27,CL14693
+1140,Aitana Farre Marin . q,2015-10-08,CL14689
+1141,Aleix Cabello Gracia .,2014-10-19,CL7760
+1142,Aranau Crespo Perez .,2016-12-14,CL8283
+1143,Quim Vendrell Martín .,2014-01-01,CL2623
+1144,Martina González Royuela .,2014-06-13,CL14615
+1145,Laia Badell Galofré . q,2015-06-20,CL15329
+1146,Maria Martínez Queraltó .,2015-06-12,CL16737
+1147,Marc Perez Moll .,2016-04-07,CL8634
+1148,Foix Maranges Sunyer .,2016-08-23,CL12229
+1149,Marc Ventura Jimenez .,2015-10-19,CL14939
+1150,Aleix Dominguez Martinez .,2016-01-08,CL6468
+1151,Albert Vila Navas .,2016-01-02,CL9597
+1152,Jan Olivares Moreno .,2016-03-02,CL12931
+1153,Marc Grau Martinez .,2016-10-21,CL14001
+1154,Paula Rueda Cuesta .,2016-01-03,CL9598
+1155,Queralt Calsada Lezcano .,2015-04-27,CL10995
+1156,Riu Romeu Llàcer,2016-01-01,CT356
+1157,Biel Garcia Llano .,2015-09-16,CL15485
+1158,Axel Caballero Jardi .,2015-07-22,CL15576
+1159,Angel Sanchez Gamez .,2016-07-03,CL15502
+1160,Aitor Ramos Perez .,2015-01-06,CL11177
+1161,Leonardo Cruells Perez .,2015-11-30,CL10971
+1162,Pol Villa Charro .,2016-12-23,CL15374
+1163,Lola Merida Cuesta .,2015-04-30,CL15413
+1164,Sergi Paolo Ainaga Aguilera,2017-06-14,CL14495
+1165,Júlia Estellers Ribalta,2017-01-24,CL14480
+1166,Leo Leiva Gracia,2015-07-01,CL1974
+1167,Teo Pou Fonts .,2015-01-09,CL14903
+1168,Ada Feliu Lorca .,2016-05-07,CL15054
+1169,Noa Pascual Prats .,2015-02-27,CL10462
+1170,Emma Bernal Baena . q,2015-08-30,CL11398
+1171,Carlota Frutos Maturana .,2015-07-18,CL16654
+1172,Guillermo Encinas Pagan .,2015-11-10,CL10460
+1173,Akram Zidane Damou .,2016-01-11,CL16656
+1174,Julia Garcia Trujillo .,2016-01-25,CL13696
+1175,Naia Guinart Trabalon .,2015-03-25,CL13220
+1176,Ot Matamala Bertran .,2015-12-15,CL13803
+1177,Bruna Barris Pardo,2016-03-25,CL14443
+1178,Isona Comí Escandell,2016-11-11,CL14440
+1179,Roeya Essoulh El Karkri,2015-07-26,CL14434
+1180,Èlia Estrada Cristià,2017-04-25,CL14449
+1181,Arnau Lladó López .,2016-12-06,CL14444
+1182,Álvaro Palacios Polo .,2014-05-16,CL13198
+1183,Arlet Mateos Vila .,2014-02-03,CL12025
+1184,Maria Barris Homar .,2014-05-24,CL9083
+1185,Kian Ferri Pedrico .,2014-06-03,CL15224
+1186,Iris Rodriguez Anto .,2014-01-17,CL13529
+1187,Oriol Arenas Marquez .,2014-03-29,CL12605
+1188,Estel Hernandez Baena .,2014-06-16,CL12618
+1189,Olivia Garces Garcia .,2014-08-28,CL12884
+1190,Nicole Hernandez Baena .,2014-06-16,CL12619
+1191,Manuel Ventura Romero .,2014-04-22,CT2637
+1192,Pedro Infiesta Font .,2015-06-02,CT2638
+1193,Arlet Mañé Segalà .,2016-04-03,CL15715
+1194,Noa Garcia Luna . q,2016-01-04,CL10547
+1195,Claudia Trujillo Garcia .,2016-03-06,CL10831
+1196,Carla Azero Sanchez .,2016-11-14,CL12981
+1197,Irene Lozano Flores .,2016-03-05,CL13027
+1198,Lucia Criado Godino .,2016-05-06,CL12983
+1199,Aina Guevara Gonzalez,2014-07-14,CL13560
+1200,Erik Ortega Nuñez,2014-09-15,CL13714
+1201,Lía Costa Asensio,2014-10-20,CL13852
+1202,Roger Riba Vall,2014-05-14,CL9378
+1203,Sarah Kaba Kaba,2014-01-01,CL7091
+1204,Bruno Rodríguez Martínez,2014-01-26,CL12126
+1205,Maria Hernandez Martin,2015-02-10,CL1834
+1206,Olivia Carrasco Cazorla,2015-01-27,CL3524
+1207,Martina Perez Olmos,2014-01-28,CL14199
+1208,Martina Reyes Nogueira,2014-10-15,CL11365
+1209,Sense dades,2014-01-01,CL8379
+1210,Oriol Sole Pecino,2014-05-24,CL11136
+1211,Marti Garcia Gamez,2015-03-13,CL11121
+1212,Sara Ouzghoub Canadell,2016-08-29,CL10041
+1213,Daniel Gomez Gonzalves,2015-04-28,CL13237
+1214,Julia Gelpi Flores,2015-01-13,CL13748
+1215,Maria Herencia Gutiérrez,2016-12-17,CL14991
+1216,Clea Muñoz Marruedo,2014-09-10,CL13075
+1217,Eloi Vilanova Mas,2015-02-18,CL13762
+1218,Aran Torras Sanchez,2016-10-21,CL15794
+1219,Laura Gracia Sanahuja.,2014-06-27,CL15995
+1220,Julia Viñals Sancho,2014-02-04,CL15182
+1221,Pau Sanchez Valles,2015-12-26,CL14950
+1222,Julia Muste Santiago,2015-09-30,CL14892
+1223,Sasha Bou Carvajal,2015-05-15,CL11622
+1224,Nidia Ines Amat Escobar,2016-08-08,CL16653
+1225,Elia Subirats Meneses,2014-12-10,CL4896
+1226,Didac Llopart Sousa PBM,2015-01-14,CL6308
+1227,Gerard Montemayor Acosta PBM,2014-06-13,CL6206
+1228,Jofre Pou Padros PBM,2014-04-23,CL6205
+1229,Martina Ferrari PBF,2014-04-17,CL4737
+1230,Aina Teignier Alvarez PBF,2014-01-04,CL6292
+1231,Biel Diaz Bebmar .,2015-08-27,CL7599
+1232,Marcos Blanco Arias .,2014-09-05,CL7580
+1233,Emma Martínez Espada .,2014-04-14,CL13208
+1234,Laura Garrós Rosa .,2014-01-01,CL95642
+1235,Nael Fernández Lozano .,2015-01-01,CL2161
+1236,Eloy Raya Figueras .,2014-12-23,CL15438
+1237,Pau Latorre Muñoz .,2015-01-08,CT1177
+1238,Carles Trenchs Gallart .,2015-03-25,CT1281
+1239,Nil Berbel Vergara .,2015-03-24,CT1278
+1240,Maria Serrano Vara .,2014-09-28,CL12988
+1241,Ibai Bardaji Castilla .,2015-08-20,CL5129
+1242,Ares Miguelez Ruiz .,2014-04-19,CL12623
+1243,Aina Caso Closa . q,2014-02-07,CL16706
+1244,Nicolas Grane Delgado-Aguilera,2014-06-09,CL6377
+1245,Núria Herreros De Tejada Viladrich .,2014-09-10,CL14195
+1246,Maria Serra Guarro .,2014-03-01,CL15146
+1247,Dune Pérez Figueroa .,2014-09-08,CL17854
+1248,Norah Garcia Horner .,2014-12-18,CL16070
+1249,Noa Godino Rodríguez .,2016-12-01,CL95018
+1250,Ariadna Amadas Hedilla .,2015-03-23,CL8187
+1251,Pablo Manrique Ortega .,2015-12-30,CL12022
+1252,Jon Pascual Corbacho .,2015-12-04,CL2221
+1253,Marc Lopez Ribo .,2014-10-09,CL2289
+1254,Hans Robert Roos .,2015-05-06,CL11295
+1255,Sergi Rodriguez Lusilla .,2015-03-20,CL13698
+1256,Marc Muñoz Gonzalez .,2015-08-30,CL13765
+1257,Daniela Garcia Gutierrez .,2014-10-16,CL10998
+1258,Valeria Martinez De Las Heras .,2014-04-16,CL13076
+1259,Guillem Planell Alferez .,2014-02-28,CL11451
+1260,Bruna Terradellas Torras .,2014-08-24,CL16835
+1261,Gerard Sanchez Llobet IM,2014-09-23,CL8496
+1262,Candela Consola Mael IF,2014-05-29,CT2728
+1263,Jana Bassegoda Gajas IF,2014-03-24,CT2646
+1264,Juliana Verdu Formiguera IF,2014-05-04,CT2769
+1265,Sofia Salinas Malpica .,2015-07-03,CL6414
+1266,Ian Castejon Castrejon AM .,2014-05-19,CL16889
+1267,Ariadna Paris Freire AF .,2014-06-17,CL12074
+1268,Lucia Mogedano Gomez .,2016-03-19,CL13379
+1269,Pau Martinez Casas .,2014-05-06,CL14790
+1270,Unai Martinez Bonacho .,2014-07-19,CL9591
+1271,Thaer Albayed Abudalal .,2014-03-01,CL15585
+1272,Jouhaina Ahrouch .,2014-01-16,CL14263
+1273,Sara Moussaoui AF .,2014-07-12,CL14515
+1274,Aran Panades Calull AM .,2014-08-20,CL15765
+1275,Martí Sonsona Amurgo AM .,2014-05-23,CL7676
+1276,Milena Danko AF .,2014-11-07,CL13335
+1277,Douae Mhirou Bouazza AF .,2014-01-01,CL15764
+1278,Keyla Cano Olalla AF .,2014-09-08,CL16527
+1279,Arturo Palma Viviani .,2014-10-07,CL16906
+1280,Cai Lorca Quintana .,2014-01-17,CL10848
+1281,Irene Lopez Frutros .,2014-10-19,CT2584
+1282,Mar Farran Rodriguez .,2014-04-26,CT2861
+1283,Elsa Colle Roca .,2015-04-16,CL11804
+1284,Alex Chimeno Frances AM .,2014-09-06,CL15516
+1285,Eloi Luque Granell AM .,2014-05-15,CL15517
+1286,Gerard Lopez Bertomeu AM .,2014-02-23,CL15510
+1287,Barbara Antonella Dolz Balague AF .,2014-01-28,CL15555
+1288,Carlota Pueyo Sancho AF .,2014-12-23,CL15509
+1289,Nestor Morillo Cano AM .,2014-11-18,CL15881
+1290,Miquel Bosch Cornelio .,2014-07-11,CL15358
+1291,Biel Puig Vila .,2017-11-15,CT1308
+1292,Aniol Mallol Padro .,2014-07-10,CL7147
+1293,Guiu Garcia Garcia .,2014-12-11,CL9962
+1294,Taha Sardia Boulali .,2015-08-19,CL10742
+1295,Walid Sardia Boulali .,2014-03-22,CL10740
+1296,JOEL COMAS GUERRERO,2015-09-03,CL2437
+1297,VALERIA GONZÁLEZ SAN ANDRÉS,2014-02-18,CL92203
+1298,EILA SUBIRATS MENESES,2014-12-10,CL2832
+1299,Nael Fernandez Urbano .,2016-01-01,CL10016
+1300,Kevin Vasiliu Mata .,2015-08-10,CL5243
+1301,Ian Ortega Urendez PBM .,2015-01-01,CT193
+1302,Adria Blanche Rodriguez .,2016-06-30,CL6680
+1303,Julen Busquets Franco .,2016-11-10,CL6683
+1304,Thomas Fernandez Moreno .,2017-03-15,CL10233
+1305,Jan Navarro Perandones .,2017-04-24,CL10232
+1306,Eric Morales Fernandez .,2017-02-19,CL10824
+1307,Arnau Ramirez Teruel .,2017-01-06,CL14203
+1308,Javier Segura de la Cruz .,2017-11-01,CL14204
+1309,Martina Fatty Rodriguez .,2017-06-19,CL10726
+1310,Elsa Ramos Escobar .,2017-06-12,CL10826
+1311,Alejandra Carrillo Suela .,2017-05-01,CL10825
+1312,Marina Flores Domínguez,2014-09-06,CL12873
+1313,Firàs Aguedo Messari,2014-11-13,CL12455
+1314,Alba Escuredo Soriano,2015-01-01,CL11781
+1315,Àstrid Jiménez Sánchez,2015-01-01,CL12979
+1316,Àstrid Jiménez Sánchez,2015-05-08,CL14394
+1317,Biel Pellicer Grau,2016-01-01,CT1971
+1318,Jan Castañe Martin,2015-09-23,CT2634
+1319,Airam Córdoba Freginals,2017-03-21,CL10252
+1320,Joel Jimenez Aliaga,2015-03-17,CL12734
+1321,Glòria Segarra Musté BF,2015-03-24,CL11982
+1322,Oliver Alvarez Sanchez IM,2014-11-28,CT1348
+1323,Gael Torres Fortuny BM,2014-01-24,CL11077
+1324,Jose Angel Masia Urzua BM,2015-02-25,CL15467
+1325,Adriana Fajardo Llorente,2014-02-27,CL13200
+1326,Fabian Ramognino Filipov BM,2016-07-09,CT3006
+1327,Eric De Cal Barbera BM,2016-11-08,CT1935
+1328,Ona Gaya Vives BF,2016-06-29,CL16686
+1329,Mar Vila Jardi BF,2016-02-05,CL16688
+1330,Ander Gonzalez Martinez BM,2015-01-20,CL16639
+1331,David Gonzalez Gonzalo BM,2015-10-01,CL12131
+1332,Selene Angulo Arias BF,2015-10-02,CL13281
+1333,Sara Izabela Vintu BF,2016-08-16,CL16759
+1334,Aleix Gilabert Gonzalez,2014-03-15,CL15325
+1335,Unai Redo Esteban,2014-11-10,CL15505
+1336,Kilian Voltes Soler,2014-01-25,CL15508
+1337,Laia Franch Borras,2014-06-20,CL15514
+1338,Martina Estorach Sanchez,2014-12-31,CL15552
+1339,Sasha Alexandraa Paga Vaseva,2014-02-19,CL15633
+1340,Oriol Torres Rovira BM,2015-06-16,CL14828
+1341,Ivet Granell Diaz BF,2016-12-16,CL14813
+1342,Martina Folch Nuévalos BF,2016-06-12,CL15697
+1343,Sofía Porras Rodrígues BF,2016-06-15,CL14821
+1344,Emma Rose Miller Bea BF,2016-06-17,CL15719
+1345,Anaïs Gata Romasanta BF,2016-09-02,CL15701
+1346,Lucía Linares Almagro BF,2016-10-01,CL16331
+1347,Sofia Benamar Núñez BF,2016-12-31,CL14801
+1348,Julia Piermattei Crespo,2014-12-29,CL13584
+1349,Ton Clemente Burgos,2015-05-20,CL9709
+1350,Salma Nassiri Hajjaj,2016-06-11,CL16308
+1351,Daniela Lázaro León,2016-08-19,CL15926
+1352,Arnau Velez Oliveras,2015-01-06,CL16466
+1353,Elora Sanchez Negro,2015-01-12,CL9843
+1354,Martina Vallicrosa Marin,2014-07-30,CL9842
+1355,Max Ciuro Marquina,2015-04-01,CL14360
+1356,Samantha Ramirez Cachiguango,2015-11-05,CL16249
+1357,Manuel Madeira Ramos Cavaco Leite,2015-04-14,CL14282
+1358,Erik Alonso Valldosera,2014-09-23,CL13137
+1359,Hector Escamilla Gonzalez,2015-03-19,CL15433
+1360,Guillem Franco Medina,2014-05-07,CL7350
+1361,Jana Ballbe Casado,2015-05-15,CL9407
+1362,Nico Ruiz Godoy,2016-03-05,CL15808
+1363,Sandra Monteagudo Jimenez,2015-08-03,CL11085
+1364,Albert Requesens Camins,2015-12-05,CL11089
+1365,Erik Galán López,2015-05-18,CL16359
+1366,Martina Latorre Puertas,2015-10-27,CT2872
+1367,Sofia Boldu Pinent,2014-08-31,CL7919
+1368,Alex Ortega Correas,2014-02-10,CL7143
+1369,Joud Ajakouk El Boughdadi,2014-09-10,CL14951
+1370,Daniela Puertas Sacristan,2014-07-19,CL7071
+1371,Paula Sanchez Trujillo,2015-03-17,CL10978
+1372,Emma Frutos Jordan,2015-09-19,CL15706
+1373,Greta Garreta Artes,2015-06-02,CL17064
+1374,Keira Villacampa Perez,2015-10-09,CL16950
+1375,Pau Arriaga Valcarce q,2015-06-04,CL13265
+1376,Pau Tarrida Hernandez,2016-06-14,CL13262
+1377,Maia Espinosa .,2014-04-06,CL10543
+1378,Maria Muñoz Pascual .,2015-11-20,CL10048
+1379,Mia Juarez Pellejero .,2015-07-21,CL12806
+1380,Julia Gómez García .,2016-01-03,CL15014
+1381,Ainara Moreno Cuello .,2016-10-01,CL13070
+1382,Victor Bonilla Aguilar,2014-12-06,CL7582
+1383,Jon Ramirez Baena BM .,2015-11-03,CL5068
+1384,Ona Ramirez Baena BF .,2015-11-03,CL5067
+1385,Ivet Avila Perez BF,2014-11-19,CL8227
+1386,Dario Delgado Alcaide,2014-02-07,CL8588
+1387,Lola López Fernández BF,2014-02-09,CL3631
+1388,Daniel Vico Solis BM,2014-01-09,CL7075
+1389,Hugo Andreu Alonso BM,2014-03-05,CL7040
+1390,Lucia Gil Reyes BF,2014-05-07,CL7002
+1391,Marti Mateu Montull BM .,2016-08-13,CL14916
+1392,Paola Palomar Sanchez . >~,2015-09-13,CL13224
+1393,Grau Llobet Lleonard .,2015-12-23,CL12274
+1394,Gael Martinez Lancho .,2016-12-20,CL9524
+1395,Miquel Barcelo La Rosa .,2015-11-26,CL10580
+1396,Aran Ortola Arabia .,2015-11-13,CL6650
+1397,Alex Perez Hernandez .,2015-07-22,CL13484
+1398,Dan Barrios Roma . +30s,2015-10-01,CL10973
+1399,Dídac Vernet Alayo .,2016-12-16,CL12226
+1400,Victoria Baro Jover . q,2016-05-14,CL12215
+1401,Adam Ramal Souliman,2018-04-12,CL13588
+1402,Abel Muñoz Martinez,2017-08-18,CL15221
+1403,Marc Martos Pérez .,2016-02-26,CL6161
+1404,Chloe Bonet Ortega,2016-06-07,CL6858
+1405,Emma Torrecillas Benet,2017-01-01,CL1666
+1406,Alex Petrini Lopez,2016-06-16,CL10044
+1407,Alejandra Martinez Valero,2017-01-01,CL8919
+1408,Ivet Martinez Chanca,2017-01-01,CL13259
+1409,Albert Barea Muñoz,2014-11-08,CL12127
+1410,Jofre Gil Rampneda,2014-04-04,CL14385
+1411,Julen Torres Soto,2014-06-26,CL14427
+1412,Unai Torondel Castelles,2014-09-08,CL14425
+1413,ALICE HEIRWEGH,2016-08-24,CL96455
+1414,Mateo Haro Sanchez,2015-12-30,CT856
+1415,Irene Lorente Fernandez .,2016-12-24,CT1178
+1416,Anna Altarriba Martinez,2017-06-21,CL12519
+1417,Alex Güell Heredia,2016-02-01,CL4967
+1418,Iris Alvarez Lopez,2017-12-20,CL9334
+1419,Kilian Moreno Urendez .,2017-04-28,CL14183
+1420,Noemi Pedrosa Carrasco,2014-06-14,CL15037
+1421,Victor Salvatierra Blanché,2014-02-12,CL12846
+1422,Jan Perez Torralba,2014-10-11,CL7337
+1423,Manuel Muñoz Diaz,2014-03-29,CL15034
+1424,Ivan Ruiz Carrillo,2014-08-28,CL10863
+1425,Carla Serrano Cantos,2014-08-22,CL16113
+1426,Judith Sierra Martínez,2014-01-16,CL16109
+1427,Anastasiia Ferlei,2014-01-01,CL16957
+1428,Ainara Alcoverro Soto,2014-12-03,CL14667
+1429,Roger Verdés Gràcia .,2014-03-04,CL12877
+1430,Flavia Castillo Ferrera .,2014-02-18,CL16809
+1431,Martí Estellers Ribalta,2014-07-14,CL6588
+1432,Arnau Gonzalez Lopez .,2014-03-18,CL9556
+1433,Tomas Aisa Archer PBM,2016-06-13,CL6030
+1434,Erik Cabrillana Primo,2015-02-22,CL13804
+1435,Èric Gassó Guillem,2014-10-01,CL11665
+1436,Aleix Carmona Arquillo,2014-01-25,CT2804
+1437,Ivet Castellanos Badia,2015-11-01,CL10063
+1438,Ivet Abellan Real,2015-03-03,CL13127
+1439,Arthur Ponce Doryk,2016-11-16,CL15498
+1440,Arlet Juan Rovira,2016-01-05,CL12615
+1441,Youssef Boughrara Elfakir q,2014-11-26,CL15310
+1442,Manuel Gelpi Flores,2015-01-13,CL13749
+1443,Dylan Perez Azizi,2015-06-02,CL11884
+1444,Miren Ortiz De Zarate Hernan,2015-09-25,CL13759
+1445,Josep Pla Fernandez,2015-08-19,CL12251
+1446,Pau Bautista Llobera,2015-09-26,CL11614
+1447,Núria Campos Mateos,2015-11-02,CL11611
+1448,Insaf El Moussaoui,2014-09-03,CL16936
+1449,Antonio Aranda Bergua,2014-06-17,CL13538
+1450,Claudia Campmany Coll,2015-08-03,CL92668
+1451,Claudia Teteris Fernandez,2014-07-21,CL13080
+1452,Vera Soriano Pepiol,2014-03-04,CL15507
+1453,Carmen Martin Lopez,2015-04-14,CL12616
+1454,Meklit Fernandez Lopez,2015-01-01,CL93464
+1455,Meklit Fernandez López,2016-07-30,CL14369
+1456,Dunia Solani Teixido,2014-05-26,CT2864
+1457,Victor Moran Granado,2015-09-10,CL6047
+1458,Julia Armengol Pascasio,2015-07-22,CL12217
+1459,Joana Vernet Alayo,2014-12-22,CL7644
+1460,Marc Sanchez Ricart,2014-12-04,CL14303
+1461,Claudia Vidal Morillo,2014-06-10,CL14431
+1462,Ameli Torres Arbones,2014-01-27,CL15270
+1463,Erika Margallo Del Valle q,2014-11-27,CL15267
+1464,Lucia Carrillo Marsal,2014-08-11,CL16960
+1465,Nico Castro Santarrosa,2015-08-02,CL10255
+1466,Abril Godia Gallardo,2014-03-19,CL10479
+1467,Irene Rodriguez Rodriguez,2014-12-23,CT2282
+1468,Enzo Gonzalez Gonzalez,2015-06-11,CL11690
+1469,Georgina Castro Guillen,2014-02-05,CL93264
+1470,Cloe Lisbeth De Prado Adosis,2016-09-04,CL16609
+1471,Gael Olmo Tubino,2015-08-08,CL12878
+1472,Pau Porca Zugarramurdi,2016-11-19,CL15441
+1473,Leonardo Galli,2016-10-26,CL15471
+1474,Aleix Mesa Vilella,2016-03-08,CL14999
+1475,Bruno Resina Chamorro,2016-07-11,CL15004
+1476,Eva Garcia De Sousa Q,2015-01-06,CL15010
+1477,Queralt Sirvent Granados,2016-10-01,CL15810
+1478,Laia Pallares Alemany,2016-12-21,CL16748
+1479,Daniel Kasyanov,2015-08-27,CL15363
+1480,Arlet Juan Rovira,2016-01-05,CL15984
+1481,Anna Guerrero Domènech,2015-01-21,CL16848
+1482,Valentin Gavila Charlier,2014-05-17,CL8117
+1483,Grau Sanchez Mercader,2014-06-16,CL13868
+1484,Nahiara Díaz Contreras,2014-07-29,CL14059
+1485,Bianca Amelunge Mosquera,2023-06-20,CL12928
+1486,Iker Asensio Rivera,2014-04-11,CL8564
+1487,Eric Nesdale Moalem,2015-09-08,CL13496
+1488,Eric Lazaro Colmena,2017-04-21,CL12228
+1489,Hugo Rius Cañete,2015-05-22,CL9948
+1490,Joaquin Castellvi,2014-01-01,CL11750
+1491,Marti Bertran Vila,2014-05-23,CL12177
+1492,Ian Ortega Urendez PBM,2015-01-01,CL91959
+1493,Kervens Sibina Cunill,2016-07-18,CL12186
+1494,Pau Fernandez Jerez,2016-05-29,CL11861
+1495,Leyre Vázquez Rincones,2016-05-31,CL10221
+1496,Carla Vidal Izquierdo,2017-01-02,CL10715
+1497,Tian Pagès Garcés,2017-05-27,CL14493
+1498,Martí Camarasa Montané,2015-10-31,CL10621
+1499,Biel Puig Vila,2017-11-15,CL16671

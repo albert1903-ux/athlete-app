@@ -14,6 +14,7 @@ import {
   Autocomplete,
   MenuItem
 } from '@mui/material'
+import { createFilterOptions } from '@mui/material/Autocomplete'
 import dayjs from 'dayjs'
 import CloseIcon from '@mui/icons-material/Close'
 import CheckIcon from '@mui/icons-material/Check'
@@ -95,19 +96,51 @@ function AddResultDialog({ open, onClose, onSuccess }) {
   const [submitLoading, setSubmitLoading] = useState(false)
   const [submitError, setSubmitError] = useState(null)
   const [submitSuccess, setSubmitSuccess] = useState(null)
-  const [marcaValorLocked, setMarcaValorLocked] = useState(false)
   const [options, setOptions] = useState({
     atletas: [],
     clubes: [],
     pruebas: [],
     categorias: []
   })
+  const [autoAssigningClub, setAutoAssigningClub] = useState(false)
+  const [atletaInputValue, setAtletaInputValue] = useState('')
+  const [athleteSearchLoading, setAthleteSearchLoading] = useState(false)
+  const [athleteSearchError, setAthleteSearchError] = useState(null)
+  const [pruebaInputValue, setPruebaInputValue] = useState('')
+  const pruebaFilter = useMemo(
+    () =>
+      createFilterOptions({
+        ignoreAccents: true,
+        ignoreCase: true,
+        matchFrom: 'start',
+        stringify: (option) => option?.nombre || ''
+      }),
+    []
+  )
+  const normalizedIncludes = useCallback((text, query) => {
+    const normalize = (str) =>
+      str
+        ?.toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '') || ''
+    return normalize(text).includes(normalize(query))
+  }, [])
+  const filteredPruebas = useMemo(() => {
+    if (!pruebaInputValue) {
+      return options.pruebas
+    }
+    return options.pruebas.filter((prueba) =>
+      normalizedIncludes(prueba?.nombre, pruebaInputValue)
+    )
+  }, [options.pruebas, pruebaInputValue, normalizedIncludes])
 
   const resetForm = useCallback(() => {
     setFormValues(initialFormState)
     setSubmitError(null)
     setSubmitSuccess(null)
-    setMarcaValorLocked(false)
+    setPruebaInputValue('')
+    setAtletaInputValue('')
+    setAthleteSearchError(null)
   }, [])
 
   useEffect(() => {
@@ -122,16 +155,10 @@ function AddResultDialog({ open, onClose, onSuccess }) {
       setSubmitError(null)
       try {
         const [
-          { data: atletasData, error: atletasError },
           { data: clubesData, error: clubesError },
           { data: pruebasData, error: pruebasError },
           { data: categoriasData, error: categoriasError }
         ] = await Promise.all([
-          supabase
-            .from('atletas')
-            .select('atleta_id, nombre, licencia')
-            .order('nombre', { ascending: true })
-            .limit(2000),
           supabase
             .from('clubes')
             .select('club_id, nombre')
@@ -146,14 +173,13 @@ function AddResultDialog({ open, onClose, onSuccess }) {
             .order('nombre', { ascending: true })
         ])
 
-        if (atletasError) throw atletasError
         if (clubesError) throw clubesError
         if (pruebasError) throw pruebasError
         if (categoriasError) throw categoriasError
 
         if (!isMounted) return
         setOptions({
-          atletas: atletasData || [],
+          atletas: [],
           clubes: clubesData || [],
           pruebas: pruebasData || [],
           categorias: categoriasData || []
@@ -178,6 +204,54 @@ function AddResultDialog({ open, onClose, onSuccess }) {
       isMounted = false
     }
   }, [open, resetForm])
+
+  // Búsqueda de atletas en Supabase mientras se escribe (debounced)
+  useEffect(() => {
+    if (!open) return
+
+    const controller = new AbortController()
+    const signal = controller.signal
+
+    const term = atletaInputValue?.trim()
+    if (!term || term.length < 2) {
+      setAthleteSearchLoading(false)
+      setAthleteSearchError(null)
+      // No borrar selección actual, sólo vaciar sugerencias
+      setOptions((prev) => ({ ...prev, atletas: [] }))
+      return
+    }
+
+    let timeoutId = setTimeout(async () => {
+      setAthleteSearchLoading(true)
+      setAthleteSearchError(null)
+      try {
+        const { data, error } = await supabase
+          .from('atletas')
+          .select('atleta_id, nombre, licencia')
+          .ilike('nombre', `%${term}%`)
+          .order('nombre', { ascending: true })
+          .limit(100)
+
+        if (error) throw error
+        if (signal.aborted) return
+        setOptions((prev) => ({ ...prev, atletas: data || [] }))
+      } catch (err) {
+        if (!signal.aborted) {
+          setAthleteSearchError(err.message || 'Error al buscar atletas')
+          setOptions((prev) => ({ ...prev, atletas: [] }))
+        }
+      } finally {
+        if (!signal.aborted) {
+          setAthleteSearchLoading(false)
+        }
+      }
+    }, 250)
+
+    return () => {
+      clearTimeout(timeoutId)
+      controller.abort()
+    }
+  }, [atletaInputValue, open])
 
   const handleClose = () => {
     if (!submitLoading) {
@@ -207,20 +281,10 @@ function AddResultDialog({ open, onClose, onSuccess }) {
 
   const handleMarcaTextoChange = (value) => {
     setFormValues((prev) => ({ ...prev, marcaTexto: value }))
-    if (!marcaValorLocked) {
-      const autoValor = convertMarcaTextoToValor(value)
-      if (autoValor !== null) {
-        setFormValues((prev) => ({ ...prev, marcaValor: autoValor }))
-      }
-    }
-  }
-
-  const handleMarcaValorChange = (value) => {
-    const numeric = Number(value)
-    setMarcaValorLocked(true)
+    const autoValor = convertMarcaTextoToValor(value)
     setFormValues((prev) => ({
       ...prev,
-      marcaValor: Number.isNaN(numeric) ? '' : numeric
+      marcaValor: autoValor !== null ? autoValor : ''
     }))
   }
 
@@ -237,6 +301,112 @@ function AddResultDialog({ open, onClose, onSuccess }) {
       Boolean(formValues.superficie)
     )
   }, [formValues])
+
+  const handleAthleteChange = async (_, newValue) => {
+    setFormValues((prev) => ({ ...prev, atleta: newValue }))
+
+    if (!newValue?.atleta_id) {
+      return
+    }
+
+    setAutoAssigningClub(true)
+    try {
+      let clubId = null
+
+      // Preferir el club activo (fecha_fin nula) con fecha_inicio más reciente en atleta_club_hist
+      try {
+        const { data: histData, error: histError } = await supabase
+          .from('atleta_club_hist')
+          .select('club_id, fecha_inicio, fecha_fin')
+          .eq('atleta_id', newValue.atleta_id)
+          .limit(1000)
+
+        if (histError) throw histError
+
+        if (histData && histData.length > 0) {
+          const toTimestamp = (value) => {
+            const parsed = dayjs(value)
+            return parsed.isValid() ? parsed.valueOf() : Number.NEGATIVE_INFINITY
+          }
+
+          const activeRecords = histData.filter((record) => !record?.fecha_fin)
+          if (activeRecords.length > 0) {
+            const latestActive = activeRecords.reduce((latest, current) => {
+              const latestTime = toTimestamp(latest?.fecha_inicio)
+              const currentTime = toTimestamp(current?.fecha_inicio)
+              if (currentTime > latestTime) {
+                return current
+              }
+              return latest
+            }, null)
+
+            clubId = latestActive?.club_id || null
+          } else {
+            const latestRecord = histData.reduce((latest, current) => {
+              const latestTime = toTimestamp(latest?.fecha_inicio)
+              const currentTime = toTimestamp(current?.fecha_inicio)
+              if (currentTime > latestTime) {
+                return current
+              }
+              return latest
+            }, null)
+
+            clubId = latestRecord?.club_id || null
+          }
+        }
+      } catch (histFetchError) {
+        console.warn('No se pudo obtener historial de clubes:', histFetchError)
+      }
+
+      // Si no hay historial, usar el club más reciente según resultados
+      if (!clubId) {
+        const { data, error } = await supabase
+          .from('resultados')
+          .select('club_id')
+          .eq('atleta_id', newValue.atleta_id)
+          .order('fecha', { ascending: false, nullsFirst: false })
+          .limit(1)
+
+        if (error) throw error
+        clubId = data?.[0]?.club_id || null
+      }
+
+      if (!clubId) return
+
+      let resolvedClub = options.clubes.find((club) => club.club_id === clubId)
+
+      if (!resolvedClub) {
+        const { data: clubData, error: clubError } = await supabase
+          .from('clubes')
+          .select('club_id, nombre')
+          .eq('club_id', clubId)
+          .maybeSingle()
+
+        if (clubError) throw clubError
+
+        if (clubData) {
+          resolvedClub = clubData
+          setOptions((prev) => {
+            if (prev.clubes.some((club) => club.club_id === clubData.club_id)) {
+              return prev
+            }
+            return {
+              ...prev,
+              clubes: [...prev.clubes, clubData]
+            }
+          })
+        }
+      }
+
+      if (resolvedClub) {
+        setFormValues((prev) => ({ ...prev, club: resolvedClub }))
+      }
+    } catch (error) {
+      console.warn('No se pudo asignar el club automáticamente:', error)
+    } finally {
+      setAutoAssigningClub(false)
+    }
+  }
 
   const handleSubmit = async () => {
     if (!isFormValid) {
@@ -324,11 +494,13 @@ function AddResultDialog({ open, onClose, onSuccess }) {
           <Stack spacing={2}>
             <Autocomplete
               value={formValues.atleta}
-              onChange={(_, newValue) => {
-                setFormValues((prev) => ({ ...prev, atleta: newValue }))
-              }}
+              onChange={handleAthleteChange}
               options={options.atletas}
-              loading={optionsLoading}
+              loading={optionsLoading || athleteSearchLoading}
+              inputValue={atletaInputValue}
+              onInputChange={(_, value) => setAtletaInputValue(value)}
+              // las opciones ya vienen filtradas desde el servidor
+              filterOptions={(opts) => opts}
               getOptionLabel={(option) =>
                 option?.nombre
                   ? `${option.nombre}${option.licencia ? ` · ${option.licencia}` : ''}`
@@ -361,7 +533,7 @@ function AddResultDialog({ open, onClose, onSuccess }) {
                 setFormValues((prev) => ({ ...prev, club: newValue }))
               }}
               options={options.clubes}
-              loading={optionsLoading}
+              loading={optionsLoading || autoAssigningClub}
               getOptionLabel={(option) => option?.nombre || ''}
               isOptionEqualToValue={(option, value) => option?.club_id === value?.club_id}
               renderInput={(params) => (
@@ -391,8 +563,11 @@ function AddResultDialog({ open, onClose, onSuccess }) {
                   unidad: newValue?.unidad_default || prev.unidad
                 }))
               }}
-              options={options.pruebas}
+              options={filteredPruebas}
               loading={optionsLoading}
+              filterOptions={pruebaFilter}
+              inputValue={pruebaInputValue}
+              onInputChange={(_, value) => setPruebaInputValue(value)}
               getOptionLabel={(option) => option?.nombre || ''}
               isOptionEqualToValue={(option, value) =>
                 option?.prueba_id === value?.prueba_id
@@ -422,9 +597,7 @@ function AddResultDialog({ open, onClose, onSuccess }) {
               }}
               options={options.categorias}
               loading={optionsLoading}
-              getOptionLabel={(option) =>
-                option?.nombre ? `${option.nombre} · ID ${option.categoria_id}` : ''
-              }
+              getOptionLabel={(option) => option?.nombre || ''}
               isOptionEqualToValue={(option, value) =>
                 option?.categoria_id === value?.categoria_id
               }
@@ -449,29 +622,15 @@ function AddResultDialog({ open, onClose, onSuccess }) {
 
           <Divider />
 
-          <Stack spacing={2} direction={{ xs: 'column', sm: 'row' }}>
-            <TextField
-              label="Fecha"
-              type="date"
-              value={formValues.fecha}
-              onChange={(event) => handleDateChange(event.target.value)}
-              required
-              InputLabelProps={{ shrink: true }}
-              fullWidth
-            />
-            <TextField
-              label="Año (auto)"
-              value={formValues.anio}
-              InputProps={{ readOnly: true }}
-              fullWidth
-            />
-            <TextField
-              label="Mes (auto)"
-              value={formValues.mes}
-              InputProps={{ readOnly: true }}
-              fullWidth
-            />
-          </Stack>
+          <TextField
+            label="Fecha"
+            type="date"
+            value={formValues.fecha}
+            onChange={(event) => handleDateChange(event.target.value)}
+            required
+            InputLabelProps={{ shrink: true }}
+            fullWidth
+          />
 
           <Stack spacing={2} direction={{ xs: 'column', sm: 'row' }}>
             <TextField
@@ -509,37 +668,15 @@ function AddResultDialog({ open, onClose, onSuccess }) {
             </TextField>
           </Stack>
 
-          <Stack spacing={2} direction={{ xs: 'column', sm: 'row' }}>
-            <TextField
-              label="Marca (texto oficial)"
-              value={formValues.marcaTexto}
-              onChange={(event) => handleMarcaTextoChange(event.target.value)}
-              placeholder="Ej. 2:11.96 o 11.23"
-              helperText="Formato libre, se guardará en `marca_texto`."
-              required
-              fullWidth
-            />
-
-            <TextField
-              label="Marca (valor numérico)"
-              value={formValues.marcaValor}
-              onChange={(event) => handleMarcaValorChange(event.target.value)}
-              placeholder="Se calcula a partir del texto si es posible"
-              helperText="Decimal en segundos o metros según la prueba."
-              fullWidth
-            />
-
-            <TextField
-              label="Unidad"
-              value={formValues.unidad}
-              onChange={(event) =>
-                setFormValues((prev) => ({ ...prev, unidad: event.target.value }))
-              }
-              placeholder="s, m, pts..."
-              required
-              fullWidth
-            />
-          </Stack>
+          <TextField
+            label="Marca (texto oficial)"
+            value={formValues.marcaTexto}
+            onChange={(event) => handleMarcaTextoChange(event.target.value)}
+            placeholder="Ej. 2:11.96 o 11.23"
+            helperText="Se calculará automáticamente el valor numérico para almacenar en la base de datos."
+            required
+            fullWidth
+          />
         </Stack>
       </DialogContent>
       <DialogActions>

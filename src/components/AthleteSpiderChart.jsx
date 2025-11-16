@@ -631,12 +631,27 @@ function AthleteSpiderChart({ comparatorAthletes = [] }) {
         ? selectedAthleteData.categoriaOrden
         : Object.keys(selectedAthleteData.categorias)
 
-    setAvailableCategories(categoriasDisponibles)
-
-    if (!selectedCategory || !categoriasDisponibles.includes(selectedCategory)) {
-      setSelectedCategory(categoriasDisponibles[0] || null)
+    // Ordenar por nivel numérico descendente (e.g., SUB12 > SUB10 > SUB8)
+    const getRank = (key) => {
+      const label = categoryLabels[key] || key
+      const match = /\d+/.exec(String(label))
+      return match ? parseInt(match[0], 10) : -Infinity
     }
-  }, [athleteData, selectedAthlete, selectedCategory])
+    const sortedDisponibles = [...categoriasDisponibles].sort((a, b) => {
+      const ra = getRank(a)
+      const rb = getRank(b)
+      if (rb !== ra) return rb - ra
+      const la = (categoryLabels[a] || a).toString()
+      const lb = (categoryLabels[b] || b).toString()
+      return lb.localeCompare(la, 'es', { sensitivity: 'base' })
+    })
+
+    setAvailableCategories(sortedDisponibles)
+
+    if (!selectedCategory || !sortedDisponibles.includes(selectedCategory)) {
+      setSelectedCategory(sortedDisponibles[0] || null)
+    }
+  }, [athleteData, selectedAthlete, selectedCategory, categoryLabels])
 
   useEffect(() => {
     if (!selectedAthlete || !selectedCategory) {
@@ -1007,16 +1022,17 @@ function AthleteSpiderChart({ comparatorAthletes = [] }) {
         <Box
           sx={{
             display: 'flex',
-            flexDirection: { xs: 'column', sm: 'row' },
-            alignItems: { xs: 'flex-start', sm: 'center' },
-            gap: 2
+            flexDirection: 'row',
+            alignItems: 'center',
+            gap: 2,
+            flexWrap: 'wrap'
           }}
         >
           <Typography variant="h6" gutterBottom sx={{ fontSize: { xs: '1.1rem' }, mb: 0 }}>
             Mejores Marcas
           </Typography>
           {availableCategories.length > 0 && (
-            <FormControl size="small" sx={{ minWidth: 160 }}>
+            <FormControl size="small" sx={{ minWidth: 160, ml: 'auto' }}>
               <InputLabel id="radar-category-select-label">Categoría</InputLabel>
               <Select
                 labelId="radar-category-select-label"
@@ -1024,11 +1040,26 @@ function AthleteSpiderChart({ comparatorAthletes = [] }) {
                 label="Categoría"
                 onChange={(event) => setSelectedCategory(event.target.value)}
               >
-                {availableCategories.map((categoriaKey) => (
-                  <MenuItem key={categoriaKey} value={categoriaKey}>
-                    {categoryLabels[categoriaKey] || categoriaKey}
-                  </MenuItem>
-                ))}
+                {(() => {
+                  const getRank = (key) => {
+                    const label = categoryLabels[key] || key
+                    const match = /\d+/.exec(label)
+                    return match ? parseInt(match[0], 10) : -Infinity
+                  }
+                  const sorted = [...availableCategories].sort((a, b) => {
+                    const ra = getRank(a)
+                    const rb = getRank(b)
+                    if (rb !== ra) return rb - ra
+                    const la = (categoryLabels[a] || a).toString()
+                    const lb = (categoryLabels[b] || b).toString()
+                    return lb.localeCompare(la, 'es', { sensitivity: 'base' })
+                  })
+                  return sorted.map((categoriaKey) => (
+                    <MenuItem key={categoriaKey} value={categoriaKey}>
+                      {categoryLabels[categoriaKey] || categoriaKey}
+                    </MenuItem>
+                  ))
+                })()}
               </Select>
             </FormControl>
           )}

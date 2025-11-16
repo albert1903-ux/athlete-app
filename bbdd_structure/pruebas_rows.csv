@@ -1,0 +1,37 @@
+prueba_id,nombre,tipo_prueba,tipo_marca,unidad_default,max_texto,max_valor
+1,60m,pista,tiempo,s,6.34,6.34000
+2,1.000m,pista,tiempo,s,2:11.96,131.96000
+3,Longitud,campo,distancia,m,8.95,8.95000
+4,Longitud,pista,distancia,m,8.95,8.95000
+5,600m,pista,tiempo,s,1:21.63,81.63000
+6,400m,pista,tiempo,s,43.03,43.03000
+7,Pes (2kg),campo,distancia,m,23.56,23.56000
+8,Pes (2kg),pista,distancia,m,23.56,23.56000
+9,1.000m Marxa en Pista,pista,tiempo,s,4:00.00,240.00000
+10,200m,pista,tiempo,s,19.19,19.19000
+11,Pes (1kg),campo,distancia,m,23.56,23.56000
+12,2.000m,pista,tiempo,s,4:43.13,283.13000
+13,Altura,pista,distancia,m,2.45,2.45000
+14,Altura,campo,distancia,m,2.45,2.45000
+15,60m tanques (0.50),pista,tiempo,s,7.27,7.27000
+16,Javelina (300g),pista,distancia,m,98.48,98.48000
+17,Javelina (300g),campo,distancia,m,98.48,98.48000
+18,Vortex,campo,distancia,m,98.48,98.48000
+19,Vortex,pista,tiempo,s,"98.48
+",98.48000
+20,Perxa,pista,tiempo,s,6.30,6.30000
+21,Perxa,campo,distancia,m,6.30,6.30000
+22,1000m Marxa en Ruta,pista,tiempo,s,4:00.00,240.00000
+23,200m tanques (0.50),pista,tiempo,s,24.24,24.24000
+24,Trofeu Mini-Combinades - Control,pista,tiempo,s,,
+25,Triple Salt,campo,distancia,m,18.29,18.29000
+26,2.000m Marxa en Pista,pista,tiempo,s,8:00.00,480.00000
+27,300m tanques (0.762),pista,tiempo,s,36.36,36.36000
+28,Pilota (250g),pista,tiempo,s,23.56,23.56000
+29,50m,pista,tiempo,s,6.00,6.00000
+30,Disc (600g),pista,tiempo,s,75.56,75.56000
+31,300m tanques (0.84),pista,tiempo,s,36.36,36.36000
+32,Triatló,pista,tiempo,s,,
+33,60m tanques (0.762),pista,tiempo,s,7.27,7.27000
+34,800m,pista,tiempo,s,1:40.91,100.91000
+35,100m,pista,tiempo,s,9.58,9.58000
