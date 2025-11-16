@@ -480,7 +480,7 @@ function AddResultDialog({ open, onClose, onSuccess }) {
         sx: { maxHeight: '90vh' }
       }}
     >
-      <DialogTitle>Añadir resultado a Seguimiento Deportivo</DialogTitle>
+      <DialogTitle sx={{ position: 'sticky', top: 0, zIndex: 2, bgcolor: 'background.paper' }}>Añadir resultado a Seguimiento Deportivo</DialogTitle>
       <DialogContent dividers>
         <Stack spacing={2}>
           <Typography variant="body2" color="text.secondary">

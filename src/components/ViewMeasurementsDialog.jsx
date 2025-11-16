@@ -208,7 +208,7 @@ function ViewMeasurementsDialog({ open, onClose }) {
         }
       }}
     >
-      <DialogTitle>
+      <DialogTitle sx={{ position: 'sticky', top: 0, zIndex: 2, bgcolor: 'background.paper' }}>
         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 1 }}>
           <Typography variant="h6" component="span">
             Mediciones Corporales

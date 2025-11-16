@@ -47,25 +47,17 @@ function AthleteSelector() {
     return stored || null
   })
 
-  console.debug('[AthleteSelector] render', {
-    open,
-    selectedAthlete,
-    tempSelectedAthlete
-  })
-
   // Guardar atleta seleccionado en localStorage cuando cambie
   useEffect(() => {
     if (selectedAthlete) {
       try {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(selectedAthlete))
-        console.debug('[AthleteSelector] stored athlete in localStorage', selectedAthlete)
       } catch (error) {
         console.error('Error al guardar atleta en localStorage:', error)
       }
     } else {
       // Limpiar localStorage si no hay atleta seleccionado
       localStorage.removeItem(STORAGE_KEY)
-      console.debug('[AthleteSelector] cleared athlete from localStorage')
     }
   }, [selectedAthlete])
 
@@ -73,29 +65,22 @@ function AthleteSelector() {
     const candidate = selectedAthlete || loadFromStorage() || null
     setTempSelectedAthlete(candidate)
     setOpen(true)
-    console.debug('[AthleteSelector] handleOpen', {
-      selectedAthlete,
-      tempSelectedAthlete: candidate
-    })
   }
 
   const handleClose = (nextTempSelected = selectedAthlete) => {
     setTempSelectedAthlete(nextTempSelected || null)
     setOpen(false)
-    console.debug('[AthleteSelector] handleClose')
   }
 
   const handleSelect = () => {
     if (tempSelectedAthlete) {
       setSelectedAthlete(tempSelectedAthlete)
       handleClose(tempSelectedAthlete)
-      console.debug('[AthleteSelector] handleSelect', tempSelectedAthlete)
     }
   }
 
   const handleResultClick = (athlete) => {
     setTempSelectedAthlete(athlete)
-    console.debug('[AthleteSelector] handleResultClick', athlete)
   }
 
   const handleRemove = () => {
@@ -111,7 +96,6 @@ function AthleteSelector() {
       const candidate = tempSelectedAthlete || selectedAthlete || loadFromStorage()
       if (candidate && (!tempSelectedAthlete || tempSelectedAthlete.atleta_id !== candidate.atleta_id)) {
         setTempSelectedAthlete(candidate)
-        console.debug('[AthleteSelector] sync tempSelectedAthlete while open', candidate)
       }
     }
   }, [open, selectedAthlete])

@@ -126,7 +126,7 @@ function AddMeasurementDialog({ open, onClose, onSuccess }) {
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
-      <DialogTitle>Nueva Medición Corporal</DialogTitle>
+      <DialogTitle sx={{ position: 'sticky', top: 0, zIndex: 2, bgcolor: 'background.paper' }}>Nueva Medición Corporal</DialogTitle>
       <DialogContent>
         <Box display="flex" flexDirection="column" gap={2} sx={{ pt: 1 }}>
           {error && (

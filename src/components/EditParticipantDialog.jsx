@@ -126,7 +126,7 @@ function EditParticipantDialog({ open, onClose, onSuccess, participant }) {
         }
       }}
     >
-      <DialogTitle>
+      <DialogTitle sx={{ position: 'sticky', top: 0, zIndex: 2, bgcolor: 'background.paper' }}>
         <Typography variant="h6" component="div">
           Editar Participante
         </Typography>
@@ -248,6 +248,7 @@ function EditParticipantDialog({ open, onClose, onSuccess, participant }) {
 }
 
 export default EditParticipantDialog
+
 
 
 

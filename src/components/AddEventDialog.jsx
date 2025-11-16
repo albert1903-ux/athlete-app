@@ -212,7 +212,7 @@ function AddEventDialog({ open, onClose, onSuccess, selectedDate }) {
         }
       }}
     >
-      <DialogTitle>
+      <DialogTitle sx={{ position: 'sticky', top: 0, zIndex: 2, bgcolor: 'background.paper' }}>
         <Typography variant="h6" component="div">
           Añadir Evento
         </Typography>

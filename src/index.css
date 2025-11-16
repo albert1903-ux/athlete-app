@@ -26,8 +26,8 @@ body {
 }
 
 /* Scroll suave para mobile */
-html {
-  -webkit-overflow-scrolling: touch;
+  html {
+    -webkit-overflow-scrolling: touch;
   touch-action: pan-y;
 }
 

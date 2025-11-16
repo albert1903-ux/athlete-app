@@ -89,9 +89,13 @@ function AppContent() {
       }}
     >
       {/* AppBar mobile-optimized */}
-      <AppBar position="sticky" sx={{ width: '100%', zIndex: 1100 }}>
-        <Toolbar sx={{ minHeight: { xs: 56 }, px: 2 }}>
-          <Typography variant="h6" component="div" sx={{ flexGrow: 1, fontSize: { xs: '1.1rem' } }}>
+      <AppBar position="fixed" sx={{ width: '100%', zIndex: 1100 }}>
+        <Toolbar sx={{ minHeight: { xs: 56 }, px: 2, display: 'flex', alignItems: 'center' }}>
+          <Typography
+            variant="h6"
+            component="div"
+            sx={{ flexGrow: 1, fontSize: { xs: '1.1rem' }, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
+          >
             {getPageTitle()}
           </Typography>
           {isSeguimientoPage && (
@@ -171,6 +175,9 @@ function AppContent() {
         </Toolbar>
       </AppBar>
 
+      {/* Spacer para compensar AppBar fixed */}
+      <Box sx={{ height: { xs: 56 } }} />
+
       {/* Diálogo para añadir atleta */}
       <AddAthleteDialog
         open={dialogOpen}
@@ -191,7 +198,7 @@ function AppContent() {
           flex: 1,
           display: 'flex',
           flexDirection: 'column',
-          overflowY: 'auto',
+          // Dejamos que el scroll lo maneje la ventana (window)
         }}
       >
         <Routes>

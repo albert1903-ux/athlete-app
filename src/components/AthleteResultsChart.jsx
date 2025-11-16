@@ -7,10 +7,12 @@ import {
   CircularProgress,
   Alert,
   Paper,
-  ToggleButton,
-  ToggleButtonGroup,
   IconButton,
-  Tooltip as MuiTooltip
+  Tooltip as MuiTooltip,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem
 } from '@mui/material'
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday'
 import PersonIcon from '@mui/icons-material/Person'
@@ -927,11 +929,12 @@ function AthleteResultsChart({ comparatorAthletes = [] }) {
     })
   }
 
-  // Manejar cambio de prueba seleccionada
+  // Manejar cambio de prueba seleccionada (soporta ToggleButtonGroup o Select)
   const handlePruebaChange = (event, newPrueba) => {
-    if (newPrueba !== null) {
-      setSelectedPrueba(newPrueba)
-      prepareChartData(allPruebasData, newPrueba, Object.values(allPruebasData).map(grupo => ({
+    const valorSeleccionado = newPrueba ?? event?.target?.value ?? null
+    if (valorSeleccionado !== null && valorSeleccionado !== undefined && valorSeleccionado !== '') {
+      setSelectedPrueba(valorSeleccionado)
+      prepareChartData(allPruebasData, valorSeleccionado, Object.values(allPruebasData).map(grupo => ({
         nombre: grupo.name,
         unidad: grupo.unidad,
         color: getColorForPrueba(grupo.name)
@@ -1341,65 +1344,81 @@ function AthleteResultsChart({ comparatorAthletes = [] }) {
   return (
     <Card sx={{ width: '100%' }}>
       <CardContent sx={{ px: { xs: 2 }, py: { xs: 2 } }}>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
-          <Typography variant="h6" gutterBottom sx={{ fontSize: { xs: '1.1rem' }, mb: 0 }}>
+        {/* Fila superior: título a la izquierda, desplegable de pruebas a la derecha */}
+        <Box
+          sx={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            mb: 0.5,
+            gap: 1
+          }}
+        >
+          <Typography
+            variant="h6"
+            gutterBottom
+            sx={{ fontSize: { xs: '1.1rem' }, mb: 0 }}
+          >
             Evolución de Marcas
           </Typography>
-          {/* Botones para cambiar entre vista por fecha y por edad */}
-          <Box sx={{ display: 'flex', gap: 0.5 }}>
-            <MuiTooltip title="Vista por Fecha">
-              <IconButton
-                size="small"
-                onClick={() => setViewMode('fecha')}
-                color={viewMode === 'fecha' ? 'primary' : 'default'}
-                sx={{
-                  backgroundColor: viewMode === 'fecha' ? 'action.selected' : 'transparent'
-                }}
-              >
-                <CalendarTodayIcon fontSize="small" />
-              </IconButton>
-            </MuiTooltip>
-            <MuiTooltip title="Vista por Edad">
-              <IconButton
-                size="small"
-                onClick={() => setViewMode('edad')}
-                color={viewMode === 'edad' ? 'primary' : 'default'}
-                sx={{
-                  backgroundColor: viewMode === 'edad' ? 'action.selected' : 'transparent'
-                }}
-              >
-                <PersonIcon fontSize="small" />
-              </IconButton>
-            </MuiTooltip>
-          </Box>
-        </Box>
-        
-        {/* Segmented Control para seleccionar prueba */}
-        {pruebasDisponibles.length > 0 && (
-          <Box sx={{ mt: 2, mb: 2, display: 'flex', justifyContent: 'center', flexWrap: 'wrap', gap: 1 }}>
-            <ToggleButtonGroup
-              value={selectedPrueba}
-              exclusive
-              onChange={handlePruebaChange}
-              aria-label="seleccionar prueba"
+          {pruebasDisponibles.length > 0 && (
+            <FormControl
               size="small"
+              sx={{ minWidth: 160 }}
+            >
+              <InputLabel id="prueba-select-label">Prueba</InputLabel>
+              <Select
+                labelId="prueba-select-label"
+                id="prueba-select"
+                value={selectedPrueba || ''}
+                label="Prueba"
+                onChange={(event) => handlePruebaChange(event, event.target.value)}
+              >
+                {pruebasDisponibles.map((pruebaNombre) => (
+                  <MenuItem key={pruebaNombre} value={pruebaNombre}>
+                    {pruebaNombre}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          )}
+        </Box>
+
+        {/* Fila inferior: botones para cambiar entre vista por fecha y por edad, debajo del título */}
+        <Box
+          sx={{
+            display: 'flex',
+            justifyContent: 'flex-start',
+            alignItems: 'center',
+            gap: 0.5,
+            mb: 1
+          }}
+        >
+          <MuiTooltip title="Vista por Fecha">
+            <IconButton
+              size="small"
+              onClick={() => setViewMode('fecha')}
+              color={viewMode === 'fecha' ? 'primary' : 'default'}
               sx={{
-                flexWrap: 'wrap',
-                '& .MuiToggleButton-root': {
-                  fontSize: '0.875rem',
-                  px: 1.5,
-                  py: 0.75,
-                }
+                backgroundColor: viewMode === 'fecha' ? 'action.selected' : 'transparent'
               }}
             >
-              {pruebasDisponibles.map((pruebaNombre) => (
-                <ToggleButton key={pruebaNombre} value={pruebaNombre} aria-label={pruebaNombre}>
-                  {pruebaNombre}
-                </ToggleButton>
-              ))}
-            </ToggleButtonGroup>
-          </Box>
-        )}
+              <CalendarTodayIcon fontSize="small" />
+            </IconButton>
+          </MuiTooltip>
+          <MuiTooltip title="Vista por Edad">
+            <IconButton
+              size="small"
+              onClick={() => setViewMode('edad')}
+              color={viewMode === 'edad' ? 'primary' : 'default'}
+              sx={{
+                backgroundColor: viewMode === 'edad' ? 'action.selected' : 'transparent'
+              }}
+            >
+              <PersonIcon fontSize="small" />
+            </IconButton>
+          </MuiTooltip>
+        </Box>
 
         {/* Gráfico */}
         {combinedChartData && combinedChartData.length > 0 && chartWidth > 0 ? (

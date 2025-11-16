@@ -78,7 +78,7 @@ function AddAthleteDialog({ open, onClose, onAdd }) {
         }
       }}
     >
-      <DialogTitle sx={{ flexShrink: 0 }}>
+      <DialogTitle sx={{ flexShrink: 0, position: 'sticky', top: 0, zIndex: 2, bgcolor: 'background.paper' }}>
         Añadir Atleta para Comparar
       </DialogTitle>
       
@@ -177,6 +177,7 @@ function AddAthleteDialog({ open, onClose, onAdd }) {
 }
 
 export default AddAthleteDialog
+
 
 
 
