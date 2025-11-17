@@ -16,6 +16,7 @@ body {
   -webkit-tap-highlight-color: transparent;
   -webkit-text-size-adjust: 100%;
   -ms-text-size-adjust: 100%;
+  background-color: #f0f0f0;
 }
 
 #root {
@@ -39,4 +40,30 @@ body {
 img, video, canvas {
   max-width: 100%;
   height: auto;
+}
+
+/* Quitar outline azul de los gráficos en estados focus y active */
+svg:focus,
+svg:active,
+svg:focus-visible {
+  outline: none !important;
+  border: none !important;
+}
+
+/* Quitar outline de contenedores de gráficos Recharts */
+.recharts-wrapper:focus,
+.recharts-wrapper:active,
+.recharts-wrapper:focus-visible,
+.recharts-surface:focus,
+.recharts-surface:active,
+.recharts-surface:focus-visible {
+  outline: none !important;
+  border: none !important;
+}
+
+/* Quitar outline de cualquier elemento dentro de los gráficos */
+.recharts-wrapper *:focus,
+.recharts-wrapper *:active,
+.recharts-wrapper *:focus-visible {
+  outline: none !important;
 }

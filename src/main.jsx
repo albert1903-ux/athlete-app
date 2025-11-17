@@ -20,7 +20,7 @@ const theme = createTheme({
       dark: '#9a0036',
     },
     background: {
-      default: '#ffffff',
+      default: '#f0f0f0',
       paper: '#ffffff',
     },
     // Colores MD3
@@ -41,14 +41,25 @@ const theme = createTheme({
       xl: 1920,
     },
   },
+  shape: {
+    borderRadius: 10,
+  },
   components: {
+    // Estilos para Cards
+    MuiCard: {
+      styleOverrides: {
+        root: {
+          backgroundColor: '#ffffff',
+          boxShadow: '0 2px 12px rgba(0, 0, 0, 0.06)',
+          borderRadius: 10,
+        },
+      },
+    },
     // Estilos para BottomNavigation según MD3
     MuiBottomNavigation: {
       styleOverrides: {
         root: {
           backgroundColor: 'background.paper',
-          borderTop: '1px solid',
-          borderColor: 'divider',
           height: '80px',
           paddingTop: '8px',
           paddingBottom: '8px',
