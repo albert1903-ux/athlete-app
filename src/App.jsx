@@ -217,8 +217,12 @@ function AppContent() {
 }
 
 function App() {
+  // Obtener el base path desde import.meta.env.BASE_URL (configurado por Vite)
+  const basename = import.meta.env.BASE_URL || '/'
+  
   return (
     <Router
+      basename={basename}
       future={{
         v7_startTransition: true,
         v7_relativeSplatPath: true
