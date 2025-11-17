@@ -1466,7 +1466,7 @@ function AthleteResultsChart({ comparatorAthletes = [] }) {
                       }}
                     />
                     <Tooltip content={<CustomTooltip />} />
-                    <Legend />
+                    <Legend wrapperStyle={{ bottom: 60 }} />
                     {chartData.pruebas && chartData.pruebas.length > 0 ? (
                       chartData.pruebas.map((prueba, index) => (
                         <Line

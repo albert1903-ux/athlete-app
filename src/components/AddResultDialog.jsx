@@ -315,44 +315,29 @@ function AddResultDialog({ open, onClose, onSuccess }) {
 
       // Preferir el club activo (fecha_fin nula) con fecha_inicio más reciente en atleta_club_hist
       try {
-        const { data: histData, error: histError } = await supabase
-          .from('atleta_club_hist')
-          .select('club_id, fecha_inicio, fecha_fin')
-          .eq('atleta_id', newValue.atleta_id)
-          .limit(1000)
+        const fetchLatestClub = async (onlyActive = false) => {
+          let query = supabase
+            .from('atleta_club_hist')
+            .select('club_id, fecha_inicio, fecha_fin')
+            .eq('atleta_id', newValue.atleta_id)
+            .order('fecha_inicio', { ascending: false, nullsFirst: false })
+            .limit(1)
 
-        if (histError) throw histError
-
-        if (histData && histData.length > 0) {
-          const toTimestamp = (value) => {
-            const parsed = dayjs(value)
-            return parsed.isValid() ? parsed.valueOf() : Number.NEGATIVE_INFINITY
+          if (onlyActive) {
+            query = query.is('fecha_fin', null)
           }
 
-          const activeRecords = histData.filter((record) => !record?.fecha_fin)
-          if (activeRecords.length > 0) {
-            const latestActive = activeRecords.reduce((latest, current) => {
-              const latestTime = toTimestamp(latest?.fecha_inicio)
-              const currentTime = toTimestamp(current?.fecha_inicio)
-              if (currentTime > latestTime) {
-                return current
-              }
-              return latest
-            }, null)
+          const { data, error } = await query
+          if (error) throw error
+          return data?.[0] || null
+        }
 
-            clubId = latestActive?.club_id || null
-          } else {
-            const latestRecord = histData.reduce((latest, current) => {
-              const latestTime = toTimestamp(latest?.fecha_inicio)
-              const currentTime = toTimestamp(current?.fecha_inicio)
-              if (currentTime > latestTime) {
-                return current
-              }
-              return latest
-            }, null)
-
-            clubId = latestRecord?.club_id || null
-          }
+        const latestActive = await fetchLatestClub(true)
+        if (latestActive?.club_id) {
+          clubId = latestActive.club_id
+        } else {
+          const latestAny = await fetchLatestClub(false)
+          clubId = latestAny?.club_id || null
         }
       } catch (histFetchError) {
         console.warn('No se pudo obtener historial de clubes:', histFetchError)
@@ -480,13 +465,9 @@ function AddResultDialog({ open, onClose, onSuccess }) {
         sx: { maxHeight: '90vh' }
       }}
     >
-      <DialogTitle sx={{ position: 'sticky', top: 0, zIndex: 2, bgcolor: 'background.paper' }}>Añadir resultado a Seguimiento Deportivo</DialogTitle>
+      <DialogTitle sx={{ position: 'sticky', top: 0, zIndex: 2, bgcolor: 'background.paper' }}>Añadir marca</DialogTitle>
       <DialogContent dividers>
         <Stack spacing={2}>
-          <Typography variant="body2" color="text.secondary">
-            Completa los campos según la estructura de la tabla `resultados`. Los
-            datos relacionados (atleta, club, prueba, categoría) se obtienen en tiempo real de Supabase.
-          </Typography>
 
           {submitError && <Alert severity="error">{submitError}</Alert>}
           {submitSuccess && <Alert severity="success">{submitSuccess}</Alert>}

@@ -1,5 +1,8 @@
 import { useState, useEffect, useMemo, useCallback } from 'react'
 import {
+  Accordion,
+  AccordionDetails,
+  AccordionSummary,
   Box,
   Card,
   CardContent,
@@ -22,6 +25,7 @@ import {
   Legend
 } from 'recharts'
 import { supabase } from '../lib/supabase'
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import { initializeColorsForComparators, getColorForAthlete } from '../utils/athleteColors'
 
 const STORAGE_KEY = 'selectedAthlete'
@@ -1106,62 +1110,64 @@ function AthleteSpiderChart({ comparatorAthletes = [] }) {
         </Box>
 
         {/* Leyenda con valores reales */}
-        <Box sx={{ mt: 3 }}>
-          <Typography variant="subtitle2" gutterBottom>
-            Mejores Resultados por Prueba:
-          </Typography>
-          {radarData.map((entry, idx) => (
-            <Box key={idx} sx={{ mt: 1, p: 1, bgcolor: 'grey.50', borderRadius: 1 }}>
-              <Typography variant="body2" fontWeight="bold" gutterBottom>
-                {entry.prueba} {entry.unidad && `(${entry.unidad})`}
-              </Typography>
-              {allAthletes.map((athlete) => {
-                const atletaIdKey = String(athlete.atleta_id)
-                const realKey = `${atletaIdKey}_real`
-                const unidadKey = `${atletaIdKey}_unidad`
-                const valorReal = entry[realKey]
-                const unidadReal = entry[unidadKey]
-                
-                // Mostrar siempre el atleta, incluso si no tiene esta prueba
-                if (valorReal === undefined || valorReal === null) {
+        <Accordion sx={{ mt: 3 }}>
+          <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+            <Typography variant="subtitle2">Mejores Resultados por Prueba</Typography>
+          </AccordionSummary>
+          <AccordionDetails>
+            {radarData.map((entry, idx) => (
+              <Box key={idx} sx={{ mt: 1, p: 1, bgcolor: 'grey.50', borderRadius: 1 }}>
+                <Typography variant="body2" fontWeight="bold" gutterBottom>
+                  {entry.prueba} {entry.unidad && `(${entry.unidad})`}
+                </Typography>
+                {allAthletes.map((athlete) => {
+                  const atletaIdKey = String(athlete.atleta_id)
+                  const realKey = `${atletaIdKey}_real`
+                  const unidadKey = `${atletaIdKey}_unidad`
+                  const valorReal = entry[realKey]
+                  const unidadReal = entry[unidadKey]
+                  
+                  // Mostrar siempre el atleta, incluso si no tiene esta prueba
+                  if (valorReal === undefined || valorReal === null) {
+                    return (
+                      <Typography 
+                        key={athlete.atleta_id} 
+                        variant="caption" 
+                        sx={{ 
+                          display: 'block',
+                          color: athleteColors[athlete.atleta_id] || getColorForAthlete(athlete.atleta_id, athlete.atleta_id === selectedAthlete?.atleta_id) || 'text.secondary',
+                          fontWeight: 'medium',
+                          fontStyle: 'italic'
+                        }}
+                      >
+                        {athlete.nombre}: No tiene esta prueba
+                      </Typography>
+                    )
+                  }
+                  
+                  const isTimeBased =
+                    athleteData[atletaIdKey]?.categorias?.[selectedCategory]?.pruebas?.[entry.prueba]
+                      ?.isTimeBased ?? true
+                  const valorFormateado = formatValue(valorReal, unidadReal, isTimeBased)
+                  
                   return (
                     <Typography 
                       key={athlete.atleta_id} 
                       variant="caption" 
                       sx={{ 
                         display: 'block',
-                        color: athleteColors[athlete.atleta_id] || getColorForAthlete(athlete.atleta_id, athlete.atleta_id === selectedAthlete?.atleta_id) || 'text.secondary',
-                        fontWeight: 'medium',
-                        fontStyle: 'italic'
+                        color: athleteColors[athlete.atleta_id] || getColorForAthlete(athlete.atleta_id, athlete.atleta_id === selectedAthlete?.atleta_id) || 'text.primary',
+                        fontWeight: 'medium'
                       }}
                     >
-                      {athlete.nombre}: No tiene esta prueba
+                      {athlete.nombre}: {valorFormateado} {unidadReal || ''}
                     </Typography>
                   )
-                }
-                
-                const isTimeBased =
-                  athleteData[atletaIdKey]?.categorias?.[selectedCategory]?.pruebas?.[entry.prueba]
-                    ?.isTimeBased ?? true
-                const valorFormateado = formatValue(valorReal, unidadReal, isTimeBased)
-                
-                return (
-                  <Typography 
-                    key={athlete.atleta_id} 
-                    variant="caption" 
-                    sx={{ 
-                      display: 'block',
-                      color: athleteColors[athlete.atleta_id] || getColorForAthlete(athlete.atleta_id, athlete.atleta_id === selectedAthlete?.atleta_id) || 'text.primary',
-                      fontWeight: 'medium'
-                    }}
-                  >
-                    {athlete.nombre}: {valorFormateado} {unidadReal || ''}
-                  </Typography>
-                )
-              })}
-            </Box>
-          ))}
-        </Box>
+                })}
+              </Box>
+            ))}
+          </AccordionDetails>
+        </Accordion>
       </CardContent>
     </Card>
   )

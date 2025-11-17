@@ -1,0 +1,189 @@
+:global(:root) {
+  --neo-bg: #e0e5ec;
+  --neo-bg-gradient: linear-gradient(145deg, #f7f8fb 0%, #e2e6ef 100%);
+  --neo-surface: #f4f6fb;
+  --neo-shadow-dark: #b8b9be;
+  --neo-shadow-light: #ffffff;
+  --neo-text-primary: #3b3f49;
+  --neo-accent: #8aa1c1;
+  --neo-accent-strong: #6a82b8;
+  --neo-radius-large: 24px;
+  --neo-radius-medium: 18px;
+  --neo-radius-small: 14px;
+  font-family: 'Poppins', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI',
+    sans-serif;
+}
+
+:global(body) {
+  background: var(--neo-bg-gradient);
+  color: var(--neo-text-primary);
+  font-family: 'Poppins', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI',
+    sans-serif;
+  min-height: 100vh;
+}
+
+.appShell {
+  background: var(--neo-bg-gradient);
+  min-height: 100vh;
+  color: var(--neo-text-primary);
+}
+
+.neoAppBar {
+  background: var(--neo-bg);
+  color: var(--neo-text-primary);
+  border-bottom-left-radius: 28px;
+  border-bottom-right-radius: 28px;
+  box-shadow: 12px 12px 24px var(--neo-shadow-dark),
+    -12px -12px 24px var(--neo-shadow-light);
+}
+
+.neoToolbar {
+  min-height: 64px;
+  padding: 0 24px;
+}
+
+.surfaceCard {
+  background: var(--neo-surface);
+  border-radius: var(--neo-radius-large);
+  box-shadow: 8px 8px 16px var(--neo-shadow-dark),
+    -8px -8px 16px var(--neo-shadow-light);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+.surfaceInset {
+  background: var(--neo-surface);
+  border-radius: var(--neo-radius-medium);
+  box-shadow: inset 6px 6px 12px var(--neo-shadow-dark),
+    inset -6px -6px 12px var(--neo-shadow-light);
+}
+
+.neoButton {
+  border-radius: var(--neo-radius-small);
+  padding: 12px 18px;
+  font-weight: 600;
+  background: var(--neo-surface);
+  color: var(--neo-text-primary);
+  box-shadow: 8px 8px 16px var(--neo-shadow-dark),
+    -8px -8px 16px var(--neo-shadow-light);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  text-transform: none;
+}
+
+.neoButtonPrimary {
+  background: var(--neo-accent);
+  color: #fff;
+  box-shadow: 6px 6px 12px rgba(98, 116, 150, 0.45),
+    -6px -6px 12px rgba(255, 255, 255, 0.8);
+}
+
+.neoButton:hover {
+  transform: translateY(-2px);
+  box-shadow: 10px 10px 20px var(--neo-shadow-dark),
+    -10px -10px 20px var(--neo-shadow-light);
+}
+
+.neoButton:active {
+  transform: translateY(1px);
+  box-shadow: inset 6px 6px 12px var(--neo-shadow-dark),
+    inset -6px -6px 12px var(--neo-shadow-light);
+}
+
+.neoIconButton {
+  width: 44px !important;
+  height: 44px !important;
+  border-radius: 50% !important;
+  background: var(--neo-surface) !important;
+  color: var(--neo-text-primary) !important;
+  box-shadow: 6px 6px 12px var(--neo-shadow-dark),
+    -6px -6px 12px var(--neo-shadow-light);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.neoIconButton:active {
+  transform: translateY(1px);
+  box-shadow: inset 4px 4px 8px var(--neo-shadow-dark),
+    inset -4px -4px 8px var(--neo-shadow-light);
+}
+
+.inputField {
+  border-radius: var(--neo-radius-small);
+  background: var(--neo-surface);
+  box-shadow: inset 5px 5px 10px var(--neo-shadow-dark),
+    inset -5px -5px 10px var(--neo-shadow-light);
+}
+
+.inputField :global(.MuiInputBase-root),
+.inputField :global(.MuiOutlinedInput-root) {
+  border-radius: var(--neo-radius-small);
+}
+
+.inputField :global(fieldset) {
+  border: none !important;
+}
+
+.chip {
+  background: var(--neo-surface) !important;
+  color: var(--neo-text-primary) !important;
+  border-radius: 18px !important;
+  box-shadow: inset 4px 4px 8px var(--neo-shadow-dark),
+    inset -4px -4px 8px var(--neo-shadow-light);
+}
+
+.dialogPaper {
+  background: var(--neo-bg);
+  border-radius: 30px !important;
+  box-shadow: 16px 16px 32px var(--neo-shadow-dark),
+    -12px -12px 32px var(--neo-shadow-light) !important;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+.dialogTitle {
+  font-weight: 600 !important;
+  text-align: center;
+  color: var(--neo-text-primary);
+}
+
+.dialogContent {
+  background: var(--neo-surface);
+  border-radius: var(--neo-radius-medium);
+  box-shadow: inset 4px 4px 8px rgba(0, 0, 0, 0.05),
+    inset -4px -4px 8px rgba(255, 255, 255, 0.6);
+}
+
+.neoList {
+  background: var(--neo-surface);
+  border-radius: var(--neo-radius-medium);
+  box-shadow: inset 6px 6px 12px var(--neo-shadow-dark),
+    inset -6px -6px 12px var(--neo-shadow-light);
+}
+
+.chartCard {
+  background: var(--neo-surface);
+  border-radius: var(--neo-radius-large);
+  box-shadow: 12px 12px 24px var(--neo-shadow-dark),
+    -12px -12px 24px var(--neo-shadow-light);
+  padding: 16px;
+}
+
+.neoToggleGroup {
+  border-radius: var(--neo-radius-medium);
+  background: var(--neo-bg);
+  box-shadow: inset 4px 4px 8px var(--neo-shadow-dark),
+    inset -4px -4px 8px var(--neo-shadow-light);
+}
+
+.neoBottomNav {
+  background: var(--neo-bg);
+  border-radius: 30px 30px 0 0;
+  box-shadow: 0 -10px 30px rgba(184, 185, 190, 0.6);
+}
+
+.neoTextSoft {
+  color: rgba(59, 63, 73, 0.7);
+}
+
+.neoSectionTitle {
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
