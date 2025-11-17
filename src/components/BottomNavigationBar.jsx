@@ -16,11 +16,16 @@ const BottomNavigationBar = () => {
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
   
   // Determinar el valor actual basado en la ruta
+  // React Router con basename ya normaliza el pathname, pero por si acaso
+  // también manejamos rutas que puedan incluir el base path
   const getRouteValue = (pathname) => {
-    if (pathname === '/' || pathname.startsWith('/seguimiento')) return 'seguimiento'
-    if (pathname.startsWith('/analisis')) return 'analisis'
-    if (pathname.startsWith('/calendario')) return 'calendario'
-    if (pathname.startsWith('/mas')) return 'mas'
+    // Normalizar pathname removiendo el base path si está presente
+    const normalizedPath = pathname.replace(/^\/athlete-app/, '') || '/'
+    
+    if (normalizedPath === '/' || normalizedPath.startsWith('/seguimiento')) return 'seguimiento'
+    if (normalizedPath.startsWith('/analisis')) return 'analisis'
+    if (normalizedPath.startsWith('/calendario')) return 'calendario'
+    if (normalizedPath.startsWith('/mas')) return 'mas'
     return 'seguimiento'
   }
 
