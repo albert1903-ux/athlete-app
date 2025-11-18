@@ -13,10 +13,7 @@ import {
   IconButton,
   Alert
 } from '@mui/material'
-import CloseIcon from '@mui/icons-material/Close'
-import CheckIcon from '@mui/icons-material/Check'
-import DeleteIcon from '@mui/icons-material/Delete'
-import AddIcon from '@mui/icons-material/Add'
+import { TbX, TbCheck, TbTrash, TbPlus, TbUserPlus } from 'react-icons/tb'
 import AthleteSearch from './AthleteSearch'
 
 const STORAGE_KEY_COMPARATORS = 'comparatorAthletes'
@@ -118,7 +115,7 @@ function AthleteComparator({ onComparatorsChange }) {
               color="secondary"
               onClick={handleOpen}
               sx={{ py: 2 }}
-              startIcon={<AddIcon />}
+              startIcon={<TbPlus />}
             >
               AÑADIR ATLETA
             </Button>
@@ -145,8 +142,9 @@ function AthleteComparator({ onComparatorsChange }) {
             }
           }}
         >
-          <DialogTitle sx={{ flexShrink: 0, position: 'sticky', top: 0, zIndex: 2, bgcolor: 'background.paper' }}>
-            Añadir Atleta para Comparar
+          <DialogTitle sx={{ flexShrink: 0, position: 'sticky', top: 0, zIndex: 2, bgcolor: 'background.paper', display: 'flex', alignItems: 'center', gap: 1 }}>
+            <TbUserPlus size={24} />
+            <Typography variant="h6" component="span">Añadir Atleta para Comparar</Typography>
           </DialogTitle>
           
           <DialogContent 
@@ -220,7 +218,7 @@ function AthleteComparator({ onComparatorsChange }) {
           <DialogActions sx={{ flexShrink: 0, py: 1.5 }}>
             <Button 
               onClick={handleClose}
-              startIcon={<CloseIcon />}
+              startIcon={<TbX />}
             >
               Cancelar
             </Button>
@@ -228,7 +226,7 @@ function AthleteComparator({ onComparatorsChange }) {
               onClick={handleSelect}
               variant="contained"
               disabled={!tempSelectedAthlete}
-              startIcon={<CheckIcon />}
+              startIcon={<TbCheck />}
               color="secondary"
             >
               Añadir
@@ -264,7 +262,7 @@ function AthleteComparator({ onComparatorsChange }) {
                 aria-label="Eliminar atleta comparador"
                 sx={{ ml: 'auto' }}
               >
-                <DeleteIcon />
+                <TbTrash />
               </IconButton>
             </Box>
             

@@ -25,7 +25,7 @@ import {
   Legend
 } from 'recharts'
 import { supabase } from '../lib/supabase'
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
+import { TbChevronDown } from 'react-icons/tb'
 import { initializeColorsForComparators, getColorForAthlete } from '../utils/athleteColors'
 
 const STORAGE_KEY = 'selectedAthlete'
@@ -1111,7 +1111,7 @@ function AthleteSpiderChart({ comparatorAthletes = [] }) {
 
         {/* Leyenda con valores reales */}
         <Accordion sx={{ mt: 3 }}>
-          <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+          <AccordionSummary expandIcon={<TbChevronDown />}>
             <Typography variant="subtitle2">Mejores Resultados por Prueba</Typography>
           </AccordionSummary>
           <AccordionDetails>

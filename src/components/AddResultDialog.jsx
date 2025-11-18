@@ -16,8 +16,7 @@ import {
 } from '@mui/material'
 import { createFilterOptions } from '@mui/material/Autocomplete'
 import dayjs from 'dayjs'
-import CloseIcon from '@mui/icons-material/Close'
-import CheckIcon from '@mui/icons-material/Check'
+import { TbX, TbCheck, TbCircuitCapacitorPolarized } from 'react-icons/tb'
 import { supabase } from '../lib/supabase'
 
 const GENERO_OPTIONS = [
@@ -459,14 +458,14 @@ function AddResultDialog({ open, onClose, onSuccess }) {
     <Dialog
       open={open}
       onClose={handleClose}
-      fullWidth
       maxWidth="md"
-      PaperProps={{
-        sx: { maxHeight: '90vh' }
-      }}
+      fullWidth
     >
-      <DialogTitle sx={{ position: 'sticky', top: 0, zIndex: 2, bgcolor: 'background.paper' }}>Añadir marca</DialogTitle>
-      <DialogContent dividers>
+      <DialogTitle sx={{ position: 'sticky', top: 0, zIndex: 2, bgcolor: 'background.paper', display: 'flex', alignItems: 'center', gap: 1 }}>
+        <TbCircuitCapacitorPolarized size={24} />
+        <Typography variant="h6" component="span">Añadir marca</Typography>
+      </DialogTitle>
+      <DialogContent>
         <Stack spacing={2}>
 
           {submitError && <Alert severity="error">{submitError}</Alert>}
@@ -663,7 +662,7 @@ function AddResultDialog({ open, onClose, onSuccess }) {
       <DialogActions>
         <Button
           onClick={handleClose}
-          startIcon={<CloseIcon />}
+          startIcon={<TbX />}
           disabled={submitLoading}
         >
           Cancelar
@@ -672,7 +671,7 @@ function AddResultDialog({ open, onClose, onSuccess }) {
           onClick={handleSubmit}
           variant="contained"
           color="secondary"
-          startIcon={<CheckIcon />}
+          startIcon={<TbCheck />}
           disabled={!isFormValid || submitLoading || optionsLoading}
         >
           Guardar

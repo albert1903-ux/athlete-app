@@ -14,8 +14,7 @@ import {
   Select,
   MenuItem
 } from '@mui/material'
-import CalendarTodayIcon from '@mui/icons-material/CalendarToday'
-import PersonIcon from '@mui/icons-material/Person'
+import { TbCalendar, TbUser } from 'react-icons/tb'
 import {
   LineChart,
   Line,
@@ -1403,7 +1402,7 @@ function AthleteResultsChart({ comparatorAthletes = [] }) {
                 backgroundColor: viewMode === 'fecha' ? 'action.selected' : 'transparent'
               }}
             >
-              <CalendarTodayIcon fontSize="small" />
+              <TbCalendar size={20} />
             </IconButton>
           </MuiTooltip>
           <MuiTooltip title="Vista por Edad">
@@ -1415,7 +1414,7 @@ function AthleteResultsChart({ comparatorAthletes = [] }) {
                 backgroundColor: viewMode === 'edad' ? 'action.selected' : 'transparent'
               }}
             >
-              <PersonIcon fontSize="small" />
+              <TbUser size={20} />
             </IconButton>
           </MuiTooltip>
         </Box>

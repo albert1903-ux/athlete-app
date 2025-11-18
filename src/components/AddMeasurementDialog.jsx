@@ -13,8 +13,7 @@ import {
   Typography
 } from '@mui/material'
 import { supabase } from '../lib/supabase'
-import CloseIcon from '@mui/icons-material/Close'
-import CheckIcon from '@mui/icons-material/Check'
+import { TbX, TbCheck, TbHeartPlus } from 'react-icons/tb'
 
 const STORAGE_KEY = 'selectedAthlete'
 
@@ -128,7 +127,10 @@ function AddMeasurementDialog({ open, onClose, onSuccess }) {
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
-      <DialogTitle sx={{ position: 'sticky', top: 0, zIndex: 2, bgcolor: 'background.paper' }}>Nueva Medición Corporal</DialogTitle>
+      <DialogTitle sx={{ position: 'sticky', top: 0, zIndex: 2, bgcolor: 'background.paper', display: 'flex', alignItems: 'center', gap: 1 }}>
+        <TbHeartPlus size={24} />
+        <Typography variant="h6" component="span">Nueva Medición Corporal</Typography>
+      </DialogTitle>
       <DialogContent>
         <Box display="flex" flexDirection="column" gap={2} sx={{ pt: 1 }}>
           {error && (
@@ -218,14 +220,14 @@ function AddMeasurementDialog({ open, onClose, onSuccess }) {
         </Box>
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose} disabled={loading} startIcon={<CloseIcon />}>
+        <Button onClick={onClose} disabled={loading} startIcon={<TbX />}>
           Cancelar
         </Button>
         <Button
           onClick={handleSubmit}
           variant="contained"
           disabled={loading}
-          startIcon={!loading ? <CheckIcon /> : undefined}
+          startIcon={!loading ? <TbCheck /> : undefined}
         >
           {loading ? <CircularProgress size={24} /> : 'Guardar'}
         </Button>

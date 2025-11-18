@@ -15,10 +15,7 @@ import {
   Snackbar,
   Alert
 } from '@mui/material'
-import AddIcon from '@mui/icons-material/Add'
-import DeleteIcon from '@mui/icons-material/Delete'
-import CloseIcon from '@mui/icons-material/Close'
-import CheckIcon from '@mui/icons-material/Check'
+import { TbPlus, TbTrash, TbX, TbCheck, TbCalendarPlus } from 'react-icons/tb'
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import { DatePicker } from '@mui/x-date-pickers/DatePicker'
@@ -208,16 +205,10 @@ function AddEventDialog({ open, onClose, onSuccess, selectedDate }) {
       onClose={onClose}
       maxWidth="md"
       fullWidth
-      PaperProps={{
-        sx: {
-          borderRadius: 2
-        }
-      }}
     >
-      <DialogTitle sx={{ position: 'sticky', top: 0, zIndex: 2, bgcolor: 'background.paper' }}>
-        <Typography variant="h6" component="div">
-          Añadir Evento
-        </Typography>
+      <DialogTitle sx={{ position: 'sticky', top: 0, zIndex: 2, bgcolor: 'background.paper', display: 'flex', alignItems: 'center', gap: 1 }}>
+        <TbCalendarPlus size={24} />
+        <Typography variant="h6" component="span">Añadir Evento</Typography>
       </DialogTitle>
 
       <DialogContent>
@@ -271,7 +262,7 @@ function AddEventDialog({ open, onClose, onSuccess, selectedDate }) {
                     disabled={loading}
                     color="error"
                   >
-                    <DeleteIcon fontSize="small" />
+                    <TbTrash size={20} />
                   </IconButton>
                 )}
               </Box>
@@ -403,7 +394,7 @@ function AddEventDialog({ open, onClose, onSuccess, selectedDate }) {
 
           {/* Botón para agregar más participantes */}
           <Button
-            startIcon={<AddIcon />}
+            startIcon={<TbPlus />}
             onClick={handleAddParticipante}
             disabled={loading}
             variant="outlined"
@@ -416,14 +407,14 @@ function AddEventDialog({ open, onClose, onSuccess, selectedDate }) {
       </DialogContent>
 
       <DialogActions sx={{ px: 3, pb: 2 }}>
-        <Button onClick={onClose} disabled={loading} startIcon={<CloseIcon />}>
+        <Button onClick={onClose} disabled={loading} startIcon={<TbX />}>
           Cancelar
         </Button>
         <Button
           onClick={handleSubmit}
           variant="contained"
           disabled={loading}
-          startIcon={loading ? <CircularProgress size={20} /> : <CheckIcon />}
+          startIcon={loading ? <CircularProgress size={20} /> : <TbCheck />}
         >
           {loading ? 'Guardando...' : 'Guardar'}
         </Button>

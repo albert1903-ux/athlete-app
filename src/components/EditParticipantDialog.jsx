@@ -12,6 +12,7 @@ import {
   Typography,
   Autocomplete
 } from '@mui/material'
+import { TbPencil } from 'react-icons/tb'
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import { TimePicker } from '@mui/x-date-pickers/TimePicker'
@@ -126,10 +127,9 @@ function EditParticipantDialog({ open, onClose, onSuccess, participant }) {
         }
       }}
     >
-      <DialogTitle sx={{ position: 'sticky', top: 0, zIndex: 2, bgcolor: 'background.paper' }}>
-        <Typography variant="h6" component="div">
-          Editar Participante
-        </Typography>
+      <DialogTitle sx={{ position: 'sticky', top: 0, zIndex: 2, bgcolor: 'background.paper', display: 'flex', alignItems: 'center', gap: 1 }}>
+        <TbPencil size={24} />
+        <Typography variant="h6" component="span">Editar Participante</Typography>
       </DialogTitle>
 
       <DialogContent>

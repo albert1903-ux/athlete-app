@@ -16,7 +16,7 @@ import {
   CartesianGrid,
   Tooltip
 } from 'recharts'
-import ScatterPlotIcon from '@mui/icons-material/ScatterPlot'
+import { TbChartScatter } from 'react-icons/tb'
 import { supabase } from '../lib/supabase'
 
 const STORAGE_KEY = 'selectedAthlete'

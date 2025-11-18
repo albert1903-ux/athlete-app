@@ -5,8 +5,7 @@ import Toolbar from '@mui/material/Toolbar'
 import Typography from '@mui/material/Typography'
 import Box from '@mui/material/Box'
 import IconButton from '@mui/material/IconButton'
-import AddIcon from '@mui/icons-material/Add'
-import VisibilityIcon from '@mui/icons-material/Visibility'
+import { TbPlus, TbEye, TbCalendarPlus, TbHeartPlus, TbCircuitCapacitorPolarized } from 'react-icons/tb'
 import BottomNavigationBar from './components/BottomNavigationBar'
 import SeguimientoPage from './pages/SeguimientoPage'
 import AnalisisPage from './pages/AnalisisPage'
@@ -114,7 +113,7 @@ function AppContent() {
               }}
               aria-label="añadir resultado"
             >
-              <AddIcon />
+              <TbCircuitCapacitorPolarized />
             </IconButton>
           )}
           {isAnalisisPage && (
@@ -133,7 +132,7 @@ function AppContent() {
                 }}
                 aria-label="añadir nueva medición"
               >
-                <AddIcon />
+                <TbHeartPlus />
               </IconButton>
               <IconButton
                 onClick={handleViewMeasurements}
@@ -149,7 +148,7 @@ function AppContent() {
                 }}
                 aria-label="visualizar mediciones"
               >
-                <VisibilityIcon />
+                <TbEye />
               </IconButton>
             </Box>
           )}
@@ -169,7 +168,7 @@ function AppContent() {
               }}
               aria-label="añadir evento"
             >
-              <AddIcon />
+              <TbCalendarPlus />
             </IconButton>
           )}
         </Toolbar>

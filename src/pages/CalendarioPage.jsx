@@ -7,16 +7,7 @@ import Chip from '@mui/material/Chip'
 import CircularProgress from '@mui/material/CircularProgress'
 import Drawer from '@mui/material/Drawer'
 import IconButton from '@mui/material/IconButton'
-import CalendarMonthIcon from '@mui/icons-material/CalendarMonth'
-import EventIcon from '@mui/icons-material/Event'
-import SportsIcon from '@mui/icons-material/Sports'
-import WarningIcon from '@mui/icons-material/Warning'
-import AccessTimeIcon from '@mui/icons-material/AccessTime'
-import EditIcon from '@mui/icons-material/Edit'
-import DeleteIcon from '@mui/icons-material/Delete'
-import ChevronLeftIcon from '@mui/icons-material/ChevronLeft'
-import ChevronRightIcon from '@mui/icons-material/ChevronRight'
-import LocationOnIcon from '@mui/icons-material/LocationOn'
+import { TbCalendar, TbCalendarEvent, TbBallFootball, TbAlertTriangle, TbClock, TbPencil, TbTrash, TbChevronLeft, TbChevronRight, TbMapPin } from 'react-icons/tb'
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import { StaticDatePicker } from '@mui/x-date-pickers/StaticDatePicker'
@@ -195,7 +186,7 @@ const CalendarioPage = () => {
               },
             }}
           >
-            <ChevronLeftIcon fontSize="small" />
+            <TbChevronLeft size={20} />
           </IconButton>
         </Box>
         
@@ -263,7 +254,7 @@ const CalendarioPage = () => {
               },
             }}
           >
-            <ChevronRightIcon fontSize="small" />
+            <TbChevronRight size={20} />
           </IconButton>
         </Box>
       </Box>
@@ -661,7 +652,7 @@ const CalendarioPage = () => {
                     },
                   }}
                 >
-                  <ChevronLeftIcon fontSize="small" />
+                  <TbChevronLeft size={20} />
                 </IconButton>
               </Box>
               
@@ -731,7 +722,7 @@ const CalendarioPage = () => {
                     },
                   }}
                 >
-                  <ChevronRightIcon fontSize="small" />
+                  <TbChevronRight size={20} />
                 </IconButton>
               </Box>
             </Box>
@@ -950,7 +941,7 @@ const CalendarioPage = () => {
             </Box>
           ) : dayParticipants.length === 0 ? (
             <Box sx={{ textAlign: 'center', py: 4 }}>
-              <EventIcon sx={{ fontSize: 48, color: 'text.secondary', mb: 2 }} />
+              <TbCalendarEvent style={{ fontSize: 48, color: 'inherit', marginBottom: 16 }} />
               <Typography variant="body1" color="text.secondary">
                 No hay eventos asociados a este día
             </Typography>
@@ -993,11 +984,11 @@ const CalendarioPage = () => {
                       <CardContent>
                         <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 2 }}>
                           {groupHasConflict && (
-                            <WarningIcon 
-                              sx={{ 
-                                color: 'warning.main', 
+                            <TbAlertTriangle 
+                              style={{ 
+                                color: 'inherit', 
                                 fontSize: 28,
-                                mt: 0.5
+                                marginTop: 4
                               }} 
                             />
                           )}
@@ -1008,7 +999,7 @@ const CalendarioPage = () => {
                               </Typography>
                               {group.ubicacion && (
                                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                                  <LocationOnIcon sx={{ fontSize: 18, color: 'text.secondary' }} />
+                                  <TbMapPin style={{ fontSize: 18, color: 'inherit' }} />
                                   <Typography variant="body2" color="text.secondary">
                                     {group.ubicacion}
                                   </Typography>
@@ -1027,7 +1018,7 @@ const CalendarioPage = () => {
                                     variant="outlined"
                                   />
                                   <Chip
-                                    icon={<AccessTimeIcon />}
+                                    icon={<TbClock />}
                                     label={dayjs(participante.hora, 'HH:mm:ss').format('HH:mm')}
                                     size="small"
                                     variant="outlined"
@@ -1038,7 +1029,7 @@ const CalendarioPage = () => {
                                     color="primary"
                                     sx={{ ml: 'auto', width: 32, height: 32 }}
                                   >
-                                    <EditIcon fontSize="small" />
+                                    <TbPencil size={20} />
                                   </IconButton>
                                   <IconButton
                                     size="small"
@@ -1046,7 +1037,7 @@ const CalendarioPage = () => {
                                     color="error"
                                     sx={{ width: 32, height: 32 }}
                                   >
-                                    <DeleteIcon fontSize="small" />
+                                    <TbTrash size={20} />
                                   </IconButton>
                                 </Box>
                               ))}

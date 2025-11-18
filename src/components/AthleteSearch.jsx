@@ -15,7 +15,7 @@ import {
   ToggleButton,
   ToggleButtonGroup
 } from '@mui/material'
-import SearchIcon from '@mui/icons-material/Search'
+import { TbSearch } from 'react-icons/tb'
 import { supabase } from '../lib/supabase'
 
 function AthleteSearch({ onResultClick }) {
@@ -270,7 +270,7 @@ function AthleteSearch({ onResultClick }) {
               variant="contained"
               onClick={handleSearch}
               disabled={loading || !searchQuery.trim()}
-              startIcon={loading ? <CircularProgress size={20} /> : <SearchIcon />}
+              startIcon={loading ? <CircularProgress size={20} /> : <TbSearch />}
               sx={{ minWidth: 120 }}
             >
               Buscar

@@ -12,9 +12,7 @@ import {
   Chip,
   IconButton
 } from '@mui/material'
-import CloseIcon from '@mui/icons-material/Close'
-import CheckIcon from '@mui/icons-material/Check'
-import EditIcon from '@mui/icons-material/Edit'
+import { TbX, TbCheck, TbPencil, TbUser } from 'react-icons/tb'
 import AthleteSearch from './AthleteSearch'
 
 const STORAGE_KEY = 'selectedAthlete'
@@ -118,7 +116,7 @@ function AthleteSelector() {
                 aria-label="Cambiar atleta"
                 sx={{ ml: 'auto' }}
               >
-                <EditIcon />
+                <TbPencil />
               </IconButton>
             </Box>
             
@@ -178,8 +176,9 @@ function AthleteSelector() {
           }
         }}
       >
-        <DialogTitle sx={{ flexShrink: 0 }}>
-          Seleccionar Atleta
+        <DialogTitle sx={{ flexShrink: 0, display: 'flex', alignItems: 'center', gap: 1 }}>
+          <TbUser size={24} />
+          <Typography variant="h6" component="span">Seleccionar Atleta</Typography>
         </DialogTitle>
         
         <DialogContent 
@@ -266,7 +265,7 @@ function AthleteSelector() {
         <DialogActions sx={{ flexShrink: 0, py: 1.5 }}>
           <Button 
             onClick={handleClose}
-            startIcon={<CloseIcon />}
+            startIcon={<TbX />}
           >
             Cancelar
           </Button>
@@ -274,7 +273,7 @@ function AthleteSelector() {
             onClick={handleSelect}
             variant="contained"
             disabled={!tempSelectedAthlete}
-            startIcon={<CheckIcon />}
+            startIcon={<TbCheck />}
           >
             Seleccionar
           </Button>

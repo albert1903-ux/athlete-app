@@ -3,10 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom'
 import BottomNavigation from '@mui/material/BottomNavigation'
 import BottomNavigationAction from '@mui/material/BottomNavigationAction'
 import Box from '@mui/material/Box'
-import SportsScoreIcon from '@mui/icons-material/SportsScore'
-import MonitorHeartIcon from '@mui/icons-material/MonitorHeart'
-import CalendarMonthIcon from '@mui/icons-material/CalendarMonth'
-import MoreHorizIcon from '@mui/icons-material/MoreHoriz'
+import { TbChartRadar, TbHeartbeat, TbCalendar, TbDots } from 'react-icons/tb'
 const BottomNavigationBar = () => {
   const navigate = useNavigate()
   const location = useLocation()
@@ -82,25 +79,25 @@ const BottomNavigationBar = () => {
         <BottomNavigationAction
           label="Seguimiento"
           value="seguimiento"
-          icon={<SportsScoreIcon />}
+          icon={<TbChartRadar size={24} />}
           aria-label="Seguimiento deportivo"
         />
         <BottomNavigationAction
           label="Análisis"
           value="analisis"
-          icon={<MonitorHeartIcon />}
+          icon={<TbHeartbeat size={24} />}
           aria-label="Análisis físico"
         />
         <BottomNavigationAction
           label="Calendario"
           value="calendario"
-          icon={<CalendarMonthIcon />}
+          icon={<TbCalendar size={24} />}
           aria-label="Calendario"
         />
         <BottomNavigationAction
           label="Más"
           value="mas"
-          icon={<MoreHorizIcon />}
+          icon={<TbDots size={24} />}
           aria-label="Más opciones"
         />
         </BottomNavigation>

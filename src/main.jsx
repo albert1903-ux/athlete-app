@@ -55,6 +55,18 @@ const theme = createTheme({
         },
       },
     },
+    // Estilos para Dialogs
+    MuiDialog: {
+      styleOverrides: {
+        paper: {
+          borderRadius: 10,
+          maxWidth: 'calc(100% - 32px)',
+          maxHeight: 'calc(100% - 32px)',
+          margin: 16,
+          width: '100%',
+        },
+      },
+    },
     // Estilos para BottomNavigation según MD3
     MuiBottomNavigation: {
       styleOverrides: {

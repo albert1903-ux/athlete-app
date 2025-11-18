@@ -6,19 +6,15 @@ import List from '@mui/material/List'
 import ListItem from '@mui/material/ListItem'
 import ListItemIcon from '@mui/material/ListItemIcon'
 import ListItemText from '@mui/material/ListItemText'
-import PersonIcon from '@mui/icons-material/Person'
-import SettingsIcon from '@mui/icons-material/Settings'
-import HelpIcon from '@mui/icons-material/Help'
-import InfoIcon from '@mui/icons-material/Info'
-import ExitToAppIcon from '@mui/icons-material/ExitToApp'
+import { TbUser, TbSettings, TbHelpCircle, TbInfoCircle, TbLogout } from 'react-icons/tb'
 
 const MasPage = () => {
   const menuItems = [
-    { icon: <PersonIcon />, text: 'Perfil', description: 'Configura tu perfil de usuario' },
-    { icon: <SettingsIcon />, text: 'Configuración', description: 'Ajustes de la aplicación' },
-    { icon: <HelpIcon />, text: 'Ayuda', description: 'Centro de ayuda y soporte' },
-    { icon: <InfoIcon />, text: 'Acerca de', description: 'Información sobre la aplicación' },
-    { icon: <ExitToAppIcon />, text: 'Cerrar sesión', description: 'Salir de la aplicación' },
+    { icon: <TbUser size={24} />, text: 'Perfil', description: 'Configura tu perfil de usuario' },
+    { icon: <TbSettings size={24} />, text: 'Configuración', description: 'Ajustes de la aplicación' },
+    { icon: <TbHelpCircle size={24} />, text: 'Ayuda', description: 'Centro de ayuda y soporte' },
+    { icon: <TbInfoCircle size={24} />, text: 'Acerca de', description: 'Información sobre la aplicación' },
+    { icon: <TbLogout size={24} />, text: 'Cerrar sesión', description: 'Salir de la aplicación' },
   ]
 
   return (

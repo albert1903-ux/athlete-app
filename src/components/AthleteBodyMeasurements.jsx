@@ -22,10 +22,7 @@ import {
   Paper,
   Chip
 } from '@mui/material'
-import AddIcon from '@mui/icons-material/Add'
-import EditIcon from '@mui/icons-material/Edit'
-import DeleteIcon from '@mui/icons-material/Delete'
-import FitnessCenterIcon from '@mui/icons-material/FitnessCenter'
+import { TbPlus, TbPencil, TbTrash, TbBarbell, TbHeartPlus } from 'react-icons/tb'
 import { supabase } from '../lib/supabase'
 
 const STORAGE_KEY = 'selectedAthlete'
@@ -238,7 +235,7 @@ function AthleteBodyMeasurements() {
       <Card>
         <CardContent>
           <Box display="flex" alignItems="center" gap={1} mb={2}>
-            <FitnessCenterIcon color="primary" />
+            <TbBarbell style={{ color: 'inherit' }} />
             <Typography variant="h6">Medidas Corporales</Typography>
           </Box>
           <Alert severity="info">
@@ -254,12 +251,12 @@ function AthleteBodyMeasurements() {
       <CardContent>
         <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
           <Box display="flex" alignItems="center" gap={1}>
-            <FitnessCenterIcon color="primary" />
+            <TbBarbell style={{ color: 'inherit' }} />
             <Typography variant="h6">Medidas Corporales</Typography>
           </Box>
           <Button
             variant="contained"
-            startIcon={<AddIcon />}
+            startIcon={<TbPlus />}
             onClick={() => handleOpenDialog()}
             size="small"
           >
@@ -329,14 +326,14 @@ function AthleteBodyMeasurements() {
                           onClick={() => handleOpenDialog(measure)}
                           color="primary"
                         >
-                          <EditIcon fontSize="small" />
+                          <TbPencil size={20} />
                         </IconButton>
                         <IconButton
                           size="small"
                           onClick={() => handleDelete(measure.medida_id)}
                           color="error"
                         >
-                          <DeleteIcon fontSize="small" />
+                          <TbTrash size={20} />
                         </IconButton>
                       </TableCell>
                     </TableRow>
@@ -349,8 +346,9 @@ function AthleteBodyMeasurements() {
 
         {/* Diálogo de entrada/edición */}
         <Dialog open={openDialog} onClose={handleCloseDialog} maxWidth="sm" fullWidth>
-          <DialogTitle>
-            {editingMeasure ? 'Editar Medición' : 'Nueva Medición'}
+          <DialogTitle sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <TbHeartPlus size={24} />
+            <Typography variant="h6" component="span">{editingMeasure ? 'Editar Medición' : 'Nueva Medición'}</Typography>
           </DialogTitle>
           <DialogContent>
             <Box display="flex" flexDirection="column" gap={2} sx={{ pt: 1 }}>
