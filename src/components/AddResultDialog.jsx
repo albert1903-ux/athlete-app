@@ -675,7 +675,7 @@ function AddResultDialog({ open, onClose, onSuccess }) {
           startIcon={<CheckIcon />}
           disabled={!isFormValid || submitLoading || optionsLoading}
         >
-          Guardar resultado
+          Guardar
         </Button>
       </DialogActions>
     </Dialog>

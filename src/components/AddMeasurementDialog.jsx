@@ -13,6 +13,8 @@ import {
   Typography
 } from '@mui/material'
 import { supabase } from '../lib/supabase'
+import CloseIcon from '@mui/icons-material/Close'
+import CheckIcon from '@mui/icons-material/Check'
 
 const STORAGE_KEY = 'selectedAthlete'
 
@@ -216,13 +218,14 @@ function AddMeasurementDialog({ open, onClose, onSuccess }) {
         </Box>
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose} disabled={loading}>
+        <Button onClick={onClose} disabled={loading} startIcon={<CloseIcon />}>
           Cancelar
         </Button>
         <Button
           onClick={handleSubmit}
           variant="contained"
           disabled={loading}
+          startIcon={!loading ? <CheckIcon /> : undefined}
         >
           {loading ? <CircularProgress size={24} /> : 'Guardar'}
         </Button>
