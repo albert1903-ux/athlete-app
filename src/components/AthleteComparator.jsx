@@ -126,21 +126,8 @@ function AthleteComparator({ onComparatorsChange }) {
         <Dialog 
           open={open} 
           onClose={handleClose} 
-          maxWidth={false}
+          maxWidth="sm"
           fullWidth
-          fullScreen={false}
-          PaperProps={{
-            sx: { 
-              width: '100%',
-              maxWidth: '100%',
-              m: { xs: 0 },
-              height: { xs: '90vh', sm: '80vh' },
-              maxHeight: { xs: '90vh', sm: '80vh' },
-              minHeight: { xs: '90vh', sm: '500px' },
-              display: 'flex',
-              flexDirection: 'column'
-            }
-          }}
         >
           <DialogTitle sx={{ flexShrink: 0, position: 'sticky', top: 0, zIndex: 2, bgcolor: 'background.paper', display: 'flex', alignItems: 'center', gap: 1 }}>
             <TbUserPlus size={24} />
@@ -308,24 +295,12 @@ function AthleteComparator({ onComparatorsChange }) {
       <Dialog 
         open={open} 
         onClose={handleClose} 
-        maxWidth={false}
+        maxWidth="sm"
         fullWidth
-        fullScreen={false}
-        PaperProps={{
-          sx: { 
-            width: '100%',
-            maxWidth: '100%',
-            m: { xs: 0 },
-            height: { xs: '90vh', sm: '80vh' },
-            maxHeight: { xs: '90vh', sm: '80vh' },
-            minHeight: { xs: '90vh', sm: '500px' },
-            display: 'flex',
-            flexDirection: 'column'
-          }
-        }}
       >
-        <DialogTitle sx={{ flexShrink: 0, position: 'sticky', top: 0, zIndex: 2, bgcolor: 'background.paper' }}>
-          Añadir Atleta para Comparar
+        <DialogTitle sx={{ flexShrink: 0, position: 'sticky', top: 0, zIndex: 2, bgcolor: 'background.paper', display: 'flex', alignItems: 'center', gap: 1 }}>
+          <TbUserPlus size={24} />
+          <Typography variant="h6" component="span">Añadir Atleta para Comparar</Typography>
         </DialogTitle>
         
         <DialogContent 

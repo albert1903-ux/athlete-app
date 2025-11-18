@@ -160,21 +160,8 @@ function AthleteSelector() {
       <Dialog 
         open={open} 
         onClose={handleClose} 
-        maxWidth={false}
+        maxWidth="sm"
         fullWidth
-        fullScreen={false}
-        PaperProps={{
-          sx: { 
-            width: '100%',
-            maxWidth: '100%',
-            m: { xs: 0 },
-            height: { xs: '90vh', sm: '80vh' },
-            maxHeight: { xs: '90vh', sm: '80vh' },
-            minHeight: { xs: '90vh', sm: '500px' },
-            display: 'flex',
-            flexDirection: 'column'
-          }
-        }}
       >
         <DialogTitle sx={{ flexShrink: 0, display: 'flex', alignItems: 'center', gap: 1 }}>
           <TbUser size={24} />

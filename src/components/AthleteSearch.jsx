@@ -19,7 +19,7 @@ import { TbSearch } from 'react-icons/tb'
 import { supabase } from '../lib/supabase'
 
 function AthleteSearch({ onResultClick }) {
-  const [searchType, setSearchType] = useState('nombre') // 'nombre', 'licencia', 'club'
+  const [searchType, setSearchType] = useState('nombre') // 'nombre', 'club'
   const [searchQuery, setSearchQuery] = useState('')
   const [loading, setLoading] = useState(false)
   const [results, setResults] = useState([])
@@ -64,26 +64,6 @@ function AthleteSearch({ onResultClick }) {
           }
           
           atletaIds = nombreData.map(a => a.atleta_id)
-          break
-        }
-
-        case 'licencia': {
-          // Buscar por licencia en la tabla atletas
-          const { data: licenciaData, error: licenciaError } = await supabase
-            .from('atletas')
-            .select('atleta_id, nombre, licencia')
-            .ilike('licencia', `%${searchQuery.trim()}%`)
-            .limit(100)
-          
-          if (licenciaError) throw licenciaError
-          
-          if (!licenciaData || licenciaData.length === 0) {
-            setError('No se encontraron atletas con esa licencia')
-            setLoading(false)
-            return
-          }
-          
-          atletaIds = licenciaData.map(a => a.atleta_id)
           break
         }
 
@@ -240,9 +220,6 @@ function AthleteSearch({ onResultClick }) {
               <ToggleButton value="nombre" aria-label="por nombre">
                 Nombre
               </ToggleButton>
-              <ToggleButton value="licencia" aria-label="por licencia">
-                Licencia
-              </ToggleButton>
               <ToggleButton value="club" aria-label="por club">
                 Club
               </ToggleButton>
@@ -253,7 +230,7 @@ function AthleteSearch({ onResultClick }) {
           <Box sx={{ display: 'flex', gap: 1, mb: 2 }}>
             <TextField
               fullWidth
-              label={`Buscar por ${searchType === 'nombre' ? 'nombre' : searchType === 'licencia' ? 'licencia' : 'club'}`}
+              label={`Buscar por ${searchType === 'nombre' ? 'nombre' : 'club'}`}
               variant="outlined"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
@@ -261,8 +238,6 @@ function AthleteSearch({ onResultClick }) {
               placeholder={
                 searchType === 'nombre' 
                   ? 'Ej: Juan Pérez'
-                  : searchType === 'licencia'
-                  ? 'Ej: 12345'
                   : 'Ej: FC Barcelona'
               }
             />
