@@ -284,7 +284,7 @@ function AthleteComparator({ onComparatorsChange }) {
             variant="outlined"
             color="secondary"
             onClick={handleOpen}
-            startIcon={<AddIcon />}
+            startIcon={<TbPlus />}
           >
             AÑADIR ATLETA
           </Button>
@@ -373,7 +373,7 @@ function AthleteComparator({ onComparatorsChange }) {
         <DialogActions sx={{ flexShrink: 0, py: 1.5 }}>
           <Button 
             onClick={handleClose}
-            startIcon={<CloseIcon />}
+            startIcon={<TbX />}
           >
             Cancelar
           </Button>
@@ -381,7 +381,7 @@ function AthleteComparator({ onComparatorsChange }) {
             onClick={handleSelect}
             variant="contained"
             disabled={!tempSelectedAthlete}
-            startIcon={<CheckIcon />}
+            startIcon={<TbCheck />}
             color="secondary"
           >
             Añadir
