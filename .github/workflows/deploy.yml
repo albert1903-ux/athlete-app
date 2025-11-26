@@ -36,6 +36,7 @@ jobs:
           NODE_ENV: production
           VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
           VITE_SUPABASE_KEY: ${{ secrets.VITE_SUPABASE_KEY }}
+          VITE_API_URL: ${{ vars.VITE_API_URL }}
         run: npm run build
 
       - name: Copy index.html to 404.html for SPA routing
