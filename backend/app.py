@@ -234,12 +234,41 @@ def process_video(filepath):
         metrics['hip_angles']['peak'] = get_hip_angle(landmarks, 'right')
         metrics['ankle_angles']['peak'] = get_ankle_angle(landmarks, 'right')
         
-        # Calculate max height (approximate based on hip position change)
-        if takeoff_frame is not None:
+        # Calculate max height using person's height as reference
+        if takeoff_frame is not None and len(frames_data[takeoff_frame]['landmarks']) > 24:
+            # Get hip positions (average of left and right hip)
             takeoff_hip_y = (frames_data[takeoff_frame]['landmarks'][23]['y'] + 
                            frames_data[takeoff_frame]['landmarks'][24]['y']) / 2
             peak_hip_y = (landmarks[23]['y'] + landmarks[24]['y']) / 2
-            metrics['max_height'] = abs(takeoff_hip_y - peak_hip_y)
+            
+            # Calculate person's height in the frame (from ankle to head)
+            # Use average of both sides for more accuracy
+            takeoff_landmarks = frames_data[takeoff_frame]['landmarks']
+            
+            # Get head position (nose landmark)
+            head_y = takeoff_landmarks[0]['y'] if len(takeoff_landmarks) > 0 else 0
+            
+            # Get ankle position (average of both ankles)
+            ankle_y = (takeoff_landmarks[27]['y'] + takeoff_landmarks[28]['y']) / 2 if len(takeoff_landmarks) > 28 else 0
+            
+            # Person's height in normalized coordinates
+            person_height_normalized = abs(ankle_y - head_y)
+            
+            # Assume average person height is 170cm (can be made configurable)
+            ASSUMED_PERSON_HEIGHT_CM = 170
+            
+            # Calculate scale factor (cm per normalized unit)
+            if person_height_normalized > 0:
+                scale_factor = ASSUMED_PERSON_HEIGHT_CM / person_height_normalized
+                
+                # Calculate height difference in normalized coordinates
+                height_diff_normalized = abs(takeoff_hip_y - peak_hip_y)
+                
+                # Convert to centimeters
+                metrics['max_height'] = height_diff_normalized * scale_factor
+            else:
+                # Fallback: use raw difference if we can't calculate scale
+                metrics['max_height'] = abs(takeoff_hip_y - peak_hip_y) * 100  # Convert to rough cm estimate
     
     if landing_frame is not None and frames_data[landing_frame]['landmarks']:
         landmarks = frames_data[landing_frame]['landmarks']
