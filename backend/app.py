@@ -288,8 +288,8 @@ def process_video(filepath):
                     
                     print(f"DEBUG - Scale factor: {scale_factor:.2f}, Height diff normalized: {height_diff_normalized:.3f}")
                     
-                    # Convert to centimeters
-                    metrics['max_height'] = height_diff_normalized * scale_factor
+                    # Convert to centimeters and multiply by 2 for calibration
+                    metrics['max_height'] = height_diff_normalized * scale_factor * 2
                     
                     print(f"DEBUG - Final max height (from feet): {metrics['max_height']:.1f} cm")
                 else:
