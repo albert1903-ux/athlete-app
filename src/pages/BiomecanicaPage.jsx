@@ -44,7 +44,13 @@ const BiomecanicaPage = () => {
                 console.log('Análisis completado:', data)
             } catch (error) {
                 console.error('Error:', error)
-                alert('Error al procesar el video')
+
+                // Check if it's a network error (backend not available)
+                if (error.message === 'Failed to fetch' || error.message.includes('Load failed')) {
+                    alert('⚠️ Funcionalidad de análisis biomecánico disponible solo en desarrollo local.\n\nPara usar esta función:\n1. Ejecuta el backend localmente: python3 backend/app.py\n2. Asegúrate de que esté corriendo en http://localhost:5001\n3. Recarga la página y vuelve a intentar')
+                } else {
+                    alert('Error al procesar el video: ' + error.message)
+                }
             } finally {
                 setIsAnalyzing(false)
             }
@@ -205,6 +211,24 @@ const BiomecanicaPage = () => {
             <Typography variant="body2" color="text.secondary">
                 Análisis de salto de longitud mediante visión por computadora.
             </Typography>
+
+            {/* Warning banner for production */}
+            {(!import.meta.env.VITE_API_URL || import.meta.env.VITE_API_URL.includes('localhost')) && (
+                <Box sx={{
+                    p: 2,
+                    bgcolor: 'warning.light',
+                    borderRadius: 2,
+                    border: '1px solid',
+                    borderColor: 'warning.main'
+                }}>
+                    <Typography variant="body2" fontWeight="bold" color="warning.contrastText" sx={{ mb: 1 }}>
+                        ⚠️ Funcionalidad disponible solo en desarrollo local
+                    </Typography>
+                    <Typography variant="caption" color="warning.contrastText">
+                        Para usar el análisis biomecánico, ejecuta el backend localmente: <code>python3 backend/app.py</code>
+                    </Typography>
+                </Box>
+            )}
 
             {/* Sección 1: Carga de Video */}
             <Card sx={{ borderRadius: 4, boxShadow: 2 }}>
