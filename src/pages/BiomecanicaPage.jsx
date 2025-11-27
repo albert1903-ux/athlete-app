@@ -13,6 +13,7 @@ const BiomecanicaPage = () => {
     const [videoUrl, setVideoUrl] = useState(null)
     const [analysisData, setAnalysisData] = useState(null)
     const [isAnalyzing, setIsAnalyzing] = useState(false)
+    const [uploadProgress, setUploadProgress] = useState(0)
     const videoRef = useRef(null)
     const canvasRef = useRef(null)
 
@@ -25,8 +26,21 @@ const BiomecanicaPage = () => {
 
             // Upload and analyze
             setIsAnalyzing(true)
+            setUploadProgress(0)
+
             const formData = new FormData()
             formData.append('file', file)
+
+            // Simulate progress
+            const progressInterval = setInterval(() => {
+                setUploadProgress(prev => {
+                    if (prev >= 90) {
+                        clearInterval(progressInterval)
+                        return 90
+                    }
+                    return prev + 10
+                })
+            }, 300)
 
             try {
                 const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001'
@@ -40,10 +54,14 @@ const BiomecanicaPage = () => {
                 }
 
                 const data = await response.json()
-                setAnalysisData(data)
-                console.log('Análisis completado:', data)
+                setUploadProgress(100)
+                setTimeout(() => {
+                    setAnalysisData(data)
+                    console.log('Análisis completado:', data)
+                }, 500)
             } catch (error) {
                 console.error('Error:', error)
+                clearInterval(progressInterval)
 
                 // Check if it's a network error (backend not available)
                 if (error.message === 'Failed to fetch' || error.message.includes('Load failed')) {
@@ -52,7 +70,9 @@ const BiomecanicaPage = () => {
                     alert('Error al procesar el video: ' + error.message)
                 }
             } finally {
+                clearInterval(progressInterval)
                 setIsAnalyzing(false)
+                setUploadProgress(0)
             }
         }
     }
@@ -532,11 +552,11 @@ const BiomecanicaPage = () => {
                             </Grid>
 
                             {/* Max Height */}
-                            <Box sx={{ p: 2, bgcolor: 'primary.light', borderRadius: 2, mb: 3 }}>
-                                <Typography variant="body2" fontWeight="bold" color="text.secondary">
+                            <Box sx={{ p: 2, bgcolor: 'primary.main', borderRadius: 2, mb: 3 }}>
+                                <Typography variant="body2" color="#ffffff" sx={{ opacity: 0.9 }}>
                                     Altura Máxima
                                 </Typography>
-                                <Typography variant="h4" fontWeight="bold" color="primary.main">
+                                <Typography variant="h4" fontWeight="bold" color="#ffffff">
                                     {analysisData.metrics.max_height.toFixed(1)} cm
                                 </Typography>
                             </Box>
@@ -576,6 +596,64 @@ const BiomecanicaPage = () => {
                 </CardContent>
             </Card>
 
+            {/* Loading Overlay */}
+            {isAnalyzing && (
+                <Box
+                    sx={{
+                        position: 'fixed',
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        bgcolor: 'rgba(0, 0, 0, 0.8)',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        zIndex: 9999,
+                        gap: 3
+                    }}
+                >
+                    <Box sx={{ position: 'relative', display: 'inline-flex' }}>
+                        <Box
+                            sx={{
+                                width: 120,
+                                height: 120,
+                                borderRadius: '50%',
+                                border: '8px solid rgba(255, 255, 255, 0.1)',
+                                borderTop: '8px solid #1976d2',
+                                animation: 'spin 1s linear infinite',
+                                '@keyframes spin': {
+                                    '0%': { transform: 'rotate(0deg)' },
+                                    '100%': { transform: 'rotate(360deg)' }
+                                }
+                            }}
+                        />
+                        <Box
+                            sx={{
+                                position: 'absolute',
+                                top: 0,
+                                left: 0,
+                                bottom: 0,
+                                right: 0,
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center'
+                            }}
+                        >
+                            <Typography variant="h5" fontWeight="bold" color="#ffffff">
+                                {uploadProgress}%
+                            </Typography>
+                        </Box>
+                    </Box>
+                    <Typography variant="h6" color="#ffffff" fontWeight="medium">
+                        Analizando video...
+                    </Typography>
+                    <Typography variant="body2" color="rgba(255, 255, 255, 0.7)">
+                        Detectando pose y calculando métricas
+                    </Typography>
+                </Box>
+            )}
         </Box>
     )
 }
