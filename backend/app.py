@@ -256,34 +256,45 @@ def process_video(filepath):
                            frames_data[takeoff_frame]['landmarks'][24]['y']) / 2
             peak_hip_y = (landmarks[23]['y'] + landmarks[24]['y']) / 2
             
-            # Calculate person's height in the frame (from ankle to head)
-            # Use average of both sides for more accuracy
+            # Calculate person's height in the frame (from head to ankle)
+            # Note: Y coordinate goes from 0 (top) to 1 (bottom)
             takeoff_landmarks = frames_data[takeoff_frame]['landmarks']
             
-            # Get head position (nose landmark)
+            # Get head position (nose landmark) - should be smaller Y value (top)
             head_y = takeoff_landmarks[0]['y'] if len(takeoff_landmarks) > 0 else 0
             
-            # Get ankle position (average of both ankles)
+            # Get ankle position (average of both ankles) - should be larger Y value (bottom)
             ankle_y = (takeoff_landmarks[27]['y'] + takeoff_landmarks[28]['y']) / 2 if len(takeoff_landmarks) > 28 else 0
             
-            # Person's height in normalized coordinates
+            # Person's height in normalized coordinates (ankle_y should be > head_y)
+            # This represents the vertical span of the person in the frame
             person_height_normalized = abs(ankle_y - head_y)
+            
+            print(f"DEBUG - Head Y: {head_y:.3f}, Ankle Y: {ankle_y:.3f}, Person height normalized: {person_height_normalized:.3f}")
+            print(f"DEBUG - Takeoff hip Y: {takeoff_hip_y:.3f}, Peak hip Y: {peak_hip_y:.3f}")
             
             # Assume average person height is 170cm (can be made configurable)
             ASSUMED_PERSON_HEIGHT_CM = 170
             
             # Calculate scale factor (cm per normalized unit)
-            if person_height_normalized > 0:
+            # Only calculate if person_height_normalized is reasonable (person visible in frame)
+            if person_height_normalized > 0.1:  # At least 10% of frame height
                 scale_factor = ASSUMED_PERSON_HEIGHT_CM / person_height_normalized
                 
                 # Calculate height difference in normalized coordinates
-                height_diff_normalized = abs(takeoff_hip_y - peak_hip_y)
+                # Positive value means hip went UP (peak_hip_y < takeoff_hip_y because Y increases downward)
+                height_diff_normalized = takeoff_hip_y - peak_hip_y
+                
+                print(f"DEBUG - Scale factor: {scale_factor:.2f}, Height diff normalized: {height_diff_normalized:.3f}")
                 
                 # Convert to centimeters
                 metrics['max_height'] = height_diff_normalized * scale_factor
+                
+                print(f"DEBUG - Final max height: {metrics['max_height']:.1f} cm")
             else:
-                # Fallback: use raw difference if we can't calculate scale
-                metrics['max_height'] = abs(takeoff_hip_y - peak_hip_y) * 100  # Convert to rough cm estimate
+                # Fallback: person not fully visible in frame
+                print(f"WARNING - Person height too small ({person_height_normalized:.3f}), person may not be fully visible")
+                metrics['max_height'] = 0
     
     if landing_frame is not None and frames_data[landing_frame]['landmarks']:
         landmarks = frames_data[landing_frame]['landmarks']
