@@ -160,15 +160,33 @@ const BiomecanicaPage = () => {
             [27, 29], [29, 31], [28, 30], [30, 32]  // Feet
         ]
 
-        ctx.strokeStyle = '#00ff00'  // Bright green
-        ctx.lineWidth = 5  // Much thicker lines
+        // Minimum visibility threshold
+        const MIN_VISIBILITY = 0.5
 
         let drawnConnections = 0
-        // Draw connections
+        // Draw connections with depth-based styling
         connections.forEach(([start, end]) => {
             const startPoint = landmarks[start]
             const endPoint = landmarks[end]
-            if (startPoint && endPoint && startPoint.visibility > 0.5 && endPoint.visibility > 0.5) {
+
+            // Only draw if both points are visible enough
+            if (startPoint && endPoint &&
+                startPoint.visibility > MIN_VISIBILITY &&
+                endPoint.visibility > MIN_VISIBILITY) {
+
+                // Use z-coordinate for depth (closer = smaller z value)
+                const avgDepth = ((startPoint.z || 0) + (endPoint.z || 0)) / 2
+
+                // Scale line width based on depth (closer = thicker)
+                const depthScale = 1 / (1 + Math.abs(avgDepth) * 2)
+                const lineWidth = 5 * Math.max(0.3, depthScale)
+
+                // Adjust opacity based on depth
+                const opacity = Math.max(0.6, 1 - Math.abs(avgDepth) * 0.5)
+
+                ctx.strokeStyle = `rgba(0, 255, 0, ${opacity})`  // Green with depth-based opacity
+                ctx.lineWidth = lineWidth
+
                 ctx.beginPath()
                 ctx.moveTo(startPoint.x * width, startPoint.y * height)
                 ctx.lineTo(endPoint.x * width, endPoint.y * height)
@@ -177,18 +195,30 @@ const BiomecanicaPage = () => {
             }
         })
 
-        ctx.fillStyle = '#ff0000'  // Bright red
+        // Draw landmarks with depth-based sizing
         let drawnPoints = 0
-        landmarks.forEach((lm, index) => {
-            if (lm.visibility > 0.5) {
+        landmarks.forEach((landmark, index) => {
+            if (landmark && landmark.visibility > MIN_VISIBILITY) {
+                const x = landmark.x * width
+                const y = landmark.y * height
+                const z = landmark.z || 0
+
+                // Scale point size based on depth
+                const depthScale = 1 / (1 + Math.abs(z) * 2)
+                const radius = 8 * Math.max(0.3, depthScale)
+
+                // Adjust opacity based on depth
+                const opacity = Math.max(0.6, 1 - Math.abs(z) * 0.5)
+
+                ctx.fillStyle = `rgba(255, 0, 0, ${opacity})`  // Red with depth-based opacity
                 ctx.beginPath()
-                ctx.arc(lm.x * width, lm.y * height, 8, 0, 2 * Math.PI)  // Larger radius
+                ctx.arc(x, y, radius, 0, 2 * Math.PI)
                 ctx.fill()
                 drawnPoints++
             }
         })
 
-        console.log('Drew', drawnConnections, 'connections and', drawnPoints, 'points')
+        console.log(`Drew ${drawnConnections} connections and ${drawnPoints} points`)
     }
 
     return (

@@ -16,7 +16,14 @@ if not os.path.exists(UPLOAD_FOLDER):
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 mp_pose = mp.solutions.pose
-pose = mp_pose.Pose(static_image_mode=False, min_detection_confidence=0.5, min_tracking_confidence=0.5)
+# Enhanced configuration for better perspective handling
+pose = mp_pose.Pose(
+    static_image_mode=False,
+    model_complexity=2,  # Use more accurate model (0, 1, or 2)
+    min_detection_confidence=0.7,  # Higher threshold for better accuracy
+    min_tracking_confidence=0.7,  # Better tracking across frames
+    smooth_landmarks=True  # Smooth landmark positions across frames
+)
 
 @app.route('/api/upload', methods=['POST'])
 @cross_origin()
