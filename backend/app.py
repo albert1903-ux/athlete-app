@@ -142,37 +142,47 @@ def generate_insights(metrics):
     """Generate insights based on biomechanical metrics"""
     insights = []
     
-    # Knee angle insights
-    if metrics['knee_angles']['landing'] < 150:
-        insights.append({
-            'type': 'warning',
-            'metric': 'knee_angle',
-            'value': metrics['knee_angles']['landing'],
-            'reference': 160,
-            'message': f"Ángulo de rodilla en aterrizaje muy cerrado ({metrics['knee_angles']['landing']:.0f}°). Riesgo de lesión. Objetivo: >160°"
-        })
-    elif metrics['knee_angles']['landing'] >= 160:
-        insights.append({
-            'type': 'success',
-            'metric': 'knee_angle',
-            'message': f"Excelente absorción del impacto en aterrizaje ({metrics['knee_angles']['landing']:.0f}°)"
-        })
+    # Knee angle insights (only if landing data exists)
+    if 'landing' in metrics.get('knee_angles', {}) and metrics['knee_angles']['landing'] is not None:
+        if metrics['knee_angles']['landing'] < 150:
+            insights.append({
+                'type': 'warning',
+                'metric': 'knee_angle',
+                'value': metrics['knee_angles']['landing'],
+                'reference': 160,
+                'message': f"Ángulo de rodilla en aterrizaje muy cerrado ({metrics['knee_angles']['landing']:.0f}°). Riesgo de lesión. Objetivo: >160°"
+            })
+        elif metrics['knee_angles']['landing'] >= 160:
+            insights.append({
+                'type': 'success',
+                'metric': 'knee_angle',
+                'message': f"Excelente absorción del impacto en aterrizaje ({metrics['knee_angles']['landing']:.0f}°)"
+            })
     
-    # Hip angle insights
-    if metrics['hip_angles']['takeoff'] < 170:
-        insights.append({
-            'type': 'info',
-            'metric': 'hip_angle',
-            'value': metrics['hip_angles']['takeoff'],
-            'message': f"Mayor extensión de cadera en despegue podría mejorar altura ({metrics['hip_angles']['takeoff']:.0f}°)"
-        })
+    # Hip angle insights (only if takeoff data exists)
+    if 'takeoff' in metrics.get('hip_angles', {}) and metrics['hip_angles']['takeoff'] is not None:
+        if metrics['hip_angles']['takeoff'] < 170:
+            insights.append({
+                'type': 'info',
+                'metric': 'hip_angle',
+                'value': metrics['hip_angles']['takeoff'],
+                'message': f"Mayor extensión de cadera en despegue podría mejorar altura ({metrics['hip_angles']['takeoff']:.0f}°)"
+            })
     
     # Max height insight
-    if metrics['max_height'] > 0.3:
+    if metrics.get('max_height', 0) > 30:  # 30cm
         insights.append({
             'type': 'success',
             'metric': 'max_height',
             'message': 'Excelente altura de salto alcanzada'
+        })
+    
+    # Add warning if phases weren't detected properly
+    if metrics.get('takeoff_frame') is None or metrics.get('peak_frame') is None:
+        insights.append({
+            'type': 'warning',
+            'metric': 'detection',
+            'message': 'No se pudieron detectar todas las fases del salto. Intenta con un video donde la persona esté completamente visible.'
         })
     
     return insights
