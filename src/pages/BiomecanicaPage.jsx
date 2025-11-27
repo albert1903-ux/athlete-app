@@ -533,11 +533,11 @@ const BiomecanicaPage = () => {
 
                             {/* Max Height */}
                             <Box sx={{ p: 2, bgcolor: 'primary.light', borderRadius: 2, mb: 3 }}>
-                                <Typography variant="subtitle2" fontWeight="bold" color="primary.contrastText">
+                                <Typography variant="body2" fontWeight="bold" color="text.secondary">
                                     Altura Máxima
                                 </Typography>
-                                <Typography variant="h5" fontWeight="bold" color="primary.contrastText">
-                                    {(analysisData.metrics.max_height * 100).toFixed(1)} cm
+                                <Typography variant="h4" fontWeight="bold" color="primary.main">
+                                    {analysisData.metrics.max_height.toFixed(1)} cm
                                 </Typography>
                             </Box>
 
