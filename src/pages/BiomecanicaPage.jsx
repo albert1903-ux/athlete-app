@@ -648,7 +648,7 @@ const BiomecanicaPage = () => {
                             }}
                         >
                             <Typography variant="h5" fontWeight="bold" color="#ffffff">
-                                {uploadProgress}%
+                                {Math.round(uploadProgress)}%
                             </Typography>
                         </Box>
                     </Box>
