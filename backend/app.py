@@ -41,10 +41,15 @@ def upload_file():
         
         # Process video
         try:
+            print(f"Processing video: {filename}")
             analysis_results = process_video(filepath)
+            print(f"Analysis completed successfully for {filename}")
             return jsonify(analysis_results)
         except Exception as e:
-            return jsonify({'error': str(e)}), 500
+            print(f"ERROR processing video {filename}: {str(e)}")
+            import traceback
+            traceback.print_exc()
+            return jsonify({'error': f'Error processing video: {str(e)}'}), 500
 
 def calculate_angle(p1, p2, p3):
     """Calculate angle between three points (p1-p2-p3) in degrees"""
