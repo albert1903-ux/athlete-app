@@ -31,16 +31,22 @@ const BiomecanicaPage = () => {
             const formData = new FormData()
             formData.append('file', file)
 
-            // Simulate progress
+            // Simulate progress (non-linear)
             const progressInterval = setInterval(() => {
                 setUploadProgress(prev => {
-                    if (prev >= 90) {
-                        clearInterval(progressInterval)
-                        return 90
-                    }
-                    return prev + 10
+                    // Fast start (0-30%)
+                    if (prev < 30) return prev + 5
+                    // Medium speed (30-60%)
+                    if (prev < 60) return prev + 2
+                    // Slow down (60-80%)
+                    if (prev < 80) return prev + 1
+                    // Very slow finish (80-90%)
+                    if (prev < 90) return prev + 0.5
+
+                    // Cap at 90% until complete
+                    return 90
                 })
-            }, 300)
+            }, 200)
 
             try {
                 const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001'
