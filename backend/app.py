@@ -170,11 +170,18 @@ def generate_insights(metrics):
             })
     
     # Max height insight
-    if metrics.get('max_height', 0) > 30:  # 30cm
+    max_height = metrics.get('max_height', 0)
+    if max_height > 60:
         insights.append({
             'type': 'success',
             'metric': 'max_height',
             'message': 'Excelente altura de salto alcanzada'
+        })
+    elif max_height > 40:
+        insights.append({
+            'type': 'info',
+            'metric': 'max_height',
+            'message': 'Buena altura de salto, sigue mejorando'
         })
     
     # Add warning if phases weren't detected properly
