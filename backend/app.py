@@ -171,13 +171,13 @@ def generate_insights(metrics):
     
     # Max height insight
     max_height = metrics.get('max_height', 0)
-    if max_height > 60:
+    if max_height > 120:
         insights.append({
             'type': 'success',
             'metric': 'max_height',
             'message': 'Excelente altura de salto alcanzada'
         })
-    elif max_height > 40:
+    elif max_height > 70:
         insights.append({
             'type': 'info',
             'metric': 'max_height',

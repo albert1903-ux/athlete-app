@@ -1,82 +1,43 @@
 # Guía de Despliegue del Backend
 
-El backend de análisis biomecánico necesita estar desplegado en un servidor para funcionar en producción (GitHub Pages).
+El backend de análisis biomecánico está diseñado para funcionar en un entorno que soporte Python y las librerías necesarias (MediaPipe, OpenCV).
 
-## Opción 1: Desplegar en Render (Recomendado - Gratis)
+## Desarrollo Local (Recomendado Actual)
 
-### Pasos:
+Para ejecutar el backend localmente:
 
-1. **Crear cuenta en Render**: https://render.com
-
-2. **Crear nuevo Web Service**:
-   - Click en "New +" → "Web Service"
-   - Conecta tu repositorio de GitHub
-   - Selecciona el repositorio `athlete-app`
-
-3. **Configuración del servicio**:
-   ```
-   Name: athlete-app-backend
-   Region: Frankfurt (o el más cercano)
-   Branch: main
-   Root Directory: backend
-   Runtime: Python 3
-   Build Command: pip install -r requirements.txt
-   Start Command: gunicorn app:app
-   ```
-
-4. **Añadir gunicorn a requirements.txt**:
+1. **Instalar dependencias**:
    ```bash
    cd backend
-   echo "gunicorn==21.2.0" >> requirements.txt
+   pip install -r requirements.txt
    ```
 
-5. **Variables de entorno** (en Render):
-   - No necesitas ninguna por ahora
+2. **Ejecutar servidor**:
+   ```bash
+   python3 app.py
+   ```
+   El servidor iniciará en `http://localhost:5001`.
 
-6. **Desplegar**: Click en "Create Web Service"
+3. **Configurar Frontend**:
+   El frontend detectará automáticamente si el backend no está disponible en producción y mostrará un mensaje para ejecutarlo localmente.
 
-7. **Obtener URL**: Render te dará una URL como `https://athlete-app-backend.onrender.com`
+## Consideraciones para Producción
 
-8. **Configurar en GitHub Pages**:
-   - Ve a Settings → Secrets and variables → Actions
-   - Añade: `VITE_API_URL` = `https://athlete-app-backend.onrender.com`
+Si deseas desplegar el backend en un servidor de producción, ten en cuenta:
 
-## Opción 2: Railway
+1. **Requisitos del Sistema**:
+   - Python 3.10+
+   - Librerías de sistema para OpenCV (`libgl1`, `libglib2.0-0`)
+   - CPU suficiente para inferencia de MediaPipe
 
-Similar a Render pero con diferentes límites gratuitos.
+2. **Docker**:
+   Se incluye un `Dockerfile` en la carpeta `backend/` que contiene toda la configuración necesaria para crear una imagen compatible.
 
-1. Ir a https://railway.app
-2. Conectar GitHub
-3. Deploy desde el directorio `backend`
-4. Configurar variables de entorno en producción
-
-## Opción 3: PythonAnywhere
-
-Servicio específico para Python, con tier gratuito limitado.
-
-## Configuración Local vs Producción
-
-### Desarrollo Local:
-```bash
-# .env.local (no commitear)
-VITE_API_URL=http://localhost:5001
-```
-
-### Producción (GitHub Pages):
-- Configurar `VITE_API_URL` en GitHub Secrets
-- O usar la URL del backend desplegado directamente
+3. **Variables de Entorno**:
+   - El frontend necesita saber la URL del backend mediante `VITE_API_URL`.
 
 ## Notas Importantes
 
-⚠️ **El backend DEBE estar desplegado** para que funcione en producción (GitHub Pages)
+⚠️ **Funcionalidad Local**: Actualmente, la funcionalidad de análisis biomecánico está optimizada para ejecutarse localmente debido a los requerimientos de cómputo de MediaPipe.
 
-⚠️ **CORS**: El backend ya tiene CORS configurado para aceptar todas las origins
-
-⚠️ **Render Free Tier**: El servicio se "duerme" después de 15 minutos de inactividad. La primera petición puede tardar 30-60 segundos en despertar.
-
-## Próximos Pasos
-
-1. Desplegar backend en Render
-2. Obtener URL del backend
-3. Configurar `VITE_API_URL` en GitHub Actions
-4. Rebuild y redeploy del frontend
+⚠️ **CORS**: El backend tiene CORS configurado para aceptar peticiones desde cualquier origen.
