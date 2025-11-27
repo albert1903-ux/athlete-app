@@ -250,50 +250,54 @@ def process_video(filepath):
         metrics['ankle_angles']['peak'] = get_ankle_angle(landmarks, 'right')
         
         # Calculate max height using person's height as reference
-        if takeoff_frame is not None and len(frames_data[takeoff_frame]['landmarks']) > 24:
-            # Get hip positions (average of left and right hip)
-            takeoff_hip_y = (frames_data[takeoff_frame]['landmarks'][23]['y'] + 
-                           frames_data[takeoff_frame]['landmarks'][24]['y']) / 2
-            peak_hip_y = (landmarks[23]['y'] + landmarks[24]['y']) / 2
+        if takeoff_frame is not None and len(frames_data[takeoff_frame]['landmarks']) > 28:
+            # Get ANKLE positions (average of left and right ankle) - this measures actual jump height
+            takeoff_ankle_y = (frames_data[takeoff_frame]['landmarks'][27]['y'] + 
+                              frames_data[takeoff_frame]['landmarks'][28]['y']) / 2
+            peak_ankle_y = (landmarks[27]['y'] + landmarks[28]['y']) / 2 if len(landmarks) > 28 else None
             
-            # Calculate person's height in the frame (from head to ankle)
-            # Note: Y coordinate goes from 0 (top) to 1 (bottom)
-            takeoff_landmarks = frames_data[takeoff_frame]['landmarks']
-            
-            # Get head position (nose landmark) - should be smaller Y value (top)
-            head_y = takeoff_landmarks[0]['y'] if len(takeoff_landmarks) > 0 else 0
-            
-            # Get ankle position (average of both ankles) - should be larger Y value (bottom)
-            ankle_y = (takeoff_landmarks[27]['y'] + takeoff_landmarks[28]['y']) / 2 if len(takeoff_landmarks) > 28 else 0
-            
-            # Person's height in normalized coordinates (ankle_y should be > head_y)
-            # This represents the vertical span of the person in the frame
-            person_height_normalized = abs(ankle_y - head_y)
-            
-            print(f"DEBUG - Head Y: {head_y:.3f}, Ankle Y: {ankle_y:.3f}, Person height normalized: {person_height_normalized:.3f}")
-            print(f"DEBUG - Takeoff hip Y: {takeoff_hip_y:.3f}, Peak hip Y: {peak_hip_y:.3f}")
-            
-            # Assume average person height is 170cm (can be made configurable)
-            ASSUMED_PERSON_HEIGHT_CM = 170
-            
-            # Calculate scale factor (cm per normalized unit)
-            # Only calculate if person_height_normalized is reasonable (person visible in frame)
-            if person_height_normalized > 0.1:  # At least 10% of frame height
-                scale_factor = ASSUMED_PERSON_HEIGHT_CM / person_height_normalized
+            if peak_ankle_y is not None:
+                # Calculate person's height in the frame (from head to ankle)
+                # Note: Y coordinate goes from 0 (top) to 1 (bottom)
+                takeoff_landmarks = frames_data[takeoff_frame]['landmarks']
                 
-                # Calculate height difference in normalized coordinates
-                # Positive value means hip went UP (peak_hip_y < takeoff_hip_y because Y increases downward)
-                height_diff_normalized = takeoff_hip_y - peak_hip_y
+                # Get head position (nose landmark) - should be smaller Y value (top)
+                head_y = takeoff_landmarks[0]['y'] if len(takeoff_landmarks) > 0 else 0
                 
-                print(f"DEBUG - Scale factor: {scale_factor:.2f}, Height diff normalized: {height_diff_normalized:.3f}")
+                # Get ankle position (average of both ankles) - should be larger Y value (bottom)
+                ankle_y = takeoff_ankle_y
                 
-                # Convert to centimeters
-                metrics['max_height'] = height_diff_normalized * scale_factor
+                # Person's height in normalized coordinates (ankle_y should be > head_y)
+                # This represents the vertical span of the person in the frame
+                person_height_normalized = abs(ankle_y - head_y)
                 
-                print(f"DEBUG - Final max height: {metrics['max_height']:.1f} cm")
+                print(f"DEBUG - Head Y: {head_y:.3f}, Ankle Y: {ankle_y:.3f}, Person height normalized: {person_height_normalized:.3f}")
+                print(f"DEBUG - Takeoff ankle Y: {takeoff_ankle_y:.3f}, Peak ankle Y: {peak_ankle_y:.3f}")
+                
+                # Assume average person height is 170cm (can be made configurable)
+                ASSUMED_PERSON_HEIGHT_CM = 170
+                
+                # Calculate scale factor (cm per normalized unit)
+                # Only calculate if person_height_normalized is reasonable (person visible in frame)
+                if person_height_normalized > 0.1:  # At least 10% of frame height
+                    scale_factor = ASSUMED_PERSON_HEIGHT_CM / person_height_normalized
+                    
+                    # Calculate height difference in normalized coordinates
+                    # Positive value means ankle went UP (peak_ankle_y < takeoff_ankle_y because Y increases downward)
+                    height_diff_normalized = takeoff_ankle_y - peak_ankle_y
+                    
+                    print(f"DEBUG - Scale factor: {scale_factor:.2f}, Height diff normalized: {height_diff_normalized:.3f}")
+                    
+                    # Convert to centimeters
+                    metrics['max_height'] = height_diff_normalized * scale_factor
+                    
+                    print(f"DEBUG - Final max height (from feet): {metrics['max_height']:.1f} cm")
+                else:
+                    # Fallback: person not fully visible in frame
+                    print(f"WARNING - Person height too small ({person_height_normalized:.3f}), person may not be fully visible")
+                    metrics['max_height'] = 0
             else:
-                # Fallback: person not fully visible in frame
-                print(f"WARNING - Person height too small ({person_height_normalized:.3f}), person may not be fully visible")
+                print("WARNING - Could not detect ankles in peak frame")
                 metrics['max_height'] = 0
     
     if landing_frame is not None and frames_data[landing_frame]['landmarks']:
