@@ -15,6 +15,21 @@ if not os.path.exists(UPLOAD_FOLDER):
 
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
+# Database configuration
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+# Navigate up 2 levels (backend -> athlete-app -> Documents) then to bbdd-athlete-app/src/bbdd.db
+DB_PATH = os.path.abspath(os.path.join(BASE_DIR, '..', '..', 'bbdd-athlete-app', 'src', 'bbdd.db'))
+
+def get_db_connection():
+    import sqlite3
+    conn = sqlite3.connect(DB_PATH)
+    conn.row_factory = sqlite3.Row
+    return conn
+
+def dict_from_row(row):
+    return dict(zip(row.keys(), row))
+
+
 mp_pose = mp.solutions.pose
 # Enhanced configuration for better perspective handling
 pose = mp_pose.Pose(
@@ -24,6 +39,98 @@ pose = mp_pose.Pose(
     min_tracking_confidence=0.7,  # Better tracking across frames
     smooth_landmarks=True  # Smooth landmark positions across frames
 )
+
+@app.route('/api/query', methods=['POST'])
+@cross_origin()
+def query_db():
+    try:
+        data = request.json
+        table = data.get('table')
+        select_fields = data.get('select', '*')
+        filters = data.get('filters', [])
+        order = data.get('order')
+        limit = data.get('limit')
+        
+        if not table:
+            return jsonify({'error': 'Table name is required'}), 400
+            
+        # Basic SQL Construction
+        # Note: This is a basic implementation for local dev. 
+        # In production, use an ORM or strict validation to prevent SQL injection.
+        
+        query = f"SELECT {select_fields} FROM {table}"
+        params = []
+        where_clauses = []
+        
+        for f in filters:
+            col = f['column']
+            op = f['operator']
+            val = f['value']
+            
+            if op == 'eq':
+                where_clauses.append(f"{col} = ?")
+                params.append(val)
+            elif op == 'ilike':
+                where_clauses.append(f"{col} LIKE ?")
+                params.append(val) # val should already include % if needed or we add it
+            elif op == 'in':
+                placeholders = ', '.join(['?'] * len(val))
+                where_clauses.append(f"{col} IN ({placeholders})")
+                params.extend(val)
+            elif op == 'gt':
+                where_clauses.append(f"{col} > ?")
+                params.append(val)
+            elif op == 'lt':
+                where_clauses.append(f"{col} < ?")
+                params.append(val)
+            elif op == 'gte':
+                where_clauses.append(f"{col} >= ?")
+                params.append(val)
+            elif op == 'lte':
+                where_clauses.append(f"{col} <= ?")
+                params.append(val)
+                
+        if where_clauses:
+            query += " WHERE " + " AND ".join(where_clauses)
+            
+        if order:
+            # Expected order: {'column': 'name', 'ascending': True, 'nullsFirst': False}
+            # or just a list of such objects
+            if isinstance(order, dict):
+                orders = [order]
+            else:
+                orders = order
+            
+            order_clauses = []
+            for o in orders:
+                col = o.get('column')
+                asc = o.get('ascending', True)
+                direction = 'ASC' if asc else 'DESC'
+                order_clauses.append(f"{col} {direction}")
+            
+            if order_clauses:
+                query += " ORDER BY " + ", ".join(order_clauses)
+                
+        if limit:
+            query += " LIMIT ?"
+            params.append(limit)
+            
+        print(f"Executing SQL: {query} with params {params}")
+        
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute(query, params)
+        rows = cursor.fetchall()
+        conn.close()
+        
+        results = [dict_from_row(row) for row in rows]
+        return jsonify({'data': results, 'error': None})
+        
+    except Exception as e:
+        print(f"Database error: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({'data': None, 'error': {'message': str(e)}}), 500
 
 @app.route('/api/upload', methods=['POST'])
 @cross_origin()

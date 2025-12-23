@@ -26,7 +26,9 @@ import {
 } from 'recharts'
 import { supabase } from '../lib/supabase'
 import { TbChevronDown } from 'react-icons/tb'
+import { PiRanking } from 'react-icons/pi'
 import { initializeColorsForComparators, getColorForAthlete } from '../utils/athleteColors'
+import RankingDialog from './RankingDialog'
 
 const STORAGE_KEY = 'selectedAthlete'
 const CATEGORY_ID_FALLBACK_LABELS = {
@@ -68,6 +70,96 @@ function AthleteSpiderChart({ comparatorAthletes = [] }) {
     height: 400
   })
   const [referenceMaxByPrueba, setReferenceMaxByPrueba] = useState({})
+
+  // State for Ranking Dialog
+  const [rankingDialogState, setRankingDialogState] = useState({
+    open: false,
+    prueba: null,
+    categoria: null
+  })
+
+  // Determine gender of selected athlete
+  const selectedAthleteGender = useMemo(() => {
+    if (!selectedAthlete || !athleteData) return null
+
+    const athleteKey = String(selectedAthlete.atleta_id)
+    const data = athleteData[athleteKey]
+
+    // Scan categories and proofs to find any result with gender
+    if (data && data.categorias) {
+      for (const catKey in data.categorias) {
+        const pruebas = data.categorias[catKey].pruebas
+        for (const pruebaKey in pruebas) {
+          const resultados = pruebas[pruebaKey].resultados
+          if (resultados && resultados.length > 0) {
+            const firstRes = resultados[0]
+            if (firstRes.genero) return firstRes.genero
+          }
+        }
+      }
+    }
+    return null
+  }, [selectedAthlete, athleteData])
+
+  // Handler to open ranking
+  const handleOpenRanking = (prueba, categoriaId) => {
+    // Find category info
+    const catInfo = athleteData[String(selectedAthlete.atleta_id)]?.categorias?.[categoriaId] || {
+      label: categoryLabels[categoriaId] || 'Categoría'
+    }
+
+    // Find prueba info to get ID
+    // We need prueba_id. It might be in 'allPruebas' range or we search in athlete data.
+    // The 'prueba' argument is the name.
+
+    // Try to find the prueba ID from the data we have
+    let foundPruebaId = null
+    let foundIsTimeBased = true
+
+    const athleteKey = String(selectedAthlete.atleta_id)
+    const pruebaData = athleteData[athleteKey]?.categorias?.[categoriaId]?.pruebas?.[prueba]
+
+    if (pruebaData) {
+      foundPruebaId = pruebaData.pruebaId || pruebaData.prueba_id || pruebaData.resultado?.prueba_id || pruebaData.resultado?.pruebaId
+      if (pruebaData.isTimeBased !== undefined) foundIsTimeBased = pruebaData.isTimeBased
+    }
+
+    // If not found in main athlete, try comparators
+    if (!foundPruebaId && comparatorAthletes.length > 0) {
+      for (const comp of comparatorAthletes) {
+        const cKey = String(comp.atleta_id)
+        const pData = athleteData[cKey]?.categorias?.[categoriaId]?.pruebas?.[prueba]
+        if (pData) {
+          foundPruebaId = pData.pruebaId || pData.prueba_id || pData.resultado?.prueba_id || pData.resultado?.pruebaId
+          if (pData.isTimeBased !== undefined) foundIsTimeBased = pData.isTimeBased
+          break
+        }
+      }
+    }
+
+    if (!foundPruebaId) {
+      // Fallback: Check referenceMaxByPrueba
+      const ref = referenceMaxByPrueba[prueba] || referenceMaxByPrueba[normalizePruebaNombre(prueba)]
+      if (ref && ref.pruebaId) foundPruebaId = ref.pruebaId
+    }
+
+    if (foundPruebaId) {
+      setRankingDialogState({
+        open: true,
+        prueba: {
+          nombre: prueba,
+          pruebaId: foundPruebaId,
+          isTimeBased: foundIsTimeBased
+        },
+        categoria: {
+          categoriaId: catInfo?.categoriaId || categoriaId,
+          label: catInfo.label || categoryLabels[categoriaId] || String(categoriaId)
+        }
+      })
+    } else {
+      console.warn('No se pudo encontrar ID para la prueba:', prueba)
+    }
+  }
 
   const normalizeCategoriaKey = (value, id) => {
     if (value && typeof value === 'string') {
@@ -113,7 +205,7 @@ function AthleteSpiderChart({ comparatorAthletes = [] }) {
     const fallbackLabel =
       categoriaId !== null
         ? CATEGORY_ID_FALLBACK_LABELS[String(categoriaId)] ||
-          CATEGORY_ID_FALLBACK_LABELS[categoriaId]
+        CATEGORY_ID_FALLBACK_LABELS[categoriaId]
         : null
 
     const keyBase = categoriaCodigo || categoriaNombreCorto || categoriaNombre || fallbackLabel || categoriaId
@@ -252,7 +344,7 @@ function AthleteSpiderChart({ comparatorAthletes = [] }) {
   const isTimeBasedPrueba = (pruebaNombre, unidad) => {
     const nombreLower = pruebaNombre.toLowerCase()
     const unidadLower = unidad ? unidad.toLowerCase().trim() : ''
-    
+
     // Pruebas de campo donde mayor es mejor
     const distanceKeywords = [
       'longitud',
@@ -271,18 +363,18 @@ function AthleteSpiderChart({ comparatorAthletes = [] }) {
     if (distanceKeywords.some(keyword => nombreLower.includes(keyword))) {
       return false
     }
-    
+
     // Si la unidad indica segundos o tiempo
     if (unidadLower === 's' || unidadLower === 'seg' || unidadLower === 'segundos') {
       return true
     }
-    
+
     // Si el nombre contiene 'm' pero no es de campo, probablemente es de tiempo
     // (60m, 100m, 200m, 600m, 1000m son de tiempo)
     if (/\d+m\b/.test(nombreLower) && !distanceKeywords.some(keyword => nombreLower.includes(keyword))) {
       return true
     }
-    
+
     // Por defecto, si no está claro, asumir que es tiempo
     return true
   }
@@ -329,232 +421,232 @@ function AthleteSpiderChart({ comparatorAthletes = [] }) {
   // Cargar resultados de un atleta
   const fetchAthleteResults = async (atletaId) => {
     try {
-        let data = null
-        let result1 = null
-        
+      let data = null
+      let result1 = null
+
+      try {
+        result1 = await supabase
+          .from('resultados')
+          .select(`
+              *,
+              prueba:pruebas(prueba_id, nombre, unidad_default)
+            `)
+          .eq('atleta_id', atletaId)
+          .order('fecha', { ascending: true })
+
+        if (!result1.error) {
+          data = result1.data
+        } else {
+          throw result1.error
+        }
+      } catch (err1) {
         try {
           result1 = await supabase
             .from('resultados')
             .select(`
-              *,
-              prueba:pruebas(prueba_id, nombre, unidad_default)
-            `)
+                *,
+                pruebas(prueba_id, nombre, unidad_default)
+              `)
             .eq('atleta_id', atletaId)
             .order('fecha', { ascending: true })
-          
+
           if (!result1.error) {
             data = result1.data
           } else {
             throw result1.error
           }
-        } catch (err1) {
-          try {
-            result1 = await supabase
-              .from('resultados')
-              .select(`
-                *,
-                pruebas(prueba_id, nombre, unidad_default)
-              `)
-              .eq('atleta_id', atletaId)
-              .order('fecha', { ascending: true })
-            
-            if (!result1.error) {
-              data = result1.data
-            } else {
-              throw result1.error
-            }
-          } catch (err2) {
-            const result2 = await supabase
-              .from('resultados')
-              .select('*')
-              .eq('atleta_id', atletaId)
-              .order('fecha', { ascending: true })
-            
-            data = result2.data
-            
-            if (data && !result2.error && data.length > 0) {
-              const pruebaIds = [...new Set(data.map(r => r.prueba_id).filter(Boolean))]
-              if (pruebaIds.length > 0) {
-                try {
-                  const { data: pruebasData } = await supabase
-                    .from('pruebas')
-                    .select('prueba_id, nombre, unidad_default')
-                    .in('prueba_id', pruebaIds)
-                  
-                  const pruebasMap = new Map()
-                  if (pruebasData) {
-                    pruebasData.forEach(p => {
-                      if (p.prueba_id) {
-                        pruebasMap.set(p.prueba_id, {
-                          nombre: p.nombre,
-                          unidad_default: p.unidad_default
-                        })
-                      }
-                    })
-                  }
-                  
-                  data = data.map(resultado => ({
-                    ...resultado,
-                    prueba: pruebasMap.get(resultado.prueba_id) || null
-                  }))
-                } catch (err3) {
-                  console.warn('No se pudo obtener información desde tabla pruebas:', err3)
+        } catch (err2) {
+          const result2 = await supabase
+            .from('resultados')
+            .select('*')
+            .eq('atleta_id', atletaId)
+            .order('fecha', { ascending: true })
+
+          data = result2.data
+
+          if (data && !result2.error && data.length > 0) {
+            const pruebaIds = [...new Set(data.map(r => r.prueba_id).filter(Boolean))]
+            if (pruebaIds.length > 0) {
+              try {
+                const { data: pruebasData } = await supabase
+                  .from('pruebas')
+                  .select('prueba_id, nombre, unidad_default')
+                  .in('prueba_id', pruebaIds)
+
+                const pruebasMap = new Map()
+                if (pruebasData) {
+                  pruebasData.forEach(p => {
+                    if (p.prueba_id) {
+                      pruebasMap.set(p.prueba_id, {
+                        nombre: p.nombre,
+                        unidad_default: p.unidad_default
+                      })
+                    }
+                  })
                 }
+
+                data = data.map(resultado => ({
+                  ...resultado,
+                  prueba: pruebasMap.get(resultado.prueba_id) || null
+                }))
+              } catch (err3) {
+                console.warn('No se pudo obtener información desde tabla pruebas:', err3)
               }
             }
           }
         }
-
-        if (!data || data.length === 0) return {}
-
-        const categoriaIdSet = new Set()
-        data.forEach((resultado) => {
-          if (
-            resultado &&
-            resultado.categoria_id !== null &&
-            resultado.categoria_id !== undefined
-          ) {
-            categoriaIdSet.add(resultado.categoria_id)
-          } else if (
-            resultado &&
-            resultado.categoriaId !== null &&
-            resultado.categoriaId !== undefined
-          ) {
-            categoriaIdSet.add(resultado.categoriaId)
-          }
-        })
-
-        const categoriaMetadataMap = new Map()
-        if (categoriaIdSet.size > 0) {
-          try {
-            const { data: categoriasData, error: categoriasError } = await supabase
-              .from('categorias')
-              .select('categoria_id, nombre')
-              .in('categoria_id', Array.from(categoriaIdSet))
-
-            if (!categoriasError && Array.isArray(categoriasData)) {
-              categoriasData.forEach((categoria) => {
-                if (categoria && categoria.categoria_id !== undefined && categoria.categoria_id !== null) {
-                  categoriaMetadataMap.set(categoria.categoria_id, categoria)
-                  categoriaMetadataMap.set(String(categoria.categoria_id), categoria)
-                }
-              })
-            }
-          } catch (categoriaError) {
-            console.warn('No se pudo obtener información adicional de categorías:', categoriaError)
-          }
-        }
-
-        // Agrupar por categoría y prueba
-        const groupedByCategoria = {}
-
-        data.forEach((resultado) => {
-          const { key: categoriaKey, label: categoriaLabel, categoriaId } = extractCategoriaFromResultado(
-            resultado,
-            categoriaMetadataMap
-          )
-          if (!groupedByCategoria[categoriaKey]) {
-            groupedByCategoria[categoriaKey] = {
-              key: categoriaKey,
-              label: categoriaLabel,
-              categoriaId,
-              pruebas: {}
-            }
-          }
-
-          let pruebaNombre = 'Prueba desconocida'
-          let unidad = ''
-
-          if (resultado.prueba && typeof resultado.prueba === 'object') {
-            pruebaNombre = resultado.prueba.nombre || resultado.prueba.prueba_nombre || 'Prueba desconocida'
-            unidad = resultado.prueba.unidad_default || ''
-          } else if (resultado.prueba_nombre) {
-            pruebaNombre = resultado.prueba_nombre
-          }
-
-          if (!pruebaNombre || pruebaNombre === 'Prueba desconocida') {
-            return
-          }
-
-          if (!unidad) {
-            unidad = resultado.marca_unidad || resultado.unidad || resultado.unidad_default || ''
-          }
-
-          if (!groupedByCategoria[categoriaKey].pruebas[pruebaNombre]) {
-            groupedByCategoria[categoriaKey].pruebas[pruebaNombre] = {
-              nombre: pruebaNombre,
-              unidad: unidad,
-              resultados: []
-            }
-          }
-
-          const pruebaGroup = groupedByCategoria[categoriaKey].pruebas[pruebaNombre]
-          if (!pruebaGroup.unidad && unidad) {
-            pruebaGroup.unidad = unidad
-          }
-
-          pruebaGroup.resultados.push(resultado)
-        })
-
-        // Calcular mejor resultado por prueba dentro de cada categoría
-        const categoriasProcesadas = {}
-        const categoriaLabels = {}
-
-        Object.entries(groupedByCategoria).forEach(([categoriaKey, categoriaData]) => {
-          const pruebasProcesadas = {}
-
-          Object.entries(categoriaData.pruebas).forEach(([pruebaNombre, pruebaData]) => {
-            const isTimeBased = isTimeBasedPrueba(pruebaNombre, pruebaData.unidad)
-            const bestResult = getBestResult(pruebaData.resultados, isTimeBased)
-
-            if (bestResult) {
-              pruebasProcesadas[pruebaNombre] = {
-                nombre: pruebaNombre,
-                unidad: pruebaData.unidad,
-                valor: bestResult.valor,
-                isTimeBased,
-                resultado: bestResult.resultado
-              }
-            }
-          })
-
-          if (Object.keys(pruebasProcesadas).length > 0) {
-            const categoriaId = categoriaData.categoriaId ?? null
-            const fallbackLabelFromId =
-              categoriaId !== null
-                ? CATEGORY_ID_FALLBACK_LABELS[String(categoriaId)] ||
-                  CATEGORY_ID_FALLBACK_LABELS[categoriaId]
-                : null
-            const resolvedLabel =
-              categoriaData.label && !/^Categoría\s+\d+$/i.test(categoriaData.label)
-                ? categoriaData.label
-                : fallbackLabelFromId || categoriaData.label || 'Sin categoría'
-
-            categoriasProcesadas[categoriaKey] = {
-              key: categoriaKey,
-              label: resolvedLabel,
-              categoriaId,
-              pruebas: pruebasProcesadas
-            }
-            categoriaLabels[categoriaKey] = resolvedLabel
-          }
-        })
-
-        const categoriaOrden = Object.keys(categoriasProcesadas).sort((a, b) => {
-          const labelA = categoriasProcesadas[a]?.label || a
-          const labelB = categoriasProcesadas[b]?.label || b
-          return labelA.localeCompare(labelB, 'es', { sensitivity: 'base' })
-        })
-
-        return {
-          categorias: categoriasProcesadas,
-          categoriaLabels,
-          categoriaOrden
-        }
-      } catch (err) {
-        console.error('Error al obtener resultados:', err)
-        return null
       }
+
+      if (!data || data.length === 0) return {}
+
+      const categoriaIdSet = new Set()
+      data.forEach((resultado) => {
+        if (
+          resultado &&
+          resultado.categoria_id !== null &&
+          resultado.categoria_id !== undefined
+        ) {
+          categoriaIdSet.add(resultado.categoria_id)
+        } else if (
+          resultado &&
+          resultado.categoriaId !== null &&
+          resultado.categoriaId !== undefined
+        ) {
+          categoriaIdSet.add(resultado.categoriaId)
+        }
+      })
+
+      const categoriaMetadataMap = new Map()
+      if (categoriaIdSet.size > 0) {
+        try {
+          const { data: categoriasData, error: categoriasError } = await supabase
+            .from('categorias')
+            .select('categoria_id, nombre')
+            .in('categoria_id', Array.from(categoriaIdSet))
+
+          if (!categoriasError && Array.isArray(categoriasData)) {
+            categoriasData.forEach((categoria) => {
+              if (categoria && categoria.categoria_id !== undefined && categoria.categoria_id !== null) {
+                categoriaMetadataMap.set(categoria.categoria_id, categoria)
+                categoriaMetadataMap.set(String(categoria.categoria_id), categoria)
+              }
+            })
+          }
+        } catch (categoriaError) {
+          console.warn('No se pudo obtener información adicional de categorías:', categoriaError)
+        }
+      }
+
+      // Agrupar por categoría y prueba
+      const groupedByCategoria = {}
+
+      data.forEach((resultado) => {
+        const { key: categoriaKey, label: categoriaLabel, categoriaId } = extractCategoriaFromResultado(
+          resultado,
+          categoriaMetadataMap
+        )
+        if (!groupedByCategoria[categoriaKey]) {
+          groupedByCategoria[categoriaKey] = {
+            key: categoriaKey,
+            label: categoriaLabel,
+            categoriaId,
+            pruebas: {}
+          }
+        }
+
+        let pruebaNombre = 'Prueba desconocida'
+        let unidad = ''
+
+        if (resultado.prueba && typeof resultado.prueba === 'object') {
+          pruebaNombre = resultado.prueba.nombre || resultado.prueba.prueba_nombre || 'Prueba desconocida'
+          unidad = resultado.prueba.unidad_default || ''
+        } else if (resultado.prueba_nombre) {
+          pruebaNombre = resultado.prueba_nombre
+        }
+
+        if (!pruebaNombre || pruebaNombre === 'Prueba desconocida') {
+          return
+        }
+
+        if (!unidad) {
+          unidad = resultado.marca_unidad || resultado.unidad || resultado.unidad_default || ''
+        }
+
+        if (!groupedByCategoria[categoriaKey].pruebas[pruebaNombre]) {
+          groupedByCategoria[categoriaKey].pruebas[pruebaNombre] = {
+            nombre: pruebaNombre,
+            unidad: unidad,
+            resultados: []
+          }
+        }
+
+        const pruebaGroup = groupedByCategoria[categoriaKey].pruebas[pruebaNombre]
+        if (!pruebaGroup.unidad && unidad) {
+          pruebaGroup.unidad = unidad
+        }
+
+        pruebaGroup.resultados.push(resultado)
+      })
+
+      // Calcular mejor resultado por prueba dentro de cada categoría
+      const categoriasProcesadas = {}
+      const categoriaLabels = {}
+
+      Object.entries(groupedByCategoria).forEach(([categoriaKey, categoriaData]) => {
+        const pruebasProcesadas = {}
+
+        Object.entries(categoriaData.pruebas).forEach(([pruebaNombre, pruebaData]) => {
+          const isTimeBased = isTimeBasedPrueba(pruebaNombre, pruebaData.unidad)
+          const bestResult = getBestResult(pruebaData.resultados, isTimeBased)
+
+          if (bestResult) {
+            pruebasProcesadas[pruebaNombre] = {
+              nombre: pruebaNombre,
+              unidad: pruebaData.unidad,
+              valor: bestResult.valor,
+              isTimeBased,
+              resultado: bestResult.resultado
+            }
+          }
+        })
+
+        if (Object.keys(pruebasProcesadas).length > 0) {
+          const categoriaId = categoriaData.categoriaId ?? null
+          const fallbackLabelFromId =
+            categoriaId !== null
+              ? CATEGORY_ID_FALLBACK_LABELS[String(categoriaId)] ||
+              CATEGORY_ID_FALLBACK_LABELS[categoriaId]
+              : null
+          const resolvedLabel =
+            categoriaData.label && !/^Categoría\s+\d+$/i.test(categoriaData.label)
+              ? categoriaData.label
+              : fallbackLabelFromId || categoriaData.label || 'Sin categoría'
+
+          categoriasProcesadas[categoriaKey] = {
+            key: categoriaKey,
+            label: resolvedLabel,
+            categoriaId,
+            pruebas: pruebasProcesadas
+          }
+          categoriaLabels[categoriaKey] = resolvedLabel
+        }
+      })
+
+      const categoriaOrden = Object.keys(categoriasProcesadas).sort((a, b) => {
+        const labelA = categoriasProcesadas[a]?.label || a
+        const labelB = categoriasProcesadas[b]?.label || b
+        return labelA.localeCompare(labelB, 'es', { sensitivity: 'base' })
+      })
+
+      return {
+        categorias: categoriasProcesadas,
+        categoriaLabels,
+        categoriaOrden
+      }
+    } catch (err) {
+      console.error('Error al obtener resultados:', err)
+      return null
+    }
   }
 
   // Cargar datos de todos los atletas
@@ -816,12 +908,12 @@ function AthleteSpiderChart({ comparatorAthletes = [] }) {
   // Colores para los atletas usando el módulo compartido
   const athleteColors = useMemo(() => {
     const colorMap = {}
-    
+
     // Color para el atleta principal
     if (selectedAthlete) {
       colorMap[selectedAthlete.atleta_id] = getColorForAthlete(selectedAthlete.atleta_id, true)
     }
-    
+
     // Inicializar colores para comparadores y obtener el mapa completo
     if (comparatorAthletes.length > 0) {
       const comparatorColorMap = initializeColorsForComparators(comparatorAthletes)
@@ -829,7 +921,7 @@ function AthleteSpiderChart({ comparatorAthletes = [] }) {
         colorMap[atletaId] = color
       })
     }
-    
+
     return colorMap
   }, [selectedAthlete, comparatorAthletes])
 
@@ -863,7 +955,7 @@ function AthleteSpiderChart({ comparatorAthletes = [] }) {
       if (active && payload && payload.length) {
         const prueba = payload[0]?.payload?.prueba || ''
         const unidad = payload[0]?.payload?.unidad || ''
-        
+
         return (
           <Paper sx={{ p: 1.5, backgroundColor: 'rgba(255, 255, 255, 0.95)' }} elevation={3}>
             <Typography variant="body2" sx={{ fontWeight: 'bold', mb: 1 }}>
@@ -873,23 +965,23 @@ function AthleteSpiderChart({ comparatorAthletes = [] }) {
               if (entry.value === null || entry.value === undefined) {
                 return null
               }
-              
+
               const atletaId = String(entry.dataKey)
               const athlete = allAthletes.find(a => String(a.atleta_id) === atletaId)
               if (!athlete) return null
-              
+
               const realKey = `${atletaId}_real`
               const unidadKey = `${atletaId}_unidad`
               const valorReal = entry.payload[realKey]
               const unidadReal = entry.payload[unidadKey] || unidad
-              
+
               if (valorReal === undefined || valorReal === null) return null
-              
+
               const isTimeBased =
                 athleteData[atletaId]?.categorias?.[selectedCategory]?.pruebas?.[prueba]?.isTimeBased ??
                 true
               const valorFormateado = formatValue(valorReal, unidadReal, isTimeBased)
-              
+
               return (
                 <Typography
                   key={index}
@@ -983,6 +1075,8 @@ function AthleteSpiderChart({ comparatorAthletes = [] }) {
     )
   }
 
+
+
   if (loading) {
     return (
       <Card sx={{ width: '100%' }}>
@@ -1021,157 +1115,191 @@ function AthleteSpiderChart({ comparatorAthletes = [] }) {
   }
 
   return (
-    <Card sx={{ width: '100%' }}>
-      <CardContent sx={{ px: { xs: 2 }, py: { xs: 2 } }}>
-        <Box
-          sx={{
-            display: 'flex',
-            flexDirection: 'row',
-            alignItems: 'center',
-            gap: 2,
-            flexWrap: 'wrap'
-          }}
-        >
-          <Typography variant="h6" gutterBottom sx={{ fontSize: { xs: '1.1rem' }, mb: 0 }}>
-            Mejores Marcas
-          </Typography>
-          {availableCategories.length > 0 && (
-            <FormControl size="small" sx={{ minWidth: 160, ml: 'auto' }}>
-              <InputLabel id="radar-category-select-label">Categoría</InputLabel>
-              <Select
-                labelId="radar-category-select-label"
-                value={selectedCategory || ''}
-                label="Categoría"
-                onChange={(event) => setSelectedCategory(event.target.value)}
-              >
-                {(() => {
-                  const getRank = (key) => {
-                    const label = categoryLabels[key] || key
-                    const match = /\d+/.exec(label)
-                    return match ? parseInt(match[0], 10) : -Infinity
-                  }
-                  const sorted = [...availableCategories].sort((a, b) => {
-                    const ra = getRank(a)
-                    const rb = getRank(b)
-                    if (rb !== ra) return rb - ra
-                    const la = (categoryLabels[a] || a).toString()
-                    const lb = (categoryLabels[b] || b).toString()
-                    return lb.localeCompare(la, 'es', { sensitivity: 'base' })
-                  })
-                  return sorted.map((categoriaKey) => (
-                    <MenuItem key={categoriaKey} value={categoriaKey}>
-                      {categoryLabels[categoriaKey] || categoriaKey}
-                    </MenuItem>
-                  ))
-                })()}
-              </Select>
-            </FormControl>
-          )}
-        </Box>
-        
-        <Box sx={{ mt: 2, width: '100%' }}>
-          {chartDimensions.width > 0 && chartDimensions.height > 0 ? (
-            <RadarChart width={chartDimensions.width} height={chartDimensions.height} data={radarData}>
-              <PolarGrid />
-              <PolarAngleAxis 
-                dataKey="prueba" 
-                tick={{ fontSize: 12 }}
-              />
-              <PolarRadiusAxis 
-                angle={90} 
-                domain={[0, 100]}
-                tick={{ fontSize: 10 }}
-              />
-              <Tooltip content={CustomTooltip} />
-              <Legend />
-              {allAthletes.map((athlete) => {
-                const atletaIdKey = String(athlete.atleta_id)
-                // Mostrar siempre el Radar, incluso si no hay datos (mostrará valores en 0)
-                
-                return (
-                  <Radar
-                    key={athlete.atleta_id}
-                    name={athlete.nombre}
-                    dataKey={atletaIdKey}
-                    stroke={athleteColors[athlete.atleta_id] || getColorForAthlete(athlete.atleta_id, athlete.atleta_id === selectedAthlete?.atleta_id) || '#8884d8'}
-                    fill={athleteColors[athlete.atleta_id] || getColorForAthlete(athlete.atleta_id, athlete.atleta_id === selectedAthlete?.atleta_id) || '#8884d8'}
-                    fillOpacity={0.4}
-                    connectNulls={true}
-                    isAnimationActive={false}
-                  />
-                )
-              })}
-            </RadarChart>
-          ) : (
-            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '400px' }}>
-              <CircularProgress />
-            </Box>
-          )}
-        </Box>
+    <>
+      <Card sx={{ width: '100%' }}>
+        <CardContent sx={{ px: { xs: 2 }, py: { xs: 2 } }}>
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: 'row',
+              alignItems: 'center',
+              gap: 2,
+              flexWrap: 'wrap'
+            }}
+          >
+            <Typography variant="h6" gutterBottom sx={{ fontSize: { xs: '1.1rem' }, mb: 0 }}>
+              Mejores Marcas
+            </Typography>
+            {availableCategories.length > 0 && (
+              <FormControl size="small" sx={{ minWidth: 160, ml: 'auto' }}>
+                <InputLabel id="radar-category-select-label">Categoría</InputLabel>
+                <Select
+                  labelId="radar-category-select-label"
+                  value={selectedCategory || ''}
+                  label="Categoría"
+                  onChange={(event) => setSelectedCategory(event.target.value)}
+                >
+                  {(() => {
+                    const getRank = (key) => {
+                      const label = categoryLabels[key] || key
+                      const match = /\d+/.exec(label)
+                      return match ? parseInt(match[0], 10) : -Infinity
+                    }
+                    const sorted = [...availableCategories].sort((a, b) => {
+                      const ra = getRank(a)
+                      const rb = getRank(b)
+                      if (rb !== ra) return rb - ra
+                      const la = (categoryLabels[a] || a).toString()
+                      const lb = (categoryLabels[b] || b).toString()
+                      return lb.localeCompare(la, 'es', { sensitivity: 'base' })
+                    })
+                    return sorted.map((categoriaKey) => (
+                      <MenuItem key={categoriaKey} value={categoriaKey}>
+                        {categoryLabels[categoriaKey] || categoriaKey}
+                      </MenuItem>
+                    ))
+                  })()}
+                </Select>
+              </FormControl>
+            )}
+          </Box>
 
-        {/* Leyenda con valores reales */}
-        <Accordion sx={{ mt: 3 }}>
-          <AccordionSummary expandIcon={<TbChevronDown />}>
-            <Typography variant="subtitle2">Mejores Resultados por Prueba</Typography>
-          </AccordionSummary>
-          <AccordionDetails>
-            {radarData.map((entry, idx) => (
-              <Box key={idx} sx={{ mt: 1, p: 1, bgcolor: 'grey.50', borderRadius: 1 }}>
-                <Typography variant="body2" fontWeight="bold" gutterBottom>
-                  {entry.prueba} {entry.unidad && `(${entry.unidad})`}
-                </Typography>
+          <Box sx={{ mt: 2, width: '100%' }}>
+            {chartDimensions.width > 0 && chartDimensions.height > 0 ? (
+              <RadarChart width={chartDimensions.width} height={chartDimensions.height} data={radarData}>
+                <PolarGrid />
+                <PolarAngleAxis
+                  dataKey="prueba"
+                  tick={{ fontSize: 12 }}
+                />
+                <PolarRadiusAxis
+                  angle={90}
+                  domain={[0, 100]}
+                  tick={{ fontSize: 10 }}
+                />
+                <Tooltip content={CustomTooltip} />
+                <Legend />
                 {allAthletes.map((athlete) => {
                   const atletaIdKey = String(athlete.atleta_id)
-                  const realKey = `${atletaIdKey}_real`
-                  const unidadKey = `${atletaIdKey}_unidad`
-                  const valorReal = entry[realKey]
-                  const unidadReal = entry[unidadKey]
-                  
-                  // Mostrar siempre el atleta, incluso si no tiene esta prueba
-                  if (valorReal === undefined || valorReal === null) {
-                    return (
-                      <Typography 
-                        key={athlete.atleta_id} 
-                        variant="caption" 
-                        sx={{ 
-                          display: 'block',
-                          color: athleteColors[athlete.atleta_id] || getColorForAthlete(athlete.atleta_id, athlete.atleta_id === selectedAthlete?.atleta_id) || 'text.secondary',
-                          fontWeight: 'medium',
-                          fontStyle: 'italic'
-                        }}
-                      >
-                        {athlete.nombre}: No tiene esta prueba
-                      </Typography>
-                    )
-                  }
-                  
-                  const isTimeBased =
-                    athleteData[atletaIdKey]?.categorias?.[selectedCategory]?.pruebas?.[entry.prueba]
-                      ?.isTimeBased ?? true
-                  const valorFormateado = formatValue(valorReal, unidadReal, isTimeBased)
-                  
+                  // Mostrar siempre el Radar, incluso si no hay datos (mostrará valores en 0)
+
                   return (
-                    <Typography 
-                      key={athlete.atleta_id} 
-                      variant="caption" 
-                      sx={{ 
-                        display: 'block',
-                        color: athleteColors[athlete.atleta_id] || getColorForAthlete(athlete.atleta_id, athlete.atleta_id === selectedAthlete?.atleta_id) || 'text.primary',
-                        fontWeight: 'medium'
-                      }}
-                    >
-                      {athlete.nombre}: {valorFormateado} {unidadReal || ''}
-                    </Typography>
+                    <Radar
+                      key={athlete.atleta_id}
+                      name={athlete.nombre}
+                      dataKey={atletaIdKey}
+                      stroke={athleteColors[athlete.atleta_id] || getColorForAthlete(athlete.atleta_id, athlete.atleta_id === selectedAthlete?.atleta_id) || '#8884d8'}
+                      fill={athleteColors[athlete.atleta_id] || getColorForAthlete(athlete.atleta_id, athlete.atleta_id === selectedAthlete?.atleta_id) || '#8884d8'}
+                      fillOpacity={0.4}
+                      connectNulls={true}
+                      isAnimationActive={false}
+                    />
                   )
                 })}
+              </RadarChart>
+            ) : (
+              <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '400px' }}>
+                <CircularProgress />
               </Box>
-            ))}
-          </AccordionDetails>
-        </Accordion>
-      </CardContent>
-    </Card>
+            )}
+          </Box>
+
+          {/* Leyenda con valores reales */}
+          <Accordion sx={{ mt: 3 }}>
+            <AccordionSummary expandIcon={<TbChevronDown />}>
+              <Typography variant="subtitle2">Mejores Resultados por Prueba</Typography>
+            </AccordionSummary>
+            <AccordionDetails>
+              {radarData.map((entry, idx) => (
+                <Box key={idx} sx={{ mt: 1, p: 1, bgcolor: 'grey.50', borderRadius: 1 }}>
+                  {/* Header with Title and Ranking Button */}
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+                    <Typography variant="body2" fontWeight="bold">
+                      {entry.prueba} {entry.unidad && `(${entry.unidad})`}
+                    </Typography>
+
+                    <Box
+                      sx={{
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        color: 'text.secondary',
+                        transition: 'color 0.2s',
+                        '&:hover': { color: 'primary.main' }
+                      }}
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        handleOpenRanking(entry.prueba, selectedCategory)
+                      }}
+                      title="Ver Ranking Top 50"
+                    >
+                      <PiRanking size={20} />
+                    </Box>
+                  </Box>
+
+                  {allAthletes.map((athlete) => {
+                    const atletaIdKey = String(athlete.atleta_id)
+                    const realKey = `${atletaIdKey}_real`
+                    const unidadKey = `${atletaIdKey}_unidad`
+                    const valorReal = entry[realKey]
+                    const unidadReal = entry[unidadKey]
+
+                    // Mostrar siempre el atleta, incluso si no tiene esta prueba
+                    if (valorReal === undefined || valorReal === null) {
+                      return (
+                        <Typography
+                          key={athlete.atleta_id}
+                          variant="caption"
+                          sx={{
+                            display: 'block',
+                            color: athleteColors[athlete.atleta_id] || getColorForAthlete(athlete.atleta_id, athlete.atleta_id === selectedAthlete?.atleta_id) || 'text.secondary',
+                            fontWeight: 'medium',
+                            fontStyle: 'italic'
+                          }}
+                        >
+                          {athlete.nombre}: No tiene esta prueba
+                        </Typography>
+                      )
+                    }
+
+                    const isTimeBased =
+                      athleteData[atletaIdKey]?.categorias?.[selectedCategory]?.pruebas?.[entry.prueba]
+                        ?.isTimeBased ?? true
+                    const valorFormateado = formatValue(valorReal, unidadReal, isTimeBased)
+
+                    return (
+                      <Typography
+                        key={athlete.atleta_id}
+                        variant="caption"
+                        sx={{
+                          display: 'block',
+                          color: athleteColors[athlete.atleta_id] || getColorForAthlete(athlete.atleta_id, athlete.atleta_id === selectedAthlete?.atleta_id) || 'text.primary',
+                          fontWeight: 'medium'
+                        }}
+                      >
+                        {athlete.nombre}: {valorFormateado} {unidadReal || ''}
+                      </Typography>
+                    )
+                  })}
+                </Box>
+              ))}
+            </AccordionDetails>
+          </Accordion>
+        </CardContent>
+      </Card>
+
+      <RankingDialog
+        open={rankingDialogState.open}
+        onClose={() => setRankingDialogState(prev => ({ ...prev, open: false }))}
+        prueba={rankingDialogState.prueba}
+        categoria={rankingDialogState.categoria}
+        mainAthleteId={selectedAthlete ? selectedAthlete.atleta_id : null}
+        comparatorAthletes={comparatorAthletes}
+        genderFilter={selectedAthleteGender}
+      />
+    </>
   )
 }
 
 export default AthleteSpiderChart
-
