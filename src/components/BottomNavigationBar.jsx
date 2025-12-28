@@ -92,12 +92,14 @@ const BottomNavigationBar = () => {
             icon={<TbHeartbeat size={24} />}
             aria-label="Análisis físico"
           />
-          <BottomNavigationAction
-            label="Biomecánica"
-            value="biomecanica"
-            icon={<TbActivity size={24} />}
-            aria-label="Biomecánica"
-          />
+          {import.meta.env.DEV && (
+            <BottomNavigationAction
+              label="Biomecánica"
+              value="biomecanica"
+              icon={<TbActivity size={24} />}
+              aria-label="Biomecánica"
+            />
+          )}
           <BottomNavigationAction
             label="Calendario"
             value="calendario"

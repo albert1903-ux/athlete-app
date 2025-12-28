@@ -207,7 +207,7 @@ function AppContent() {
           <Route path="/" element={<Navigate to="/seguimiento" replace />} />
           <Route path="/seguimiento" element={<SeguimientoPage />} />
           <Route path="/analisis" element={<AnalisisPage />} />
-          <Route path="/biomecanica" element={<BiomecanicaPage />} />
+          {import.meta.env.DEV && <Route path="/biomecanica" element={<BiomecanicaPage />} />}
           <Route path="/calendario" element={<CalendarioPage />} />
           <Route path="/mas" element={<MasPage />} />
         </Routes>
