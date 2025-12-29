@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import dayjs from 'dayjs'
 import {
   Box,
   Button,
@@ -38,7 +39,7 @@ function AthleteSelector() {
     // Solo abrir popup si NO hay atleta guardado
     return athlete === null
   })
-  
+
   const [selectedAthlete, setSelectedAthlete] = useState(() => loadFromStorage())
   const [tempSelectedAthlete, setTempSelectedAthlete] = useState(() => {
     const stored = loadFromStorage()
@@ -58,6 +59,22 @@ function AthleteSelector() {
       localStorage.removeItem(STORAGE_KEY)
     }
   }, [selectedAthlete])
+
+  // Escuchar cambios externos (por ejemplo, desde RankingDialog)
+  useEffect(() => {
+    const handleExternalChange = () => {
+      const stored = loadFromStorage()
+      // Solo actualizar si es diferente para evitar loops
+      setSelectedAthlete(prev => {
+        if (!prev && !stored) return prev
+        if (prev && stored && prev.atleta_id === stored.atleta_id) return prev
+        return stored
+      })
+    }
+
+    window.addEventListener('localStorageChange', handleExternalChange)
+    return () => window.removeEventListener('localStorageChange', handleExternalChange)
+  }, [])
 
   const handleOpen = () => {
     const candidate = selectedAthlete || loadFromStorage() || null
@@ -109,8 +126,8 @@ function AthleteSelector() {
               <Typography variant="h6" component="span" fontWeight="bold">
                 {selectedAthlete.nombre}
               </Typography>
-              <IconButton 
-                size="small" 
+              <IconButton
+                size="small"
                 onClick={handleOpen}
                 color="primary"
                 aria-label="Cambiar atleta"
@@ -119,20 +136,27 @@ function AthleteSelector() {
                 <TbPencil />
               </IconButton>
             </Box>
-            
+
             {/* Fila inferior: Chips de licencia y club */}
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
+              {selectedAthlete.fecha_nacimiento && (
+                <Chip
+                  label={dayjs(selectedAthlete.fecha_nacimiento).format('DD/MM/YYYY')}
+                  size="small"
+                  variant="outlined"
+                />
+              )}
               {selectedAthlete.licencia && selectedAthlete.licencia !== 'N/A' && (
-                <Chip 
-                  label={`Lic: ${selectedAthlete.licencia}`} 
-                  size="small" 
+                <Chip
+                  label={`Lic: ${selectedAthlete.licencia}`}
+                  size="small"
                   variant="outlined"
                 />
               )}
               {selectedAthlete.club && selectedAthlete.club !== 'N/A' && selectedAthlete.club !== 'Sin club' && (
-                <Chip 
-                  label={selectedAthlete.club} 
-                  size="small" 
+                <Chip
+                  label={selectedAthlete.club}
+                  size="small"
                   color="primary"
                   variant="outlined"
                 />
@@ -157,9 +181,9 @@ function AthleteSelector() {
       )}
 
       {/* Popup con búsqueda */}
-      <Dialog 
-        open={open} 
-        onClose={handleClose} 
+      <Dialog
+        open={open}
+        onClose={handleClose}
         maxWidth="sm"
         fullWidth
       >
@@ -167,10 +191,10 @@ function AthleteSelector() {
           <TbUser size={24} />
           <Typography variant="h6" component="span">Seleccionar Atleta</Typography>
         </DialogTitle>
-        
-        <DialogContent 
-          dividers 
-          sx={{ 
+
+        <DialogContent
+          dividers
+          sx={{
             pb: 0,
             position: 'relative',
             flex: 1,
@@ -212,9 +236,9 @@ function AthleteSelector() {
                 zIndex: (theme) => theme.zIndex.appBar
               }}
             >
-              <Card 
-                sx={{ 
-                  bgcolor: 'primary.light', 
+              <Card
+                sx={{
+                  bgcolor: 'primary.light',
                   color: 'primary.contrastText'
                 }}
               >
@@ -226,18 +250,26 @@ function AthleteSelector() {
                     <Typography variant="body1" fontWeight="bold">
                       {tempSelectedAthlete.nombre}
                     </Typography>
+                    {tempSelectedAthlete.fecha_nacimiento && (
+                      <Chip
+                        label={dayjs(tempSelectedAthlete.fecha_nacimiento).format('DD/MM/YYYY')}
+                        size="small"
+                        variant="outlined"
+                        sx={{ bgcolor: 'white', color: 'primary.main' }}
+                      />
+                    )}
                     {tempSelectedAthlete.licencia && tempSelectedAthlete.licencia !== 'N/A' && (
-                      <Chip 
-                        label={`Lic: ${tempSelectedAthlete.licencia}`} 
-                        size="small" 
+                      <Chip
+                        label={`Lic: ${tempSelectedAthlete.licencia}`}
+                        size="small"
                         variant="outlined"
                         sx={{ bgcolor: 'white', color: 'primary.main' }}
                       />
                     )}
                     {tempSelectedAthlete.club && tempSelectedAthlete.club !== 'N/A' && tempSelectedAthlete.club !== 'Sin club' && (
-                      <Chip 
-                        label={tempSelectedAthlete.club} 
-                        size="small" 
+                      <Chip
+                        label={tempSelectedAthlete.club}
+                        size="small"
                         variant="outlined"
                         sx={{ bgcolor: 'white', color: 'primary.main' }}
                       />
@@ -248,15 +280,15 @@ function AthleteSelector() {
             </Box>
           )}
         </DialogContent>
-        
+
         <DialogActions sx={{ flexShrink: 0, py: 1.5 }}>
-          <Button 
+          <Button
             onClick={handleClose}
             startIcon={<TbX />}
           >
             Cancelar
           </Button>
-          <Button 
+          <Button
             onClick={handleSelect}
             variant="contained"
             disabled={!tempSelectedAthlete}

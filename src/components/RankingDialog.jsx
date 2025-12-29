@@ -13,11 +13,17 @@ import {
     ListItemText,
     Avatar,
     Divider,
-    Paper
+    Paper,
+    Select,
+    MenuItem,
+    FormControl,
+    InputLabel,
+    IconButton
 } from '@mui/material'
 import { supabase } from '../lib/supabase'
 import { IoClose } from 'react-icons/io5'
 import { PiRanking } from 'react-icons/pi'
+import { TbSwords } from 'react-icons/tb'
 import { getColorForAthlete } from '../utils/athleteColors'
 
 function RankingDialog({
@@ -27,11 +33,15 @@ function RankingDialog({
     categoria,
     mainAthleteId,
     comparatorAthletes = [],
-    genderFilter = null
+    genderFilter = null,
+    onAthleteSelect, // New prop callback
+    onAthleteCompare // New prop to add as comparator
 }) {
     const [loading, setLoading] = useState(false)
     const [rankingData, setRankingData] = useState([])
     const [error, setError] = useState(null)
+    const [years, setYears] = useState([])
+    const [selectedYear, setSelectedYear] = useState('historic')
 
     // Determine IDs of "sticky" athletes (main + comparators)
     const stickyAthleteIds = useMemo(() => {
@@ -45,6 +55,39 @@ function RankingDialog({
         }
         return ids
     }, [mainAthleteId, comparatorAthletes])
+
+    // Fetch available years
+    useEffect(() => {
+        const fetchYears = async () => {
+            try {
+                const { data, error } = await supabase
+                    .from('resultados')
+                    .select('anio')
+                    // Using a hack to get unique values since .distinct() might not work as expected in all clients
+                    // But typically .select('anio') returns all rows.
+                    // Better to use rpc or fetch all and unique in client if list is small.
+                    // For now, let's fetch distinct years using a specialized query or just all distinct anios from results
+                    // Actually, let's just use a simple query and unique in JS for robustness
+                    .order('anio', { ascending: false })
+
+                if (data) {
+                    const uniqueYears = [...new Set(data.map(d => d.anio))].filter(Boolean)
+                    setYears(uniqueYears)
+
+                    // Set default year logic: Current Year -> Previous Year -> ...
+                    const currentYear = new Date().getFullYear()
+                    if (uniqueYears.includes(currentYear)) {
+                        setSelectedYear(currentYear)
+                    } else if (uniqueYears.length > 0) {
+                        setSelectedYear(uniqueYears[0])
+                    }
+                }
+            } catch (err) {
+                console.error("Error fetching years:", err)
+            }
+        }
+        fetchYears()
+    }, [])
 
     useEffect(() => {
         if (!open || !prueba || !categoria) {
@@ -90,7 +133,8 @@ function RankingDialog({
             unidad,
             fecha,
             club_id,
-            genero
+            genero,
+            anio
           `)
                     .eq('prueba_id', pruebaId)
                     .eq('categoria_id', categoriaId)
@@ -98,6 +142,11 @@ function RankingDialog({
                 if (effectiveGender) {
                     query = query.eq('genero', effectiveGender)
                 }
+
+                if (selectedYear !== 'historic') {
+                    query = query.eq('anio', selectedYear)
+                }
+
 
                 const { data: resultsData, error: resultsError } = await query
 
@@ -123,7 +172,7 @@ function RankingDialog({
                 if (athleteIds.size > 0) {
                     const { data: athletesData } = await supabase
                         .from('atletas')
-                        .select('atleta_id, nombre, fecha_nac')
+                        .select('atleta_id, nombre, fecha_nac, licencia')
                         .in('atleta_id', Array.from(athleteIds))
 
                     if (athletesData) {
@@ -237,7 +286,7 @@ function RankingDialog({
         }
 
         fetchRanking()
-    }, [open, prueba, categoria, stickyAthleteIds, genderFilter])
+    }, [open, prueba, categoria, stickyAthleteIds, genderFilter, selectedYear])
 
     const renderRow = (item, isSticky = false) => {
         const isMain = String(item.atleta_id) === String(mainAthleteId)
@@ -268,7 +317,27 @@ function RankingDialog({
                 </Box>
                 <ListItemText
                     primary={
-                        <Typography variant="body2" fontWeight={isMain || isComparator ? "bold" : "normal"} color={color}>
+                        <Typography
+                            variant="body2"
+                            fontWeight={isMain || isComparator ? "bold" : "normal"}
+                            color="primary.main"
+                            sx={{
+                                cursor: 'pointer',
+                                textDecoration: 'underline',
+                                '&:hover': { textDecoration: 'underline' }
+                            }}
+                            onClick={() => {
+                                if (onAthleteSelect && item.atletas) {
+                                    // Construct full athlete object for compatibility with AthleteSelector
+                                    const fullAthlete = {
+                                        ...item.atletas,
+                                        fecha_nacimiento: item.atletas.fecha_nac,
+                                        club: item.clubes?.nombre || 'Sin club'
+                                    }
+                                    onAthleteSelect(fullAthlete)
+                                }
+                            }}
+                        >
                             {item.atletas?.nombre || 'Desconocido'}
                         </Typography>
                     }
@@ -284,9 +353,31 @@ function RankingDialog({
                         </Box>
                     }
                 />
-                <Typography variant="body2" fontWeight="bold">
-                    {item.marca_texto || item.marca_valor} {item.unidad}
-                </Typography>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <Typography variant="body2" fontWeight="bold">
+                        {item.marca_texto || item.marca_valor} {item.unidad}
+                    </Typography>
+                    <IconButton
+                        size="small"
+                        color="primary"
+                        onClick={(e) => {
+                            e.stopPropagation()
+                            if (onAthleteCompare && item.atletas) {
+                                // Construct full athlete object
+                                const fullAthlete = {
+                                    ...item.atletas,
+                                    fecha_nacimiento: item.atletas.fecha_nac,
+                                    club: item.clubes?.nombre || 'Sin club'
+                                }
+                                onAthleteCompare(fullAthlete)
+                            }
+                        }}
+                        title="Comparar (VS)"
+                        sx={{ ml: 0.5, p: 0.5, transition: 'background-color 0.2s' }}
+                    >
+                        <TbSwords size={18} />
+                    </IconButton>
+                </Box>
             </ListItem>
         )
     }
@@ -303,9 +394,25 @@ function RankingDialog({
                         {prueba?.nombre} • {categoria?.label}
                     </Typography>
                 </Box>
-                <Button onClick={onClose} sx={{ minWidth: 0, p: 1, borderRadius: '50%' }}>
-                    <IoClose size={24} />
-                </Button>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <FormControl size="small" sx={{ minWidth: 100 }}>
+                        <Select
+                            value={selectedYear}
+                            onChange={(e) => setSelectedYear(e.target.value)}
+                            displayEmpty
+                            variant="outlined"
+                            sx={{ height: 32, fontSize: '0.875rem' }}
+                        >
+                            {years.map(year => (
+                                <MenuItem key={year} value={year}>{year}</MenuItem>
+                            ))}
+                            <MenuItem value="historic">Histórico</MenuItem>
+                        </Select>
+                    </FormControl>
+                    <Button onClick={onClose} sx={{ minWidth: 0, p: 1, borderRadius: '50%' }}>
+                        <IoClose size={24} />
+                    </Button>
+                </Box>
             </DialogTitle>
             <Divider />
 

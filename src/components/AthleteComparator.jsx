@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import dayjs from 'dayjs'
 import {
   Box,
   Button,
@@ -13,7 +14,7 @@ import {
   IconButton,
   Alert
 } from '@mui/material'
-import { TbX, TbCheck, TbTrash, TbPlus, TbUserPlus } from 'react-icons/tb'
+import { TbX, TbCheck, TbTrash, TbPlus, TbUserPlus, TbSwords } from 'react-icons/tb'
 import AthleteSearch from './AthleteSearch'
 
 const STORAGE_KEY_COMPARATORS = 'comparatorAthletes'
@@ -115,28 +116,28 @@ function AthleteComparator({ onComparatorsChange }) {
               color="secondary"
               onClick={handleOpen}
               sx={{ py: 2 }}
-              startIcon={<TbPlus />}
+              startIcon={<TbSwords />}
             >
-              AÑADIR ATLETA
+              AÑADIR ATLETA A COMPARAR
             </Button>
           </CardContent>
         </Card>
 
         {/* Popup con búsqueda */}
-        <Dialog 
-          open={open} 
-          onClose={handleClose} 
+        <Dialog
+          open={open}
+          onClose={handleClose}
           maxWidth="sm"
           fullWidth
         >
           <DialogTitle sx={{ flexShrink: 0, position: 'sticky', top: 0, zIndex: 2, bgcolor: 'background.paper', display: 'flex', alignItems: 'center', gap: 1 }}>
-            <TbUserPlus size={24} />
+            <TbSwords size={24} />
             <Typography variant="h6" component="span">Añadir Atleta para Comparar</Typography>
           </DialogTitle>
-          
-          <DialogContent 
-            dividers 
-            sx={{ 
+
+          <DialogContent
+            dividers
+            sx={{
               pb: 0,
               position: 'relative',
               flex: 1,
@@ -149,7 +150,7 @@ function AthleteComparator({ onComparatorsChange }) {
             <Box sx={{ flex: 1, overflow: 'auto', minHeight: 0 }}>
               <AthleteSearch onResultClick={handleResultClick} />
             </Box>
-            
+
             {/* Card sticky del atleta seleccionado */}
             {tempSelectedAthlete && (
               <Box
@@ -162,9 +163,9 @@ function AthleteComparator({ onComparatorsChange }) {
                   pb: 1
                 }}
               >
-                <Card 
-                  sx={{ 
-                    bgcolor: 'secondary.light', 
+                <Card
+                  sx={{
+                    bgcolor: 'secondary.light',
                     color: 'secondary.contrastText'
                   }}
                 >
@@ -176,21 +177,21 @@ function AthleteComparator({ onComparatorsChange }) {
                     <Typography variant="body1" fontWeight="bold" sx={{ mb: 1 }}>
                       {tempSelectedAthlete.nombre}
                     </Typography>
-                    
+
                     {/* Chips de licencia y club */}
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
                       {tempSelectedAthlete.licencia && tempSelectedAthlete.licencia !== 'N/A' && (
-                        <Chip 
-                          label={`Lic: ${tempSelectedAthlete.licencia}`} 
-                          size="small" 
+                        <Chip
+                          label={`Lic: ${tempSelectedAthlete.licencia}`}
+                          size="small"
                           variant="outlined"
                           sx={{ bgcolor: 'white', color: 'secondary.main' }}
                         />
                       )}
                       {tempSelectedAthlete.club && tempSelectedAthlete.club !== 'N/A' && tempSelectedAthlete.club !== 'Sin club' && (
-                        <Chip 
-                          label={tempSelectedAthlete.club} 
-                          size="small" 
+                        <Chip
+                          label={tempSelectedAthlete.club}
+                          size="small"
                           variant="outlined"
                           sx={{ bgcolor: 'white', color: 'secondary.main' }}
                         />
@@ -201,15 +202,15 @@ function AthleteComparator({ onComparatorsChange }) {
               </Box>
             )}
           </DialogContent>
-          
+
           <DialogActions sx={{ flexShrink: 0, py: 1.5 }}>
-            <Button 
+            <Button
               onClick={handleClose}
               startIcon={<TbX />}
             >
               Cancelar
             </Button>
-            <Button 
+            <Button
               onClick={handleSelect}
               variant="contained"
               disabled={!tempSelectedAthlete}
@@ -227,9 +228,9 @@ function AthleteComparator({ onComparatorsChange }) {
   return (
     <Box sx={{ width: '100%' }}>
       {comparators.map((comparator, index) => (
-        <Card 
-          key={comparator.atleta_id} 
-          sx={{ 
+        <Card
+          key={comparator.atleta_id}
+          sx={{
             width: '100%',
             mb: index < comparators.length - 1 ? 2 : 0,
             borderLeft: '4px solid',
@@ -242,8 +243,8 @@ function AthleteComparator({ onComparatorsChange }) {
               <Typography variant="h6" component="span" fontWeight="bold">
                 {comparator.nombre}
               </Typography>
-              <IconButton 
-                size="small" 
+              <IconButton
+                size="small"
                 color="error"
                 onClick={() => handleRemove(comparator.atleta_id)}
                 aria-label="Eliminar atleta comparador"
@@ -252,21 +253,29 @@ function AthleteComparator({ onComparatorsChange }) {
                 <TbTrash />
               </IconButton>
             </Box>
-            
+
             {/* Fila inferior: Chips de licencia y club */}
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
+              {comparator.fecha_nacimiento && (
+                <Chip
+                  label={dayjs(comparator.fecha_nacimiento).format('DD/MM/YYYY')}
+                  size="small"
+                  variant="outlined"
+                  color="secondary"
+                />
+              )}
               {comparator.licencia && comparator.licencia !== 'N/A' && (
-                <Chip 
-                  label={`Lic: ${comparator.licencia}`} 
-                  size="small" 
+                <Chip
+                  label={`Lic: ${comparator.licencia}`}
+                  size="small"
                   variant="outlined"
                   color="secondary"
                 />
               )}
               {comparator.club && comparator.club !== 'N/A' && comparator.club !== 'Sin club' && (
-                <Chip 
-                  label={comparator.club} 
-                  size="small" 
+                <Chip
+                  label={comparator.club}
+                  size="small"
                   color="secondary"
                   variant="outlined"
                 />
@@ -284,28 +293,28 @@ function AthleteComparator({ onComparatorsChange }) {
             variant="outlined"
             color="secondary"
             onClick={handleOpen}
-            startIcon={<TbPlus />}
+            startIcon={<TbSwords />}
           >
-            AÑADIR ATLETA
+            AÑADIR ATLETA A COMPARAR
           </Button>
         </CardContent>
       </Card>
 
       {/* Popup con búsqueda */}
-      <Dialog 
-        open={open} 
-        onClose={handleClose} 
+      <Dialog
+        open={open}
+        onClose={handleClose}
         maxWidth="sm"
         fullWidth
       >
         <DialogTitle sx={{ flexShrink: 0, position: 'sticky', top: 0, zIndex: 2, bgcolor: 'background.paper', display: 'flex', alignItems: 'center', gap: 1 }}>
-          <TbUserPlus size={24} />
+          <TbSwords size={24} />
           <Typography variant="h6" component="span">Añadir Atleta para Comparar</Typography>
         </DialogTitle>
-        
-        <DialogContent 
-          dividers 
-          sx={{ 
+
+        <DialogContent
+          dividers
+          sx={{
             pb: 0,
             position: 'relative',
             flex: 1,
@@ -318,7 +327,7 @@ function AthleteComparator({ onComparatorsChange }) {
           <Box sx={{ flex: 1, overflow: 'auto', mb: tempSelectedAthlete ? '140px' : 0 }}>
             <AthleteSearch onResultClick={handleResultClick} />
           </Box>
-          
+
           {/* Card sticky del atleta seleccionado */}
           {tempSelectedAthlete && (
             <Box
@@ -333,9 +342,9 @@ function AthleteComparator({ onComparatorsChange }) {
                 pt: 2
               }}
             >
-              <Card 
-                sx={{ 
-                  bgcolor: 'secondary.light', 
+              <Card
+                sx={{
+                  bgcolor: 'secondary.light',
                   color: 'secondary.contrastText'
                 }}
               >
@@ -347,18 +356,26 @@ function AthleteComparator({ onComparatorsChange }) {
                     <Typography variant="body1" fontWeight="bold">
                       {tempSelectedAthlete.nombre}
                     </Typography>
+                    {tempSelectedAthlete.fecha_nacimiento && (
+                      <Chip
+                        label={dayjs(tempSelectedAthlete.fecha_nacimiento).format('DD/MM/YYYY')}
+                        size="small"
+                        variant="outlined"
+                        sx={{ bgcolor: 'white', color: 'secondary.main' }}
+                      />
+                    )}
                     {tempSelectedAthlete.licencia && tempSelectedAthlete.licencia !== 'N/A' && (
-                      <Chip 
-                        label={`Lic: ${tempSelectedAthlete.licencia}`} 
-                        size="small" 
+                      <Chip
+                        label={`Lic: ${tempSelectedAthlete.licencia}`}
+                        size="small"
                         variant="outlined"
                         sx={{ bgcolor: 'white', color: 'secondary.main' }}
                       />
                     )}
                     {tempSelectedAthlete.club && tempSelectedAthlete.club !== 'N/A' && tempSelectedAthlete.club !== 'Sin club' && (
-                      <Chip 
-                        label={tempSelectedAthlete.club} 
-                        size="small" 
+                      <Chip
+                        label={tempSelectedAthlete.club}
+                        size="small"
                         variant="outlined"
                         sx={{ bgcolor: 'white', color: 'secondary.main' }}
                       />
@@ -369,15 +386,15 @@ function AthleteComparator({ onComparatorsChange }) {
             </Box>
           )}
         </DialogContent>
-        
+
         <DialogActions sx={{ flexShrink: 0, py: 1.5 }}>
-          <Button 
+          <Button
             onClick={handleClose}
             startIcon={<TbX />}
           >
             Cancelar
           </Button>
-          <Button 
+          <Button
             onClick={handleSelect}
             variant="contained"
             disabled={!tempSelectedAthlete}

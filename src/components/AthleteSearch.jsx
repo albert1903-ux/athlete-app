@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import dayjs from 'dayjs'
 import {
   Box,
   TextField,
@@ -51,18 +52,18 @@ function AthleteSearch({ onResultClick }) {
           // Buscar por nombre en la tabla atletas
           const { data: nombreData, error: nombreError } = await supabase
             .from('atletas')
-            .select('atleta_id, nombre, licencia')
+            .select('atleta_id, nombre, licencia, fecha_nac')
             .ilike('nombre', `%${searchQuery.trim()}%`)
             .limit(100)
-          
+
           if (nombreError) throw nombreError
-          
+
           if (!nombreData || nombreData.length === 0) {
             setError('No se encontraron atletas con ese nombre')
             setLoading(false)
             return
           }
-          
+
           atletaIds = nombreData.map(a => a.atleta_id)
           break
         }
@@ -74,28 +75,28 @@ function AthleteSearch({ onResultClick }) {
             .select('club_id, nombre')
             .ilike('nombre', `%${searchQuery.trim()}%`)
             .limit(10)
-          
+
           if (clubsError) throw clubsError
-          
+
           if (!clubsData || clubsData.length === 0) {
             setError('No se encontró ningún club con ese nombre')
             setLoading(false)
             return
           }
-          
+
           const clubIds = clubsData.map(c => c.club_id)
-          
+
           // Obtener atletas únicos de esos clubes (a través de resultados)
           const { data: resultadosData, error: resultadosError } = await supabase
             .from('resultados')
             .select('atleta_id')
             .in('club_id', clubIds)
-          
+
           if (resultadosError) throw resultadosError
-          
+
           // Extraer IDs únicos de atletas
           atletaIds = [...new Set(resultadosData?.map(r => r.atleta_id).filter(Boolean) || [])]
-          
+
           if (atletaIds.length === 0) {
             setError('No se encontraron atletas en ese club')
             setLoading(false)
@@ -117,9 +118,9 @@ function AthleteSearch({ onResultClick }) {
       // Obtener información de los atletas
       const { data: atletasData, error: atletasError } = await supabase
         .from('atletas')
-        .select('atleta_id, nombre, licencia')
+        .select('atleta_id, nombre, licencia, fecha_nac')
         .in('atleta_id', atletaIds)
-      
+
       if (atletasError) throw atletasError
 
       if (!atletasData || atletasData.length === 0) {
@@ -135,7 +136,7 @@ function AthleteSearch({ onResultClick }) {
         .select('atleta_id, club_id, fecha')
         .in('atleta_id', atletaIds)
         .order('fecha', { ascending: false, nullsFirst: false })
-      
+
       if (resultadosError) throw resultadosError
 
       // Crear un mapa con el club_id más reciente por atleta
@@ -150,29 +151,30 @@ function AthleteSearch({ onResultClick }) {
 
       // Obtener IDs únicos de clubes
       const clubIdsUnicos = [...new Set(clubPorAtletaMap.values())]
-      
+
       // Obtener nombres de clubes
       const { data: clubesData, error: clubesError } = clubIdsUnicos.length > 0
         ? await supabase
-            .from('clubes')
-            .select('club_id, nombre')
-            .in('club_id', clubIdsUnicos)
+          .from('clubes')
+          .select('club_id, nombre')
+          .in('club_id', clubIdsUnicos)
         : { data: null, error: null }
-      
+
       if (clubesError) throw clubesError
 
       // Crear mapa de clubes
       const clubesMap = new Map(clubesData?.map(c => [c.club_id, c.nombre]) || [])
-      
+
       // Crear resultados únicos (solo nombre, licencia, club)
       const resultadosUnicos = atletasData.map(atleta => {
         const clubId = clubPorAtletaMap.get(atleta.atleta_id)
         const clubNombre = clubId ? (clubesMap.get(clubId) || 'Sin club') : 'Sin club'
-        
+
         return {
           atleta_id: atleta.atleta_id,
           nombre: atleta.nombre,
           licencia: atleta.licencia || 'N/A',
+          fecha_nacimiento: atleta.fecha_nac,
           club: clubNombre
         }
       })
@@ -236,7 +238,7 @@ function AthleteSearch({ onResultClick }) {
               onChange={(e) => setSearchQuery(e.target.value)}
               onKeyPress={handleKeyPress}
               placeholder={
-                searchType === 'nombre' 
+                searchType === 'nombre'
                   ? 'Ej: Juan Pérez'
                   : 'Ej: FC Barcelona'
               }
@@ -272,7 +274,7 @@ function AthleteSearch({ onResultClick }) {
             <List>
               {results.map((item, index) => (
                 <Box key={item.atleta_id || index}>
-                  <ListItemButton 
+                  <ListItemButton
                     onClick={() => {
                       console.debug('[AthleteSearch] result clicked', item)
                       if (onResultClick) {
@@ -292,20 +294,27 @@ function AthleteSearch({ onResultClick }) {
                     <Typography variant="subtitle1" component="span" fontWeight="bold" sx={{ width: '100%', mb: 1 }}>
                       {item.nombre}
                     </Typography>
-                    
+
                     {/* Chips de licencia y club */}
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap', width: '100%' }}>
+                      {item.fecha_nacimiento && (
+                        <Chip
+                          label={dayjs(item.fecha_nacimiento).format('DD/MM/YYYY')}
+                          size="small"
+                          variant="outlined"
+                        />
+                      )}
                       {item.licencia && item.licencia !== 'N/A' && (
-                        <Chip 
-                          label={`Lic: ${item.licencia}`} 
-                          size="small" 
+                        <Chip
+                          label={`Lic: ${item.licencia}`}
+                          size="small"
                           variant="outlined"
                         />
                       )}
                       {item.club && item.club !== 'N/A' && item.club !== 'Sin club' && (
-                        <Chip 
-                          label={item.club} 
-                          size="small" 
+                        <Chip
+                          label={item.club}
+                          size="small"
                           color="primary"
                           variant="outlined"
                         />

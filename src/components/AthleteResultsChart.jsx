@@ -143,7 +143,7 @@ function AthleteResultsChart({ comparatorAthletes = [] }) {
       }
 
       const newComparatorData = {}
-      
+
       for (const athlete of comparatorAthletes) {
         try {
           const data = await fetchAthleteResultsForComparator(athlete.atleta_id)
@@ -153,7 +153,7 @@ function AthleteResultsChart({ comparatorAthletes = [] }) {
           newComparatorData[athlete.atleta_id] = null
         }
       }
-      
+
       setComparatorData(newComparatorData)
     }
 
@@ -169,7 +169,7 @@ function AthleteResultsChart({ comparatorAthletes = [] }) {
 
     // Inicializar colores usando el módulo compartido
     const colorMap = initializeColorsForComparators(comparatorAthletes)
-    
+
     // Convertir Map a objeto para el estado
     const newColors = {}
     colorMap.forEach((color, atletaId) => {
@@ -187,7 +187,7 @@ function AthleteResultsChart({ comparatorAthletes = [] }) {
       // Primero obtener información del atleta (nombre y fecha de nacimiento)
       let atletaNombre = null
       let fechaNacimiento = null
-      
+
       try {
         // Obtener nombre y fecha de nacimiento del atleta desde la tabla atletas
         const { data: atletaInfo, error: atletaError } = await supabase
@@ -195,7 +195,7 @@ function AthleteResultsChart({ comparatorAthletes = [] }) {
           .select('nombre, fecha_nac')
           .eq('atleta_id', atletaId)
           .maybeSingle()
-        
+
         if (atletaError) {
           console.warn('Error al obtener información del atleta:', atletaError)
         } else if (atletaInfo) {
@@ -210,99 +210,108 @@ function AthleteResultsChart({ comparatorAthletes = [] }) {
       // Primero intentamos con relación a pruebas, luego sin ella
       let data = null
       let queryError = null
+      let result1 = null
+
+      const isLocalDB = import.meta.env.VITE_USE_LOCAL_DB === 'true'
 
       // Intentar con relación a pruebas, obteniendo específicamente nombre y unidad_default
       // Probar diferentes formatos de relación posibles
-      let result1 = null
-      
-      // Intentar formato 1: prueba:pruebas(...)
-      try {
-        result1 = await supabase
-          .from('resultados')
-          .select(`
-            *,
-            prueba:pruebas(prueba_id, nombre, unidad_default)
-          `)
-          .eq('atleta_id', atletaId)
-          .order('fecha', { ascending: true })
-        
-        if (!result1.error) {
-          data = result1.data
-          queryError = null
-        } else {
-          throw result1.error
-        }
-      } catch (err1) {
-        // Intentar formato 2: pruebas(...) directamente
+      // SOLO si no estamos en modo local (el backend local no soporta joins complejos en SQL)
+      if (!isLocalDB) {
+        // Intentar formato 1: prueba:pruebas(...)
         try {
           result1 = await supabase
             .from('resultados')
             .select(`
-              *,
-              pruebas(prueba_id, nombre, unidad_default)
-            `)
+                *,
+                prueba:pruebas(prueba_id, nombre, unidad_default)
+              `)
             .eq('atleta_id', atletaId)
             .order('fecha', { ascending: true })
-          
+
           if (!result1.error) {
             data = result1.data
             queryError = null
           } else {
             throw result1.error
           }
-        } catch (err2) {
-          // Si ambas relaciones fallan, obtener solo resultados y luego buscar pruebas por separado
-          const result2 = await supabase
-            .from('resultados')
-            .select('*')
-            .eq('atleta_id', atletaId)
-            .order('fecha', { ascending: true })
-          
-          data = result2.data
-          queryError = result2.error
-          
-          // Si tenemos datos pero sin relación, intentar obtener información desde tabla pruebas
-          if (data && !queryError && data.length > 0) {
-            // Obtener IDs únicos de pruebas
-            const pruebaIds = [...new Set(data.map(r => r.prueba_id).filter(Boolean))]
-            if (pruebaIds.length > 0) {
-              try {
-                const { data: pruebasData } = await supabase
-                  .from('pruebas')
-                  .select('prueba_id, nombre, unidad_default')
-                  .in('prueba_id', pruebaIds)
-                
-                // Crear un mapa de prueba_id -> información de prueba
-                const pruebasMap = new Map()
-                if (pruebasData) {
-                  pruebasData.forEach(p => {
-                    if (p.prueba_id) {
-                      pruebasMap.set(p.prueba_id, {
-                        nombre: p.nombre,
-                        unidad_default: p.unidad_default
-                      })
-                    }
-                  })
-                  
-                  // Agregar información de pruebas a los resultados
-                  data = data.map(resultado => ({
-                    ...resultado,
-                    prueba: pruebasMap.get(resultado.prueba_id) || null
-                  }))
-                }
-              } catch (err3) {
-                console.warn('No se pudo obtener información desde tabla pruebas:', err3)
-              }
+        } catch (err1) {
+          // Intentar formato 2: pruebas(...) directamente
+          try {
+            result1 = await supabase
+              .from('resultados')
+              .select(`
+                  *,
+                  pruebas(prueba_id, nombre, unidad_default)
+                `)
+              .eq('atleta_id', atletaId)
+              .order('fecha', { ascending: true })
+
+            if (!result1.error) {
+              data = result1.data
+              queryError = null
+            } else {
+              throw result1.error
             }
+          } catch (err2) {
+            // Fallthrough to fallback
           }
         }
       }
+
+      // Si no tenemos datos (falló el join o estamos en local), usar query simple
+      if (!data) {
+        const result2 = await supabase
+          .from('resultados')
+          .select('*')
+          .eq('atleta_id', atletaId)
+          .order('fecha', { ascending: true })
+
+        data = result2.data
+        queryError = result2.error
+      }
+
+      // Si tenemos datos pero sin relación, intentar obtener información desde tabla pruebas
+      if (data && !queryError && data.length > 0) {
+        // Obtener IDs únicos de pruebas
+        const pruebaIds = [...new Set(data.map(r => r.prueba_id).filter(Boolean))]
+        if (pruebaIds.length > 0) {
+          try {
+            const { data: pruebasData } = await supabase
+              .from('pruebas')
+              .select('prueba_id, nombre, unidad_default')
+              .in('prueba_id', pruebaIds)
+
+            // Crear un mapa de prueba_id -> información de prueba
+            const pruebasMap = new Map()
+            if (pruebasData) {
+              pruebasData.forEach(p => {
+                if (p.prueba_id) {
+                  pruebasMap.set(p.prueba_id, {
+                    nombre: p.nombre,
+                    unidad_default: p.unidad_default
+                  })
+                }
+              })
+
+              // Agregar información de pruebas a los resultados
+              data = data.map(resultado => ({
+                ...resultado,
+                prueba: pruebasMap.get(resultado.prueba_id) || null
+              }))
+            }
+          } catch (err3) {
+            console.warn('No se pudo obtener información desde tabla pruebas:', err3)
+          }
+        }
+      }
+
 
       if (queryError) throw queryError
 
       // Inicializar data como array vacío si es null
       data = data || []
-      
+
       // Si no pudimos obtener el nombre del atleta desde la tabla atletas,
       // intentar obtenerlo desde los resultados encontrados
       if (!atletaNombre && data.length > 0) {
@@ -316,11 +325,11 @@ function AthleteResultsChart({ comparatorAthletes = [] }) {
             const conteo = data.filter(r => r.nombre === nombre).length
             conteoNombres[nombre] = conteo
           })
-          atletaNombre = Object.keys(conteoNombres).reduce((a, b) => 
+          atletaNombre = Object.keys(conteoNombres).reduce((a, b) =>
             conteoNombres[a] > conteoNombres[b] ? a : b
           )
         }
-        
+
         // Si no obtuvimos fecha_nac desde atletas, intentar desde resultados como fallback
         if (!fechaNacimiento && data.length > 0) {
           const fechasEncontradas = [...new Set(data.map(r => r.fecha_nacimiento).filter(Boolean))]
@@ -333,14 +342,14 @@ function AthleteResultsChart({ comparatorAthletes = [] }) {
               const conteo = data.filter(r => r.fecha_nacimiento === fecha).length
               conteoFechas[fecha] = conteo
             })
-            const fechaMasComun = Object.keys(conteoFechas).reduce((a, b) => 
+            const fechaMasComun = Object.keys(conteoFechas).reduce((a, b) =>
               conteoFechas[a] > conteoFechas[b] ? a : b
             )
             fechaNacimiento = fechaMasComun
           }
         }
       }
-      
+
       // Asegurarse de que todos los resultados tengan información de prueba
       // Si hay resultados sin relación, obtener información de pruebas manualmente
       const resultadosSinPrueba = data.filter(r => !r.prueba || typeof r.prueba !== 'object')
@@ -352,7 +361,7 @@ function AthleteResultsChart({ comparatorAthletes = [] }) {
               .from('pruebas')
               .select('prueba_id, nombre, unidad_default')
               .in('prueba_id', pruebaIdsSinInfo)
-            
+
             const pruebasMapParaResultados = new Map()
             if (pruebasDataParaResultados) {
               pruebasDataParaResultados.forEach(p => {
@@ -364,7 +373,7 @@ function AthleteResultsChart({ comparatorAthletes = [] }) {
                 }
               })
             }
-            
+
             // Actualizar resultados sin información de prueba
             data = data.map(resultado => {
               if (!resultado.prueba || typeof resultado.prueba !== 'object') {
@@ -383,7 +392,7 @@ function AthleteResultsChart({ comparatorAthletes = [] }) {
           }
         }
       }
-      
+
       // Obtener IDs de resultados ya encontrados para evitar duplicados
       const resultadosIdsEncontrados = new Set(
         data.map(r => r.resultado_id || r.id).filter(Boolean)
@@ -395,16 +404,16 @@ function AthleteResultsChart({ comparatorAthletes = [] }) {
       // 3. Por otros atletas con nombre similar
       try {
         let resultadosAdicionales = []
-        
+
         // Nota: fecha_nacimiento probablemente no existe en la tabla atletas,
         // solo en resultados, por lo que no intentamos obtenerla desde atletas
-        
+
         // Obtener todas las fechas de nacimiento únicas de los resultados encontrados
         const fechasNacimientoEncontradas = [...new Set(data.map(r => r.fecha_nacimiento).filter(Boolean))]
-        
+
         // Usar fecha de nacimiento si está disponible en los resultados encontrados
         const fechaParaBuscar = fechaNacimiento || (fechasNacimientoEncontradas.length > 0 ? fechasNacimientoEncontradas[0] : null)
-        
+
         // Estrategia 2: Buscar resultados con atleta_id NULL
         // Nota: fecha_nacimiento no existe en la tabla resultados, así que no podemos filtrar por ella
         try {
@@ -414,23 +423,23 @@ function AthleteResultsChart({ comparatorAthletes = [] }) {
             .is('atleta_id', null)
             .order('fecha', { ascending: true })
             .limit(200)
-          
+
           if (!resultNull.error && resultNull.data && resultNull.data.length > 0) {
             let nuevosResultados = resultNull.data
-            
+
             // Filtrar manualmente por fecha de nacimiento si está disponible en los datos
             if (fechasNacimientoEncontradas.length > 0) {
-              nuevosResultados = nuevosResultados.filter(r => 
+              nuevosResultados = nuevosResultados.filter(r =>
                 r.fecha_nacimiento && fechasNacimientoEncontradas.includes(r.fecha_nacimiento)
               )
             }
-            
+
             // Filtrar duplicados
             nuevosResultados = nuevosResultados.filter(r => {
               const resultadoId = r.resultado_id || r.id
               return resultadoId && !resultadosIdsEncontrados.has(resultadoId)
             })
-            
+
             if (nuevosResultados.length > 0) {
               resultadosAdicionales = [...resultadosAdicionales, ...nuevosResultados]
             }
@@ -438,7 +447,7 @@ function AthleteResultsChart({ comparatorAthletes = [] }) {
         } catch (errNull) {
           // Error silenciado - fecha_nacimiento no existe en resultados
         }
-        
+
         // Estrategia 3: Buscar otros atletas con nombre similar y obtener sus resultados
         if (atletaNombre && resultadosAdicionales.length === 0) {
           try {
@@ -448,28 +457,28 @@ function AthleteResultsChart({ comparatorAthletes = [] }) {
               .from('atletas')
               .select('atleta_id, nombre')
               .ilike('nombre', `%${nombreNormalizado}%`)
-            
+
             if (atletasSimilares && atletasSimilares.length > 0) {
               // Filtrar para obtener solo los que no son el atleta actual
               const otrosAtletas = atletasSimilares.filter(a => a.atleta_id !== atletaId)
-              
+
               if (otrosAtletas.length > 0) {
                 const otrosAtletaIds = otrosAtletas.map(a => a.atleta_id)
-                
+
                 // Buscar resultados de estos otros atletas
                 const { data: resultadosOtrosAtletas } = await supabase
                   .from('resultados')
                   .select('*')
                   .in('atleta_id', otrosAtletaIds)
                   .order('fecha', { ascending: true })
-                
+
                 if (resultadosOtrosAtletas && resultadosOtrosAtletas.length > 0) {
                   // Filtrar duplicados
                   const nuevosResultados = resultadosOtrosAtletas.filter(r => {
                     const resultadoId = r.resultado_id || r.id
                     return resultadoId && !resultadosIdsEncontrados.has(resultadoId)
                   })
-                  
+
                   if (nuevosResultados.length > 0) {
                     resultadosAdicionales = [...resultadosAdicionales, ...nuevosResultados]
                   }
@@ -480,11 +489,11 @@ function AthleteResultsChart({ comparatorAthletes = [] }) {
             // Error silenciado
           }
         }
-        
+
         // Estrategia 4: Si tenemos fecha de nacimiento, buscar por esa fecha directamente
         // Nota: fecha_nacimiento no existe en la tabla resultados, así que esta estrategia no es viable
         // Se omite para evitar errores 400
-        
+
         // Obtener información de pruebas para todos los resultados adicionales
         if (resultadosAdicionales.length > 0) {
           const pruebaIdsParaObtener = [...new Set(resultadosAdicionales.map(r => r.prueba_id).filter(Boolean))]
@@ -494,7 +503,7 @@ function AthleteResultsChart({ comparatorAthletes = [] }) {
                 .from('pruebas')
                 .select('prueba_id, nombre, unidad_default')
                 .in('prueba_id', pruebaIdsParaObtener)
-              
+
               const pruebasMap = new Map()
               if (pruebasInfo) {
                 pruebasInfo.forEach(p => {
@@ -506,7 +515,7 @@ function AthleteResultsChart({ comparatorAthletes = [] }) {
                   }
                 })
               }
-              
+
               resultadosAdicionales = resultadosAdicionales.map(resultado => {
                 const pruebaInfo = pruebasMap.get(resultado.prueba_id)
                 if (pruebaInfo) {
@@ -518,7 +527,7 @@ function AthleteResultsChart({ comparatorAthletes = [] }) {
               // Error silenciado
             }
           }
-          
+
           // Continuar con el procesamiento solo si tenemos resultados
           if (resultadosAdicionales.length > 0) {
             // Ya no necesitamos filtrar por fecha porque ya lo hicimos en la consulta
@@ -527,7 +536,7 @@ function AthleteResultsChart({ comparatorAthletes = [] }) {
               const resultadoId = r.resultado_id || r.id
               return resultadoId && !resultadosIdsEncontrados.has(resultadoId)
             })
-            
+
             // Combinar con los datos existentes
             if (resultadosAdicionales.length > 0) {
               data = [...data, ...resultadosAdicionales]
@@ -567,7 +576,7 @@ function AthleteResultsChart({ comparatorAthletes = [] }) {
           // Último fallback
           pruebaNombre = typeof resultado.prueba === 'string' ? resultado.prueba : 'Prueba desconocida'
         }
-        
+
         // Si no tenemos nombre de prueba válido, saltar este resultado
         if (!pruebaNombre || pruebaNombre === 'Prueba desconocida') {
           return
@@ -619,15 +628,15 @@ function AthleteResultsChart({ comparatorAthletes = [] }) {
         const fechaFormateada = fecha && !isNaN(fecha.getTime())
           ? fecha.toLocaleDateString('es-ES', { year: 'numeric', month: 'short' })
           : año && resultado.mes
-          ? `${new Date(año, resultado.mes - 1).toLocaleDateString('es-ES', { month: 'short' })} ${año}`
-          : 'Fecha desconocida'
+            ? `${new Date(año, resultado.mes - 1).toLocaleDateString('es-ES', { month: 'short' })} ${año}`
+            : 'Fecha desconocida'
 
         // Calcular edad si tenemos fecha de nacimiento y fecha del resultado
         // Usar fecha_nacimiento del resultado, o la general del atleta como fallback
         const fechaNacimientoResultado = resultado.fecha_nacimiento || null
         const fechaNacimientoParaEdad = fechaNacimientoResultado || fechaNacimiento || null
         let edad = null
-        
+
         if (fechaNacimientoParaEdad && fecha && !isNaN(fecha.getTime())) {
           edad = calcularEdad(fechaNacimientoParaEdad, fecha)
         }
@@ -660,7 +669,7 @@ function AthleteResultsChart({ comparatorAthletes = [] }) {
 
       // Preparar datos para el gráfico de la prueba seleccionada (o primera si no hay selección)
       const pruebaAUsar = selectedPrueba || (pruebasList.length > 0 ? pruebasList[0].nombre : null)
-      
+
       if (pruebaAUsar && groupedByPrueba[pruebaAUsar]) {
         const pruebaData = groupedByPrueba[pruebaAUsar]
         const datosGrafico = pruebaData.data.map(punto => ({
@@ -668,7 +677,7 @@ function AthleteResultsChart({ comparatorAthletes = [] }) {
           fechaTimestamp: punto.fechaTimestamp,
           marca: punto.marca
         }))
-        
+
         // Siempre usar el mismo color para el atleta principal
         setChartData({
           datos: datosGrafico,
@@ -678,7 +687,7 @@ function AthleteResultsChart({ comparatorAthletes = [] }) {
             color: '#0275d8'
           }]
         })
-        
+
         // Seleccionar la primera prueba por defecto si no hay ninguna seleccionada
         if (!selectedPrueba && pruebasList.length > 0) {
           setSelectedPrueba(pruebasList[0].nombre)
@@ -710,7 +719,7 @@ function AthleteResultsChart({ comparatorAthletes = [] }) {
           .select('fecha_nac')
           .eq('atleta_id', atletaId)
           .maybeSingle()
-        
+
         if (atletaInfo && atletaInfo.fecha_nac) {
           fechaNacimiento = atletaInfo.fecha_nac
         }
@@ -721,81 +730,91 @@ function AthleteResultsChart({ comparatorAthletes = [] }) {
       let data = null
       let queryError = null
       let result1 = null
-      
-      // Intentar formato 1: prueba:pruebas(...)
-      try {
-        result1 = await supabase
-          .from('resultados')
-          .select(`
-            *,
-            prueba:pruebas(prueba_id, nombre, unidad_default)
-          `)
-          .eq('atleta_id', atletaId)
-          .order('fecha', { ascending: true })
-        
-        if (!result1.error) {
-          data = result1.data
-          queryError = null
-        } else {
-          throw result1.error
-        }
-      } catch (err1) {
-        // Intentar formato 2: pruebas(...) directamente
+
+      const isLocalDB = import.meta.env.VITE_USE_LOCAL_DB === 'true'
+
+      if (!isLocalDB) {
+        // Intentar formato 1: prueba:pruebas(...)
         try {
           result1 = await supabase
             .from('resultados')
             .select(`
               *,
-              pruebas(prueba_id, nombre, unidad_default)
+              prueba:pruebas(prueba_id, nombre, unidad_default)
             `)
             .eq('atleta_id', atletaId)
             .order('fecha', { ascending: true })
-          
+
           if (!result1.error) {
             data = result1.data
             queryError = null
           } else {
             throw result1.error
           }
-        } catch (err2) {
-          const result2 = await supabase
-            .from('resultados')
-            .select('*')
-            .eq('atleta_id', atletaId)
-            .order('fecha', { ascending: true })
-          
-          data = result2.data
-          queryError = result2.error
-          
-          if (data && !queryError && data.length > 0) {
-            const pruebaIds = [...new Set(data.map(r => r.prueba_id).filter(Boolean))]
-            if (pruebaIds.length > 0) {
-              try {
-                const { data: pruebasData } = await supabase
-                  .from('pruebas')
-                  .select('prueba_id, nombre, unidad_default')
-                  .in('prueba_id', pruebaIds)
-                
-                const pruebasMap = new Map()
-                if (pruebasData) {
-                  pruebasData.forEach(p => {
-                    if (p.prueba_id) {
-                      pruebasMap.set(p.prueba_id, {
-                        nombre: p.nombre,
-                        unidad_default: p.unidad_default
-                      })
-                    }
+        } catch (err1) {
+          // Intentar formato 2: pruebas(...) directamente
+          try {
+            result1 = await supabase
+              .from('resultados')
+              .select(`
+                *,
+                pruebas(prueba_id, nombre, unidad_default)
+              `)
+              .eq('atleta_id', atletaId)
+              .order('fecha', { ascending: true })
+
+            if (!result1.error) {
+              data = result1.data
+              queryError = null
+            } else {
+              throw result1.error
+            }
+          } catch (err2) {
+            // Fallthrough to fallback
+          }
+        }
+      }
+
+      // Si no tenemos datos (falló el join o estamos en local), usar query simple
+      if (!data) {
+        const result2 = await supabase
+          .from('resultados')
+          .select('*')
+          .eq('atleta_id', atletaId)
+          .order('fecha', { ascending: true })
+
+        data = result2.data
+        queryError = result2.error
+      }
+
+      // Si tenemos datos, intentar obtener información desde tabla pruebas (hydrate)
+      if (data && !queryError && data.length > 0) {
+        const pruebaIds = [...new Set(data.map(r => r.prueba_id).filter(Boolean))]
+        if (pruebaIds.length > 0) {
+          try {
+            const { data: pruebasData } = await supabase
+              .from('pruebas')
+              .select('prueba_id, nombre, unidad_default')
+              .in('prueba_id', pruebaIds)
+
+            const pruebasMap = new Map()
+            if (pruebasData) {
+              pruebasData.forEach(p => {
+                if (p.prueba_id) {
+                  pruebasMap.set(p.prueba_id, {
+                    nombre: p.nombre,
+                    unidad_default: p.unidad_default
                   })
                 }
-                
-                data = data.map(resultado => ({
-                  ...resultado,
-                  prueba: pruebasMap.get(resultado.prueba_id) || null
-                }))
-              } catch (err3) {
-                console.warn('No se pudo obtener información desde tabla pruebas:', err3)
-              }
+              })
             }
+
+            data = data.map(resultado => ({
+              ...resultado,
+              prueba: pruebasMap.get(resultado.prueba_id) || null
+            }))
+          } catch (err3) {
+            console.warn('No se pudo obtener información desde tabla pruebas:', err3)
           }
         }
       }
@@ -819,7 +838,7 @@ function AthleteResultsChart({ comparatorAthletes = [] }) {
         } else if (resultado.prueba) {
           pruebaNombre = typeof resultado.prueba === 'string' ? resultado.prueba : 'Prueba desconocida'
         }
-        
+
         if (!pruebaNombre || pruebaNombre === 'Prueba desconocida') {
           return
         }
@@ -863,8 +882,8 @@ function AthleteResultsChart({ comparatorAthletes = [] }) {
         const fechaFormateada = fecha && !isNaN(fecha.getTime())
           ? fecha.toLocaleDateString('es-ES', { year: 'numeric', month: 'short' })
           : año && resultado.mes
-          ? `${new Date(año, resultado.mes - 1).toLocaleDateString('es-ES', { month: 'short' })} ${año}`
-          : 'Fecha desconocida'
+            ? `${new Date(año, resultado.mes - 1).toLocaleDateString('es-ES', { month: 'short' })} ${año}`
+            : 'Fecha desconocida'
 
         // Calcular edad si tenemos fecha de nacimiento y fecha del resultado
         // Usar fecha_nac de la tabla atletas (disponible en el scope de la función)
@@ -907,7 +926,7 @@ function AthleteResultsChart({ comparatorAthletes = [] }) {
 
     // Obtener datos solo de la prueba seleccionada
     const pruebaData = groupedByPrueba[pruebaSeleccionada]
-    
+
     // Preparar datos para el gráfico
     const datosGrafico = pruebaData.data.map(punto => ({
       fecha: punto.fecha,
@@ -964,34 +983,34 @@ function AthleteResultsChart({ comparatorAthletes = [] }) {
         b: parseInt(result[3], 16)
       } : null
     }
-    
+
     // Convertir RGB a LAB
     const rgbToLab = (rgb) => {
       const { r: red, g: green, b: blue } = rgb
       const [x, y, z] = [red / 255, green / 255, blue / 255]
         .map(val => val > 0.04045 ? Math.pow((val + 0.055) / 1.055, 2.4) : val / 12.92)
         .map((val, i) => val * [0.95047, 1.00000, 1.08883][i] * 100)
-      
+
       function f(t) {
-        return t > 0.008856 ? Math.pow(t, 1/3) : (7.787 * t + 16/116)
+        return t > 0.008856 ? Math.pow(t, 1 / 3) : (7.787 * t + 16 / 116)
       }
-      
+
       const L = 116 * f(y / 100) - 16
       const a = 500 * (f(x / 95.047) - f(y / 100))
       const b = 200 * (f(y / 100) - f(z / 108.883))
-      
+
       return { L, a, b }
     }
-    
+
     // Cálculo de distancia euclidiana en LAB
     const rgb1 = hexToRgb(color1)
     const rgb2 = hexToRgb(color2)
-    
+
     if (!rgb1 || !rgb2) return Infinity
-    
+
     const lab1 = rgbToLab(rgb1)
     const lab2 = rgbToLab(rgb2)
-    
+
     return Math.sqrt(
       Math.pow(lab1.L - lab2.L, 2) +
       Math.pow(lab1.a - lab2.a, 2) +
@@ -1018,34 +1037,34 @@ function AthleteResultsChart({ comparatorAthletes = [] }) {
       '#ff9800', // Naranja medio
       '#673ab7', // Púrpura profundo
     ]
-    
+
     // Filtrar colores que son lo suficientemente diferentes del principal
     const suitableColors = allColors.filter(color => {
       const distance = colorDistance(mainColor, color)
       // Distancia mínima de 15 puntos CIE76 para considerar colores diferentes
       return distance > 15
     })
-    
+
     // Si tenemos suficientes colores adecuados, usar esos
     if (suitableColors.length > 0) {
       return suitableColors[index % suitableColors.length]
     }
-    
+
     // Fallback: usar todos los colores si no se encontraron diferencias
     return allColors[index % allColors.length]
   }
 
   // Combinar datos de comparadores con los del atleta principal
   const [combinedChartData, setCombinedChartData] = useState([])
-  
+
   useEffect(() => {
     if (selectedPrueba && chartData.datos && chartData.datos.length > 0) {
       // Si estamos en modo edad, usar edad como clave, si no, usar fecha
       const keyField = viewMode === 'edad' ? 'edad' : 'fecha'
-      
+
       // Crear un mapa con todos los datos usando la clave apropiada
       const dataMap = new Map()
-      
+
       // Añadir datos del atleta principal
       chartData.datos.forEach(point => {
         const key = point[keyField]
@@ -1071,7 +1090,7 @@ function AthleteResultsChart({ comparatorAthletes = [] }) {
           }
         }
       })
-      
+
       // Añadir datos de cada comparador
       if (comparatorAthletes.length > 0 && Object.keys(comparatorData).length > 0) {
         comparatorAthletes.forEach((athlete) => {
@@ -1079,7 +1098,7 @@ function AthleteResultsChart({ comparatorAthletes = [] }) {
           if (compData && compData[selectedPrueba]) {
             const compPruebaData = compData[selectedPrueba]
             const atletaDataKey = `marca_comp_${athlete.atleta_id}`
-            
+
             compPruebaData.data.forEach(compPoint => {
               const compKey = compPoint[keyField]
               // En modo edad, solo incluir puntos que tengan edad calculada (número)
@@ -1123,7 +1142,7 @@ function AthleteResultsChart({ comparatorAthletes = [] }) {
           }
         })
       }
-      
+
       // Convertir el mapa a array y ordenar
       let newData = Array.from(dataMap.values())
       if (viewMode === 'edad') {
@@ -1137,7 +1156,7 @@ function AthleteResultsChart({ comparatorAthletes = [] }) {
         // Ordenar por fecha
         newData.sort((a, b) => a.fechaTimestamp - b.fechaTimestamp)
       }
-      
+
       setCombinedChartData(newData)
     } else {
       setCombinedChartData(chartData.datos || [])
@@ -1159,7 +1178,7 @@ function AthleteResultsChart({ comparatorAthletes = [] }) {
       '#e64a19', // Rojo oscuro
       '#5d4037'  // Marrón
     ]
-    
+
     // Hash simple para asignar color consistente
     let hash = 0
     for (let i = 0; i < nombrePrueba.length; i++) {
@@ -1214,7 +1233,7 @@ function AthleteResultsChart({ comparatorAthletes = [] }) {
     // Solo formatear si la unidad es segundos (s)
     const unidadLower = unidad ? unidad.toLowerCase().trim() : ''
     const esSegundos = unidadLower === 's' || unidadLower === 'seg' || unidadLower === 'segundos'
-    
+
     if (!esSegundos) {
       // Si no es segundos, formatear como número normal
       return segundos % 1 === 0 ? segundos.toString() : segundos.toFixed(2)
@@ -1224,10 +1243,10 @@ function AthleteResultsChart({ comparatorAthletes = [] }) {
     if (segundos >= 60) {
       const minutos = Math.floor(segundos / 60)
       const segundosRestantes = segundos % 60
-      
+
       // Formatear segundos con centésimas (2 decimales)
       const segundosFormateados = segundosRestantes.toFixed(2).padStart(5, '0')
-      
+
       return `${minutos}:${segundosFormateados}`
     } else {
       // Si es menor a 60 segundos: Segundos.Milisegundos
@@ -1243,14 +1262,14 @@ function AthleteResultsChart({ comparatorAthletes = [] }) {
       const unidadLower = unidad ? unidad.toLowerCase().trim() : ''
       const esSegundos = unidadLower === 's' || unidadLower === 'seg' || unidadLower === 'segundos'
       const textoUnidad = esSegundos ? '' : (unidad ? ` ${unidad}` : '')
-      
+
       // Obtener el punto de datos completo para mostrar fecha y edad
       const dataPoint = payload[0]?.payload
       const mostrarFecha = dataPoint?.fecha || label
-      const mostrarEdad = dataPoint?.edad !== null && dataPoint?.edad !== undefined 
+      const mostrarEdad = dataPoint?.edad !== null && dataPoint?.edad !== undefined
         ? `${dataPoint.edad.toFixed(1)} años`
         : null
-      
+
       return (
         <Paper sx={{ p: 1.5, backgroundColor: 'rgba(255, 255, 255, 0.95)' }} elevation={3}>
           <Typography variant="body2" sx={{ fontWeight: 'bold', mb: 0.5 }}>
@@ -1429,97 +1448,97 @@ function AthleteResultsChart({ comparatorAthletes = [] }) {
                 data={combinedChartData}
                 margin={{ top: 5, right: 10, left: 10, bottom: 80 }}
               >
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis
-                      dataKey={viewMode === 'edad' ? 'edad' : 'fecha'}
-                      angle={viewMode === 'edad' ? 0 : -45}
-                      textAnchor={viewMode === 'edad' ? 'middle' : 'end'}
-                      height={viewMode === 'edad' ? 40 : 80}
-                      interval="preserveStartEnd"
-                      tick={{ fontSize: 10 }}
-                      label={{
-                        value: viewMode === 'edad' ? 'Edad (años)' : 'Fecha',
-                        position: 'insideBottom',
-                        offset: viewMode === 'edad' ? -5 : -10,
-                        style: { textAnchor: 'middle', fontSize: '10px' }
-                      }}
-                      tickFormatter={(value) => {
-                        if (viewMode === 'edad') {
-                          // Formatear edad como número con un decimal
-                          return typeof value === 'number' ? value.toFixed(1) : value
-                        }
-                        return value
-                      }}
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis
+                  dataKey={viewMode === 'edad' ? 'edad' : 'fecha'}
+                  angle={viewMode === 'edad' ? 0 : -45}
+                  textAnchor={viewMode === 'edad' ? 'middle' : 'end'}
+                  height={viewMode === 'edad' ? 40 : 80}
+                  interval="preserveStartEnd"
+                  tick={{ fontSize: 10 }}
+                  label={{
+                    value: viewMode === 'edad' ? 'Edad (años)' : 'Fecha',
+                    position: 'insideBottom',
+                    offset: viewMode === 'edad' ? -5 : -10,
+                    style: { textAnchor: 'middle', fontSize: '10px' }
+                  }}
+                  tickFormatter={(value) => {
+                    if (viewMode === 'edad') {
+                      // Formatear edad como número con un decimal
+                      return typeof value === 'number' ? value.toFixed(1) : value
+                    }
+                    return value
+                  }}
+                />
+                <YAxis
+                  label={{
+                    value: chartData.pruebas?.[0]?.unidad ? `Valor (${chartData.pruebas[0].unidad})` : 'Valor',
+                    angle: -90,
+                    position: 'insideLeft',
+                    style: { textAnchor: 'middle', fontSize: '10px' }
+                  }}
+                  tick={{ fontSize: 10 }}
+                  tickFormatter={(value) => {
+                    const unidad = chartData.pruebas?.[0]?.unidad || ''
+                    return formatTiempo(value, unidad)
+                  }}
+                />
+                <Tooltip content={<CustomTooltip />} />
+                <Legend wrapperStyle={{ bottom: 60 }} />
+                {chartData.pruebas && chartData.pruebas.length > 0 ? (
+                  chartData.pruebas.map((prueba, index) => (
+                    <Line
+                      key={index}
+                      type="monotone"
+                      dataKey="marca"
+                      stroke={prueba.color || '#0275d8'}
+                      strokeWidth={2}
+                      dot={{ r: 4 }}
+                      activeDot={{ r: 6 }}
+                      connectNulls={true}
+                      name={selectedAthlete?.nombre || 'Atleta Principal'}
                     />
-                    <YAxis 
-                      label={{ 
-                        value: chartData.pruebas?.[0]?.unidad ? `Valor (${chartData.pruebas[0].unidad})` : 'Valor', 
-                        angle: -90, 
-                        position: 'insideLeft',
-                        style: { textAnchor: 'middle', fontSize: '10px' }
-                      }}
-                      tick={{ fontSize: 10 }}
-                      tickFormatter={(value) => {
-                        const unidad = chartData.pruebas?.[0]?.unidad || ''
-                        return formatTiempo(value, unidad)
-                      }}
-                    />
-                    <Tooltip content={<CustomTooltip />} />
-                    <Legend wrapperStyle={{ bottom: 60 }} />
-                    {chartData.pruebas && chartData.pruebas.length > 0 ? (
-                      chartData.pruebas.map((prueba, index) => (
-                        <Line
-                          key={index}
-                          type="monotone"
-                          dataKey="marca"
-                          stroke={prueba.color || '#0275d8'}
-                          strokeWidth={2}
-                          dot={{ r: 4 }}
-                          activeDot={{ r: 6 }}
-                          connectNulls={true}
-                          name={selectedAthlete?.nombre || 'Atleta Principal'}
-                        />
-                      ))
-                    ) : (
+                  ))
+                ) : (
+                  <Line
+                    type="monotone"
+                    dataKey="marca"
+                    stroke="#0275d8"
+                    strokeWidth={2}
+                    dot={{ r: 4 }}
+                    activeDot={{ r: 6 }}
+                    connectNulls={true}
+                    name={selectedAthlete?.nombre || 'Atleta Principal'}
+                  />
+                )}
+                {/* Líneas para cada comparador */}
+                {comparatorAthletes.map((athlete, index) => {
+                  const compData = comparatorData[athlete.atleta_id]
+                  if (compData && compData[selectedPrueba]) {
+                    const compPruebaData = compData[selectedPrueba]
+                    const atletaDataKey = `marca_comp_${athlete.atleta_id}`
+                    // Usar el color consistente asignado al atleta desde el módulo compartido
+                    const athleteColor = getColorForAthlete(athlete.atleta_id) || athleteColors[athlete.atleta_id] || '#0275d8'
+                    return (
                       <Line
+                        key={`comp_${athlete.atleta_id}`}
                         type="monotone"
-                        dataKey="marca"
-                        stroke="#0275d8"
+                        dataKey={atletaDataKey}
+                        stroke={athleteColor}
                         strokeWidth={2}
                         dot={{ r: 4 }}
                         activeDot={{ r: 6 }}
                         connectNulls={true}
-                        name={selectedAthlete?.nombre || 'Atleta Principal'}
+                        name={athlete.nombre}
                       />
-                    )}
-                    {/* Líneas para cada comparador */}
-                    {comparatorAthletes.map((athlete, index) => {
-                      const compData = comparatorData[athlete.atleta_id]
-                      if (compData && compData[selectedPrueba]) {
-                        const compPruebaData = compData[selectedPrueba]
-                        const atletaDataKey = `marca_comp_${athlete.atleta_id}`
-                        // Usar el color consistente asignado al atleta desde el módulo compartido
-                        const athleteColor = getColorForAthlete(athlete.atleta_id) || athleteColors[athlete.atleta_id] || '#0275d8'
-                        return (
-                          <Line
-                            key={`comp_${athlete.atleta_id}`}
-                            type="monotone"
-                            dataKey={atletaDataKey}
-                            stroke={athleteColor}
-                            strokeWidth={2}
-                            dot={{ r: 4 }}
-                            activeDot={{ r: 6 }}
-                            connectNulls={true}
-                            name={athlete.nombre}
-                          />
-                        )
-                      }
-                      return null
-                    })}
+                    )
+                  }
+                  return null
+                })}
               </LineChart>
             </Box>
 
-            
+
           </>
         ) : selectedPrueba && (
           <Box sx={{ mt: 2, p: 2 }}>

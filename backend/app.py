@@ -23,6 +23,7 @@ DB_PATH = os.path.abspath(os.path.join(BASE_DIR, '..', '..', 'bbdd-athlete-app',
 def get_db_connection():
     import sqlite3
     conn = sqlite3.connect(DB_PATH)
+    conn.create_function("lower", 1, lambda s: s.lower() if s else None)
     conn.row_factory = sqlite3.Row
     return conn
 
@@ -71,7 +72,7 @@ def query_db():
                 where_clauses.append(f"{col} = ?")
                 params.append(val)
             elif op == 'ilike':
-                where_clauses.append(f"{col} LIKE ?")
+                where_clauses.append(f"LOWER({col}) LIKE LOWER(?)")
                 params.append(val) # val should already include % if needed or we add it
             elif op == 'in':
                 placeholders = ', '.join(['?'] * len(val))

@@ -13,7 +13,8 @@ import {
   FormControl,
   InputLabel,
   Select,
-  MenuItem
+  MenuItem,
+  IconButton
 } from '@mui/material'
 import {
   RadarChart,
@@ -1218,24 +1219,18 @@ function AthleteSpiderChart({ comparatorAthletes = [] }) {
                       {entry.prueba} {entry.unidad && `(${entry.unidad})`}
                     </Typography>
 
-                    <Box
-                      sx={{
-                        cursor: 'pointer',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        color: 'text.secondary',
-                        transition: 'color 0.2s',
-                        '&:hover': { color: 'primary.main' }
-                      }}
+                    <IconButton
+                      size="small"
+                      color="primary"
                       onClick={(e) => {
                         e.stopPropagation()
                         handleOpenRanking(entry.prueba, selectedCategory)
                       }}
                       title="Ver Ranking Top 50"
+                      sx={{ transition: 'background-color 0.2s' }}
                     >
                       <PiRanking size={20} />
-                    </Box>
+                    </IconButton>
                   </Box>
 
                   {allAthletes.map((athlete) => {
@@ -1297,6 +1292,29 @@ function AthleteSpiderChart({ comparatorAthletes = [] }) {
         mainAthleteId={selectedAthlete ? selectedAthlete.atleta_id : null}
         comparatorAthletes={comparatorAthletes}
         genderFilter={selectedAthleteGender}
+        onAthleteSelect={(athlete) => {
+          setSelectedAthlete(athlete)
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(athlete))
+          // Dispatch custom event for same-window updates
+          window.dispatchEvent(new Event('localStorageChange'))
+          // Close dialog
+          setRankingDialogState(prev => ({ ...prev, open: false }))
+        }}
+        onAthleteCompare={(athlete) => {
+          const stored = localStorage.getItem('comparatorAthletes')
+          let current = stored ? JSON.parse(stored) : []
+          if (!Array.isArray(current)) current = []
+
+          // Check for duplicates
+          if (!current.some(c => c.atleta_id === athlete.atleta_id)) {
+            const updated = [...current, athlete]
+            localStorage.setItem('comparatorAthletes', JSON.stringify(updated))
+            // Dispatch event for other components (like AthleteComparator and SeguimientoPage)
+            window.dispatchEvent(new Event('comparatorAthletesChanged'))
+            // Close dialog
+            setRankingDialogState(prev => ({ ...prev, open: false }))
+          }
+        }}
       />
     </>
   )
