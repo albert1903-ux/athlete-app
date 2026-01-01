@@ -71,11 +71,20 @@ function RankingDialog({
                     .order('anio', { ascending: false })
 
                 if (data) {
-                    const uniqueYears = [...new Set(data.map(d => d.anio))].filter(Boolean)
+                    let uniqueYears = [...new Set(data.map(d => d.anio))].filter(Boolean)
+
+                    // Ensure Current Year is always included
+                    const currentYear = new Date().getFullYear()
+                    if (!uniqueYears.includes(currentYear)) {
+                        uniqueYears.push(currentYear)
+                    }
+
+                    // Sort descending
+                    uniqueYears.sort((a, b) => b - a)
+
                     setYears(uniqueYears)
 
                     // Set default year logic: Current Year -> Previous Year -> ...
-                    const currentYear = new Date().getFullYear()
                     if (uniqueYears.includes(currentYear)) {
                         setSelectedYear(currentYear)
                     } else if (uniqueYears.length > 0) {
@@ -95,6 +104,59 @@ function RankingDialog({
             return
         }
 
+        // Helper to calculate eligible birth years based on category and ranking year
+        const getEligibleBirthYears = (catCode, rankYear) => {
+            const rYear = Number(rankYear)
+            if (isNaN(rYear)) return []
+
+            // Normalize category code to uppercase just in case
+            const code = catCode ? catCode.toUpperCase().replace(/\s/g, '') : ''
+
+            let ageMin = 0
+            let ageMax = 0
+
+            // Standard Spanish/World Athletics age groups (Age turning in the year of competition)
+            // SUB10 (Benjamín): 8-9 years
+            // SUB12 (Alevín): 10-11 years
+            // SUB14 (Infantil): 12-13 years
+            // SUB16 (Cadete): 14-15 years
+            // SUB18 (Juvenil): 16-17 years
+            // SUB20 (Junior): 18-19 years
+            // SUB23 (Promesa): 20-22 years
+            // SENIOR: 23-34 years (approx, usually open)
+            // MASTER: 35+
+
+            if (code.includes('SUB10')) { ageMin = 8; ageMax = 9; }
+            else if (code.includes('SUB12')) { ageMin = 10; ageMax = 11; }
+            else if (code.includes('SUB14')) { ageMin = 12; ageMax = 13; }
+            else if (code.includes('SUB16')) { ageMin = 14; ageMax = 15; }
+            else if (code.includes('SUB18')) { ageMin = 16; ageMax = 17; }
+            else if (code.includes('SUB20')) { ageMin = 18; ageMax = 19; }
+            else if (code.includes('SUB23')) { ageMin = 20; ageMax = 22; }
+            else if (code.includes('SENIOR') || code.includes('ABSOLUT')) { ageMin = 23; ageMax = 99; } // Broad range
+            else if (code.includes('MASTER') || code.includes('VET')) { ageMin = 35; ageMax = 99; }
+            else {
+                // Fallback: try to standard logic if unknown
+                return []
+            }
+
+            // Birth Year = Current Year - Age
+            // Example: 2026, SUB12 (10-11). 
+            // 2026 - 10 = 2016
+            // 2026 - 11 = 2015
+            // So Years: 2015, 2016
+
+            const maxBirthYear = rYear - ageMin
+            const minBirthYear = rYear - ageMax
+
+            // Generate range
+            const years = []
+            for (let y = minBirthYear; y <= maxBirthYear; y++) {
+                years.push(y)
+            }
+            return years
+        }
+
         const fetchRanking = async () => {
             setLoading(true)
             setError(null)
@@ -102,6 +164,7 @@ function RankingDialog({
             try {
                 const pruebaId = prueba.pruebaId || prueba.prueba_id
                 const categoriaId = categoria.categoriaId || categoria.categoria_id
+                const categoriaLabel = categoria.label || categoria.nombre // Need label for logic (e.g. SUB12)
 
                 if (!pruebaId || !categoriaId) {
                     throw new Error('Información de prueba o categoría incompleta')
@@ -123,7 +186,61 @@ function RankingDialog({
                     }
                 }
 
-                // 1. Fetch all results (no joins)
+
+                let eligibleAthleteIds = null
+
+                // STRATEGY:
+                // If "Histórico", keep using simple query (all time top 50).
+                // If a specific Year is selected:
+                // 1. Calculate eligible birth years for that category in that year.
+                // 2. Fetch IDs of athletes born in those years.
+                // 3. Fetch results for those athletes in [Year, Year-1].
+
+                let targetYears = []
+                const isHistoric = selectedYear === 'historic'
+
+                if (!isHistoric) {
+                    const rYear = Number(selectedYear)
+                    // Valid results = Selected Year AND Previous Year (as per requirements)
+                    targetYears = [rYear, rYear - 1]
+
+                    const eligibleBirthYears = getEligibleBirthYears(categoriaLabel, selectedYear)
+
+                    if (eligibleBirthYears.length > 0) {
+                        // Creating ISO dates for range check on fecha_nac
+                        // Actually fecha_nac is date YYYY-MM-DD
+                        // Filter by date range: Jan 1st of minYear to Dec 31st of maxYear
+                        const minYear = Math.min(...eligibleBirthYears)
+                        const maxYear = Math.max(...eligibleBirthYears)
+
+                        const minDate = `${minYear}-01-01`
+                        const maxDate = `${maxYear}-12-31`
+
+                        // Fetch eligible athletes
+                        // This might be large but usually thousands, feasible for ID collection
+                        const { data: eligibleAthletes, error: athleteError } = await supabase
+                            .from('atletas')
+                            .select('atleta_id')
+                            .gte('fecha_nac', minDate)
+                            .lte('fecha_nac', maxDate)
+
+                        if (athleteError) throw athleteError
+
+                        if (eligibleAthletes && eligibleAthletes.length > 0) {
+                            eligibleAthleteIds = eligibleAthletes.map(a => a.atleta_id)
+                        } else {
+                            // No eligible athletes found for this category/year
+                            setRankingData({ top50: [], stickyList: [] })
+                            return
+                        }
+                    } else {
+                        // Could not determine age group, fallback to simple filtering by category_id in results
+                        console.warn("Could not determine birth years for category:", categoriaLabel)
+                    }
+                }
+
+
+                // 1. Fetch results
                 let query = supabase
                     .from('resultados')
                     .select(`
@@ -137,17 +254,38 @@ function RankingDialog({
             anio
           `)
                     .eq('prueba_id', pruebaId)
-                    .eq('categoria_id', categoriaId)
+                // If we have strict birth year filtering, we might RELAX the category_id filter in results
+                // because a result from 2025 might be labeled as "SUB10" but now valid for "SUB12" ranking.
+                // HOWEVER, results usually store the category at the time of competition.
+                // So we should PROBABLY filtering by Athlete Eligibility regardless of historical category label.
+                // SO: if eligibleAthleteIds exists, remove .eq('categoria_id', ...) ?
+                // Actually, safer to keep it broadly or remove it if we trust the birth filter.
+                // Requirement: "sí hay resultados que son validos...".
+                // A 2025 result for a 2015-born kid was SUB12 (First year) or SUB10?
+                // Born 2015. In 2025 (age 10) -> SUB12.
+                // So the category_id overlap is high.
+                // But to be safe and truly implement "Best mark of eligible athletes", we should ignore the record's category_id 
+                // and rely on the athlete's eligibility + filtering by valid result years.
+
+                if (eligibleAthleteIds) {
+                    // Logic: Get results for these athletes
+                    // Do NOT filter by categoria_id (as it might differ in prev year)
+                    // Filter by valid years
+                    query = query.in('atleta_id', eligibleAthleteIds)
+                        .in('anio', targetYears)
+                } else {
+                    // Fallback (Historic or unknown category logic): use standard category filtering
+                    query = query.eq('categoria_id', categoriaId)
+                    if (!isHistoric) {
+                        query = query.eq('anio', selectedYear)
+                    }
+                }
 
                 if (effectiveGender) {
                     query = query.eq('genero', effectiveGender)
                 }
 
-                if (selectedYear !== 'historic') {
-                    query = query.eq('anio', selectedYear)
-                }
-
-
+                // Execute Query
                 const { data: resultsData, error: resultsError } = await query
 
                 if (resultsError) throw resultsError
@@ -170,10 +308,13 @@ function RankingDialog({
                 let clubsMap = new Map()
 
                 if (athleteIds.size > 0) {
-                    const { data: athletesData } = await supabase
+                    // Start query
+                    let athletesQuery = supabase
                         .from('atletas')
                         .select('atleta_id, nombre, fecha_nac, licencia')
                         .in('atleta_id', Array.from(athleteIds))
+
+                    const { data: athletesData } = await athletesQuery
 
                     if (athletesData) {
                         athletesData.forEach(a => athletesMap.set(String(a.atleta_id), a))
@@ -192,6 +333,7 @@ function RankingDialog({
                 }
 
                 // 4. Group and Join
+                // Since we fetch 2 years, we likely have duplicates. Pick BEST.
                 const bestMarksMap = new Map()
                 const isTimeBased = prueba.isTimeBased ?? true
 
