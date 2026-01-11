@@ -496,16 +496,21 @@ function RankingDialog({
                                 {item.clubes?.nombre || '-'}
                             </Typography>
                             <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.7rem' }}>
-                                {new Date(item.fecha).toLocaleDateString()}
-                                {item.age && ` • ${item.age} años`}
+                                {item.atletas?.fecha_nac ? new Date(item.atletas.fecha_nac).toLocaleDateString() : '-'}
                             </Typography>
                         </Box>
                     }
                 />
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <Typography variant="body2" fontWeight="bold">
-                        {item.marca_texto || item.marca_valor} {item.unidad}
-                    </Typography>
+                    <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
+                        <Typography variant="body2" fontWeight="bold">
+                            {item.marca_texto || item.marca_valor} {item.unidad}
+                        </Typography>
+                        <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.7rem', textAlign: 'right' }}>
+                            {new Date(item.fecha).toLocaleDateString()}
+                            {item.age && ` • ${item.age} años`}
+                        </Typography>
+                    </Box>
                     <IconButton
                         size="small"
                         color="primary"
