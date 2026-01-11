@@ -126,7 +126,8 @@ function RankingDialog({
             // SENIOR: 23-34 years (approx, usually open)
             // MASTER: 35+
 
-            if (code.includes('SUB10')) { ageMin = 8; ageMax = 9; }
+            if (code.includes('SUB8') || code.includes('PRE')) { ageMin = 6; ageMax = 7; } // Pre-Benjamín
+            else if (code.includes('SUB10')) { ageMin = 8; ageMax = 9; }
             else if (code.includes('SUB12')) { ageMin = 10; ageMax = 11; }
             else if (code.includes('SUB14')) { ageMin = 12; ageMax = 13; }
             else if (code.includes('SUB16')) { ageMin = 14; ageMax = 15; }
