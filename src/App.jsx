@@ -91,7 +91,7 @@ function AppContent() {
       }}
     >
       {/* AppBar mobile-optimized */}
-      <AppBar position="fixed" sx={{ width: '100%', zIndex: 1100 }}>
+      <AppBar position="fixed" sx={{ width: '100%', zIndex: 1100, pt: 'env(safe-area-inset-top)' }}>
         <Toolbar sx={{ minHeight: { xs: 56 }, px: 2, display: 'flex', alignItems: 'center' }}>
           <Typography
             variant="h6"
@@ -177,8 +177,8 @@ function AppContent() {
         </Toolbar>
       </AppBar>
 
-      {/* Spacer para compensar AppBar fixed */}
-      <Box sx={{ height: { xs: 56 } }} />
+      {/* Spacer para compensar AppBar fixed (56px + safe area) */}
+      <Box sx={{ height: 'calc(56px + env(safe-area-inset-top))' }} />
 
       {/* Diálogo para añadir atleta */}
       <AddAthleteDialog
