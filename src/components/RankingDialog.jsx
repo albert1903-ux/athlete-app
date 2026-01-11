@@ -282,6 +282,14 @@ function RankingDialog({
                     }
                 }
 
+                // Filter by season start date if not historic
+                // Season starts on Sept 1st of the previous year
+                if (!isHistoric) {
+                    const seasonStartYear = Number(selectedYear) - 1
+                    const seasonStartDate = `${seasonStartYear}-09-01`
+                    query = query.gte('fecha', seasonStartDate)
+                }
+
                 if (effectiveGender) {
                     query = query.eq('genero', effectiveGender)
                 }
