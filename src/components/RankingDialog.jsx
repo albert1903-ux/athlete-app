@@ -335,7 +335,13 @@ function RankingDialog({
                 // 4. Group and Join
                 // Since we fetch 2 years, we likely have duplicates. Pick BEST.
                 const bestMarksMap = new Map()
-                const isTimeBased = prueba.isTimeBased ?? true
+                // Determine if event is time-based.
+                // 1. Check prop 'isTimeBased' (if passed explicitly)
+                // 2. Check DB field 'tipo_marca' (tiempo/crono vs distancia/concurso)
+                // 3. Fallback to true (Time is usually default if unknown, but risky for jumps. 60m is time.)
+                const isTimeBased = prueba.isTimeBased ??
+                    (prueba.tipo_marca === 'tiempo' || prueba.tipo_marca === 'crono') ??
+                    true
 
                 resultsData.forEach(row => {
                     const atletaId = String(row.atleta_id)
