@@ -60,37 +60,57 @@ function RankingDialog({
     useEffect(() => {
         const fetchYears = async () => {
             try {
-                const { data, error } = await supabase
-                    .from('resultados')
-                    .select('anio')
-                    // Using a hack to get unique values since .distinct() might not work as expected in all clients
-                    // But typically .select('anio') returns all rows.
-                    // Better to use rpc or fetch all and unique in client if list is small.
-                    // For now, let's fetch distinct years using a specialized query or just all distinct anios from results
-                    // Actually, let's just use a simple query and unique in JS for robustness
-                    .order('anio', { ascending: false })
+                // Iterative fetch to find all distinct years
+                // Since .distinct() is not easily available, we fetch the max year < last_known
+                let foundYears = []
+                let currentMax = 9999 // Start high
 
-                if (data) {
-                    let uniqueYears = [...new Set(data.map(d => d.anio))].filter(Boolean)
+                while (true) {
+                    const { data, error } = await supabase
+                        .from('resultados')
+                        .select('anio')
+                        .lt('anio', currentMax)
+                        .order('anio', { ascending: false })
+                        .limit(1)
 
-                    // Ensure Current Year is always included
-                    const currentYear = new Date().getFullYear()
-                    if (!uniqueYears.includes(currentYear)) {
-                        uniqueYears.push(currentYear)
+                    if (error) throw error
+
+                    if (data && data.length > 0) {
+                        const y = data[0].anio
+                        if (y) {
+                            foundYears.push(y)
+                            currentMax = y
+                        } else {
+                            break // Should not happen if anio is not null
+                        }
+                    } else {
+                        break // No more years found
                     }
 
-                    // Sort descending
-                    uniqueYears.sort((a, b) => b - a)
-
-                    setYears(uniqueYears)
-
-                    // Set default year logic: Current Year -> Previous Year -> ...
-                    if (uniqueYears.includes(currentYear)) {
-                        setSelectedYear(currentYear)
-                    } else if (uniqueYears.length > 0) {
-                        setSelectedYear(uniqueYears[0])
-                    }
+                    // Safety break to prevent infinite loops if something is wrong
+                    if (foundYears.length > 20) break
                 }
+
+                // Ensure Current Year is always included
+                const currentYear = new Date().getFullYear()
+                if (!foundYears.includes(currentYear)) {
+                    foundYears.unshift(currentYear)
+                }
+
+                // Sort descending (just in case)
+                foundYears.sort((a, b) => b - a)
+                // Unique
+                foundYears = [...new Set(foundYears)]
+
+                setYears(foundYears)
+
+                // Set default year logic: Current Year -> Previous Year -> ...
+                if (foundYears.includes(currentYear)) {
+                    setSelectedYear(currentYear)
+                } else if (foundYears.length > 0) {
+                    setSelectedYear(foundYears[0])
+                }
+
             } catch (err) {
                 console.error("Error fetching years:", err)
             }
