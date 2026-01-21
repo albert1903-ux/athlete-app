@@ -244,6 +244,7 @@ function RankingDialog({
                             .select('atleta_id')
                             .gte('fecha_nac', minDate)
                             .lte('fecha_nac', maxDate)
+                            .limit(10000)
 
                         if (athleteError) throw athleteError
 
