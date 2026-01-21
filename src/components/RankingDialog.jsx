@@ -185,7 +185,7 @@ function RankingDialog({
             try {
                 const pruebaId = prueba.pruebaId || prueba.prueba_id
                 const categoriaId = categoria.categoriaId || categoria.categoria_id
-                const categoriaLabel = categoria.label || categoria.nombre // Need label for logic (e.g. SUB12)
+                const categoriaLabel = categoria.label || categoria.nombre
 
                 if (!pruebaId || !categoriaId) {
                     throw new Error('Información de prueba o categoría incompleta')
@@ -193,129 +193,92 @@ function RankingDialog({
 
                 // Determine effective gender filter
                 let effectiveGender = genderFilter;
-
-                // If no gender provided from prop, try to fetch it for the main athlete
                 if (!effectiveGender && mainAthleteId) {
                     const { data: athleteRes } = await supabase
                         .from('resultados')
                         .select('genero')
                         .eq('atleta_id', mainAthleteId)
                         .limit(1)
-
-                    if (athleteRes && athleteRes.length > 0 && athleteRes[0].genero) {
-                        effectiveGender = athleteRes[0].genero
-                    }
+                    if (athleteRes && athleteRes.length > 0) effectiveGender = athleteRes[0].genero
                 }
 
-
-                let eligibleAthleteIds = null
-
-                // STRATEGY:
-                // If "Histórico", keep using simple query (all time top 50).
-                // If a specific Year is selected:
-                // 1. Calculate eligible birth years for that category in that year.
-                // 2. Fetch IDs of athletes born in those years.
-                // 3. Fetch results for those athletes in [Year, Year-1].
-
-                let targetYears = []
                 const isHistoric = selectedYear === 'historic'
+                let minDate = null
+                let maxDate = null
+                let targetYears = []
 
                 if (!isHistoric) {
                     const rYear = Number(selectedYear)
-                    // Valid results = Selected Year AND Previous Year (as per requirements)
+                    // Valid results = Selected Year AND Previous Year
                     targetYears = [rYear, rYear - 1]
 
                     const eligibleBirthYears = getEligibleBirthYears(categoriaLabel, selectedYear)
-
                     if (eligibleBirthYears.length > 0) {
-                        // Creating ISO dates for range check on fecha_nac
-                        // Actually fecha_nac is date YYYY-MM-DD
-                        // Filter by date range: Jan 1st of minYear to Dec 31st of maxYear
                         const minYear = Math.min(...eligibleBirthYears)
                         const maxYear = Math.max(...eligibleBirthYears)
-
-                        const minDate = `${minYear}-01-01`
-                        const maxDate = `${maxYear}-12-31`
-
-                        // Fetch eligible athletes
-                        // This might be large but usually thousands, feasible for ID collection
-                        const { data: eligibleAthletes, error: athleteError } = await supabase
-                            .from('atletas')
-                            .select('atleta_id')
-                            .gte('fecha_nac', minDate)
-                            .lte('fecha_nac', maxDate)
-                            .limit(10000)
-
-                        if (athleteError) throw athleteError
-
-                        if (eligibleAthletes && eligibleAthletes.length > 0) {
-                            eligibleAthleteIds = eligibleAthletes.map(a => a.atleta_id)
-                        } else {
-                            // No eligible athletes found for this category/year
-                            setRankingData({ top50: [], stickyList: [] })
-                            return
-                        }
+                        minDate = `${minYear}-01-01`
+                        maxDate = `${maxYear}-12-31`
                     } else {
-                        // Could not determine age group, fallback to simple filtering by category_id in results
+                        // Fallback: If unknown category, maybe we cannot use birth filter. 
                         console.warn("Could not determine birth years for category:", categoriaLabel)
                     }
                 }
 
-
-                // 1. Fetch results
+                // Main Query: Fetch Results + Joined Athletes + Joined Clubs
+                // Use !inner on athletes to enforce the birth date filter server-side
                 let query = supabase
                     .from('resultados')
                     .select(`
-            atleta_id,
-            marca_valor,
-            marca_texto,
-            unidad,
-            fecha,
-            club_id,
-            genero,
-            anio
-          `)
+                        atleta_id,
+                        marca_valor,
+                        marca_texto,
+                        unidad,
+                        fecha,
+                        club_id,
+                        genero,
+                        anio,
+                        atletas!inner (
+                            atleta_id, nombre, fecha_nac, licencia
+                        ),
+                        clubes (
+                            club_id, nombre
+                        )
+                    `)
                     .eq('prueba_id', pruebaId)
-                // If we have strict birth year filtering, we might RELAX the category_id filter in results
-                // because a result from 2025 might be labeled as "SUB10" but now valid for "SUB12" ranking.
-                // HOWEVER, results usually store the category at the time of competition.
-                // So we should PROBABLY filtering by Athlete Eligibility regardless of historical category label.
-                // SO: if eligibleAthleteIds exists, remove .eq('categoria_id', ...) ?
-                // Actually, safer to keep it broadly or remove it if we trust the birth filter.
-                // Requirement: "sí hay resultados que son validos...".
-                // A 2025 result for a 2015-born kid was SUB12 (First year) or SUB10?
-                // Born 2015. In 2025 (age 10) -> SUB12.
-                // So the category_id overlap is high.
-                // But to be safe and truly implement "Best mark of eligible athletes", we should ignore the record's category_id 
-                // and rely on the athlete's eligibility + filtering by valid result years.
 
-                if (eligibleAthleteIds) {
-                    // Logic: Get results for these athletes
-                    // Do NOT filter by categoria_id (as it might differ in prev year)
-                    // Filter by valid years
-                    query = query.in('atleta_id', eligibleAthleteIds)
-                        .in('anio', targetYears)
-                } else {
-                    // Fallback (Historic or unknown category logic): use standard category filtering
-                    query = query.eq('categoria_id', categoriaId)
-                    if (!isHistoric) {
-                        query = query.eq('anio', selectedYear)
-                    }
-                }
-
-                // Filter by season start date if not historic
-                // Season starts on Sept 1st of the previous year
+                // Apply Filters
                 if (!isHistoric) {
+                    // Filter by Applicant Birth Date (Server-Side)
+                    if (minDate && maxDate) {
+                        query = query.gte('atletas.fecha_nac', minDate)
+                            .lte('atletas.fecha_nac', maxDate)
+                    } else {
+                        // Fallback to category_id if we couldn't calc birth years
+                        query = query.eq('categoria_id', categoriaId)
+                    }
+
+                    // Filter by Seasons/Years
+                    query = query.in('anio', targetYears)
+
+                    // Filter by Season Start Date
                     const seasonStartYear = Number(selectedYear) - 1
                     const seasonStartDate = `${seasonStartYear}-09-01`
                     query = query.gte('fecha', seasonStartDate)
+
+                } else {
+                    // Historic: Just match category ID from the record
+                    // (Assuming historical records have correct category_id snapshot)
+                    query = query.eq('categoria_id', categoriaId)
                 }
 
                 if (effectiveGender) {
                     query = query.eq('genero', effectiveGender)
                 }
 
-                // Execute Query
+                // Execute
+                // Use a reasonably high limit for safety, though join filters strictly
+                query = query.limit(5000)
+
                 const { data: resultsData, error: resultsError } = await query
 
                 if (resultsError) throw resultsError
@@ -325,50 +288,9 @@ function RankingDialog({
                     return
                 }
 
-                // 2. Extract IDs for fetching related data
-                const athleteIds = new Set()
-                const clubIds = new Set()
-                resultsData.forEach(r => {
-                    if (r.atleta_id) athleteIds.add(r.atleta_id)
-                    if (r.club_id) clubIds.add(r.club_id)
-                })
-
-                // 3. Fetch Athletes and Clubs
-                let athletesMap = new Map()
-                let clubsMap = new Map()
-
-                if (athleteIds.size > 0) {
-                    // Start query
-                    let athletesQuery = supabase
-                        .from('atletas')
-                        .select('atleta_id, nombre, fecha_nac, licencia')
-                        .in('atleta_id', Array.from(athleteIds))
-
-                    const { data: athletesData } = await athletesQuery
-
-                    if (athletesData) {
-                        athletesData.forEach(a => athletesMap.set(String(a.atleta_id), a))
-                    }
-                }
-
-                if (clubIds.size > 0) {
-                    const { data: clubsData } = await supabase
-                        .from('clubes')
-                        .select('club_id, nombre')
-                        .in('club_id', Array.from(clubIds))
-
-                    if (clubsData) {
-                        clubsData.forEach(c => clubsMap.set(String(c.club_id), c))
-                    }
-                }
-
-                // 4. Group and Join
-                // Since we fetch 2 years, we likely have duplicates. Pick BEST.
+                // Process Results (Deduplicate best marks)
                 const bestMarksMap = new Map()
-                // Determine if event is time-based.
-                // 1. Check prop 'isTimeBased' (if passed explicitly)
-                // 2. Check DB field 'tipo_marca' (tiempo/crono vs distancia/concurso)
-                // 3. Fallback to true (Time is usually default if unknown, but risky for jumps. 60m is time.)
+
                 const isTimeBased = prueba.isTimeBased ??
                     (prueba.tipo_marca === 'tiempo' || prueba.tipo_marca === 'crono') ??
                     true
@@ -379,19 +301,17 @@ function RankingDialog({
 
                     // Handle null/invalid explicitly
                     let isValid = true
-                    // Treat null, undefined, or NaN as invalid
                     if (row.marca_valor === null || row.marca_valor === undefined || isNaN(valor)) {
                         isValid = false
-                        // Assign sentinel for sorting: worst possible value
                         valor = isTimeBased ? Infinity : -Infinity
                     }
 
-                    // Manually join data
+                    // Enriched Row directly from joined data
                     const enrichedRow = {
                         ...row,
-                        numericValue: valor, // Store parsed value for sorting
-                        atletas: athletesMap.get(atletaId) || { nombre: 'Desconocido' },
-                        clubes: clubsMap.get(String(row.club_id)) || { nombre: '-' }
+                        numericValue: valor,
+                        atletas: row.atletas || { nombre: 'Desconocido' }, // from join
+                        clubes: row.clubes || { nombre: '-' }      // from join
                     }
 
                     if (!bestMarksMap.has(atletaId)) {
@@ -415,13 +335,12 @@ function RankingDialog({
 
                 const allAthletes = Array.from(bestMarksMap.values())
 
-                // Calculate Age if possible
+                // Calculate Age
                 allAthletes.forEach(item => {
                     if (item.fecha && item.atletas?.fecha_nac) {
                         const dateMark = new Date(item.fecha)
                         const dateBirth = new Date(item.atletas.fecha_nac)
                         if (!isNaN(dateMark) && !isNaN(dateBirth)) {
-                            // Calculate difference in years
                             const diffTime = Math.abs(dateMark - dateBirth);
                             const diffYears = diffTime / (1000 * 60 * 60 * 24 * 365.25);
                             item.age = diffYears.toFixed(1)
@@ -436,15 +355,13 @@ function RankingDialog({
                     return isTimeBased ? valA - valB : valB - valA
                 })
 
-                // Add rank
+                // Rank
                 allAthletes.forEach((item, index) => {
                     item.rank = index + 1
                 })
 
-                // Split Top 50 vs Others
+                // Split Top 50 vs Sticky
                 const top50 = allAthletes.slice(0, 50)
-
-                // Find sticky athletes not in top 50
                 const stickyList = []
                 stickyAthleteIds.forEach(id => {
                     const found = allAthletes.find(a => String(a.atleta_id) === id)
