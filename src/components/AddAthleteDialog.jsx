@@ -1,17 +1,15 @@
 import { useState } from 'react'
 import {
   Box,
-  Button,
+
   Card,
   CardContent,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
+
   Typography,
   Chip,
   Alert
 } from '@mui/material'
+import { Button, Modal } from './ui'
 import { TbX, TbCheck, TbUserPlus } from 'react-icons/tb'
 import AthleteSearch from './AthleteSearch'
 
@@ -34,7 +32,7 @@ function AddAthleteDialog({ open, onClose, onAdd }) {
         const stored = localStorage.getItem(STORAGE_KEY_COMPARATORS)
         const comparators = stored ? JSON.parse(stored) : []
         const exists = comparators.some(c => c.atleta_id === tempSelectedAthlete.atleta_id)
-        
+
         if (!exists) {
           if (onAdd) {
             onAdd(tempSelectedAthlete)
@@ -58,20 +56,20 @@ function AddAthleteDialog({ open, onClose, onAdd }) {
   }
 
   return (
-    <Dialog 
-      open={open} 
-      onClose={handleClose} 
+    <Modal.Root
+      open={open}
+      onClose={handleClose}
       maxWidth="sm"
-      fullWidth
     >
-      <DialogTitle sx={{ flexShrink: 0, position: 'sticky', top: 0, zIndex: 2, bgcolor: 'background.paper', display: 'flex', alignItems: 'center', gap: 1 }}>
-        <TbUserPlus size={24} />
-        <Typography variant="h6" component="span">Añadir Atleta para Comparar</Typography>
-      </DialogTitle>
-      
-      <DialogContent 
-        dividers 
-        sx={{ 
+      <Modal.Header onClose={handleClose}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          <TbUserPlus size={24} />
+          <Typography variant="h6" component="span">Añadir Atleta para Comparar</Typography>
+        </Box>
+      </Modal.Header>
+
+      <Modal.Body
+        sx={{
           pb: 0,
           position: 'relative',
           flex: 1,
@@ -84,7 +82,7 @@ function AddAthleteDialog({ open, onClose, onAdd }) {
         <Box sx={{ flex: 1, overflow: 'auto', minHeight: 0 }}>
           <AthleteSearch onResultClick={handleResultClick} />
         </Box>
-        
+
         {/* Card sticky del atleta seleccionado */}
         {tempSelectedAthlete && (
           <Box
@@ -97,9 +95,9 @@ function AddAthleteDialog({ open, onClose, onAdd }) {
               pb: 1
             }}
           >
-            <Card 
-              sx={{ 
-                bgcolor: 'secondary.light', 
+            <Card
+              sx={{
+                bgcolor: 'secondary.light',
                 color: 'secondary.contrastText'
               }}
             >
@@ -110,20 +108,20 @@ function AddAthleteDialog({ open, onClose, onAdd }) {
                 <Typography variant="body1" fontWeight="bold" sx={{ mb: 1 }}>
                   {tempSelectedAthlete.nombre}
                 </Typography>
-                
+
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
                   {tempSelectedAthlete.licencia && tempSelectedAthlete.licencia !== 'N/A' && (
-                    <Chip 
-                      label={`Lic: ${tempSelectedAthlete.licencia}`} 
-                      size="small" 
+                    <Chip
+                      label={`Lic: ${tempSelectedAthlete.licencia}`}
+                      size="small"
                       variant="outlined"
                       sx={{ bgcolor: 'white', color: 'secondary.main' }}
                     />
                   )}
                   {tempSelectedAthlete.club && tempSelectedAthlete.club !== 'N/A' && tempSelectedAthlete.club !== 'Sin club' && (
-                    <Chip 
-                      label={tempSelectedAthlete.club} 
-                      size="small" 
+                    <Chip
+                      label={tempSelectedAthlete.club}
+                      size="small"
                       variant="outlined"
                       sx={{ bgcolor: 'white', color: 'secondary.main' }}
                     />
@@ -133,33 +131,33 @@ function AddAthleteDialog({ open, onClose, onAdd }) {
             </Card>
           </Box>
         )}
-        
+
         {/* Alerta de duplicado */}
         {duplicateError && (
           <Alert severity="warning" sx={{ mt: 2 }} onClose={() => setDuplicateError(false)}>
             Este atleta ya está en la lista de comparación
           </Alert>
         )}
-      </DialogContent>
-      
-      <DialogActions sx={{ flexShrink: 0, py: 1.5 }}>
-        <Button 
+      </Modal.Body>
+
+      <Modal.Footer>
+        <Button
           onClick={handleClose}
+          variant="ghost"
           startIcon={<TbX />}
         >
           Cancelar
         </Button>
-        <Button 
+        <Button
           onClick={handleSelect}
-          variant="contained"
+          variant="primary"
           disabled={!tempSelectedAthlete}
           startIcon={<TbCheck />}
-          color="secondary"
         >
           Añadir
         </Button>
-      </DialogActions>
-    </Dialog>
+      </Modal.Footer>
+    </Modal.Root>
   )
 }
 

@@ -1,20 +1,15 @@
 import { useState, useEffect } from 'react'
 import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Button,
   TextField,
   CircularProgress,
   Box,
-  Typography,
   IconButton,
   Autocomplete,
   Divider,
   Snackbar,
   Alert
 } from '@mui/material'
+import { Modal, Button, Input, Typography } from './ui'
 import { TbPlus, TbTrash, TbX, TbCheck, TbCalendarPlus } from 'react-icons/tb'
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
@@ -200,18 +195,15 @@ function AddEventDialog({ open, onClose, onSuccess, selectedDate }) {
   }
 
   return (
-    <Dialog
-      open={open}
-      onClose={onClose}
-      maxWidth="md"
-      fullWidth
-    >
-      <DialogTitle sx={{ position: 'sticky', top: 0, zIndex: 2, bgcolor: 'background.paper', display: 'flex', alignItems: 'center', gap: 1 }}>
-        <TbCalendarPlus size={24} />
-        <Typography variant="h6" component="span">Añadir Evento</Typography>
-      </DialogTitle>
+    <Modal.Root open={open} onClose={onClose} maxWidth="md">
+      <Modal.Header onClose={onClose}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          <TbCalendarPlus size={24} />
+          <Typography variant="h6" component="span">Añadir Evento</Typography>
+        </Box>
+      </Modal.Header>
 
-      <DialogContent>
+      <Modal.Body>
         <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="es">
           {/* Campos Fecha y Ubicación */}
           <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, gap: 2, mt: 1 }}>
@@ -231,8 +223,7 @@ function AddEventDialog({ open, onClose, onSuccess, selectedDate }) {
               />
             </Box>
             <Box sx={{ width: { xs: '100%', sm: '50%' } }}>
-              <TextField
-                fullWidth
+              <Input
                 label="Ubicación"
                 value={ubicacion}
                 onChange={(e) => setUbicacion(e.target.value)}
@@ -243,201 +234,200 @@ function AddEventDialog({ open, onClose, onSuccess, selectedDate }) {
             </Box>
           </Box>
 
-        {/* Participantes */}
-        <Box sx={{ mt: 3, mb: 2 }}>
-          <Typography variant="subtitle1" sx={{ mb: 2, fontWeight: 600 }}>
-            Participantes
-          </Typography>
+          {/* Participantes */}
+          <Box sx={{ mt: 3, mb: 2 }}>
+            <Typography variant="subtitle1" sx={{ mb: 2, fontWeight: 600 }}>
+              Participantes
+            </Typography>
 
-          {participantes.map((participante, index) => (
-            <Box key={index} sx={{ mb: 3 }}>
-              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
-                <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 500 }}>
-                  Participante {index + 1}
-                </Typography>
-                {participantes.length > 1 && (
-                  <IconButton
-                    size="small"
-                    onClick={() => handleRemoveParticipante(index)}
+            {participantes.map((participante, index) => (
+              <Box key={index} sx={{ mb: 3 }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
+                  <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 500 }}>
+                    Participante {index + 1}
+                  </Typography>
+                  {participantes.length > 1 && (
+                    <IconButton
+                      size="small"
+                      onClick={() => handleRemoveParticipante(index)}
+                      disabled={loading}
+                      color="error"
+                    >
+                      <TbTrash size={20} />
+                    </IconButton>
+                  )}
+                </Box>
+
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, pl: 2, borderLeft: '2px solid', borderColor: 'divider' }}>
+                  {/* Nombre del atleta */}
+                  <Input
+                    label="Nombre del atleta"
+                    value={participante.nombre_atleta}
+                    onChange={(e) => handleParticipanteChange(index, 'nombre_atleta', e.target.value)}
+                    required
                     disabled={loading}
-                    color="error"
-                  >
-                    <TbTrash size={20} />
-                  </IconButton>
+                    size="small"
+                  />
+
+                  {/* Prueba - Autocompletado */}
+                  <Autocomplete
+                    freeSolo
+                    options={pruebas}
+                    getOptionLabel={(option) => {
+                      if (typeof option === 'string') return option
+                      return option.nombre || ''
+                    }}
+                    isOptionEqualToValue={(option, value) => {
+                      if (typeof option === 'string' || typeof value === 'string') {
+                        return option === value
+                      }
+                      return option.prueba_id === value.prueba_id
+                    }}
+                    value={
+                      participante.prueba_id
+                        ? pruebas.find(p => p.prueba_id === participante.prueba_id) || null
+                        : participante.prueba_nombre_manual || null
+                    }
+                    onChange={(event, newValue) => {
+                      const updated = [...participantes]
+                      if (typeof newValue === 'string') {
+                        // Usuario escribió manualmente
+                        updated[index] = {
+                          ...updated[index],
+                          prueba_id: null,
+                          prueba_nombre_manual: newValue
+                        }
+                      } else if (newValue && newValue.prueba_id) {
+                        // Usuario seleccionó de la lista
+                        updated[index] = {
+                          ...updated[index],
+                          prueba_id: newValue.prueba_id,
+                          prueba_nombre_manual: ''
+                        }
+                      } else {
+                        // Limpiar
+                        updated[index] = {
+                          ...updated[index],
+                          prueba_id: null,
+                          prueba_nombre_manual: ''
+                        }
+                      }
+                      setParticipantes(updated)
+                    }}
+                    onInputChange={(event, newInputValue, reason) => {
+                      // Solo actualizar manualmente cuando el usuario escribe (no cuando selecciona)
+                      // 'input' = usuario está escribiendo
+                      // 'clear' = se limpió el campo
+                      // 'reset' = se reseteó el campo
+                      if (reason === 'input') {
+                        // Solo actualizar si no hay una prueba_id seleccionada
+                        // Esto evita sobrescribir cuando se selecciona de la lista
+                        const currentParticipant = participantes[index]
+                        if (!currentParticipant.prueba_id) {
+                          handleParticipanteChange(index, 'prueba_nombre_manual', newInputValue)
+                        }
+                      }
+                    }}
+                    loading={loadingPruebas}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        label="Prueba"
+                        required
+                        disabled={loading}
+                        size="small"
+                        helperText="Selecciona de la lista o escribe una nueva"
+                      />
+                    )}
+                    renderOption={(props, option) => {
+                      const { key, ...otherProps } = props
+                      return (
+                        <Box component="li" key={key} {...otherProps}>
+                          {typeof option === 'string' ? option : option.nombre}
+                        </Box>
+                      )
+                    }}
+                    getOptionKey={(option) => {
+                      if (typeof option === 'string') return option
+                      return `prueba-${option.prueba_id}`
+                    }}
+                  />
+
+                  {/* Hora */}
+                  <TimePicker
+                    label="Hora"
+                    value={participante.hora && dayjs.isDayjs(participante.hora) ? participante.hora : null}
+                    onChange={(newValue) => {
+                      // Solo actualizar si el valor es válido o null
+                      if (newValue === null || (dayjs.isDayjs(newValue) && newValue.isValid())) {
+                        handleParticipanteChange(index, 'hora', newValue)
+                      }
+                    }}
+                    disabled={loading}
+                    slotProps={{
+                      textField: {
+                        fullWidth: true,
+                        required: true,
+                        size: 'small'
+                      }
+                    }}
+                    views={['hours', 'minutes']}
+                    format="HH:mm"
+                  />
+                </Box>
+
+                {index < participantes.length - 1 && (
+                  <Divider sx={{ my: 2 }} />
                 )}
               </Box>
+            ))}
 
-              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, pl: 2, borderLeft: '2px solid', borderColor: 'divider' }}>
-                {/* Nombre del atleta */}
-                <TextField
-                  fullWidth
-                  label="Nombre del atleta"
-                  value={participante.nombre_atleta}
-                  onChange={(e) => handleParticipanteChange(index, 'nombre_atleta', e.target.value)}
-                  required
-                  disabled={loading}
-                  size="small"
-                />
-
-                {/* Prueba - Autocompletado */}
-                <Autocomplete
-                  freeSolo
-                  options={pruebas}
-                  getOptionLabel={(option) => {
-                    if (typeof option === 'string') return option
-                    return option.nombre || ''
-                  }}
-                  isOptionEqualToValue={(option, value) => {
-                    if (typeof option === 'string' || typeof value === 'string') {
-                      return option === value
-                    }
-                    return option.prueba_id === value.prueba_id
-                  }}
-                  value={
-                    participante.prueba_id
-                      ? pruebas.find(p => p.prueba_id === participante.prueba_id) || null
-                      : participante.prueba_nombre_manual || null
-                  }
-                  onChange={(event, newValue) => {
-                    const updated = [...participantes]
-                    if (typeof newValue === 'string') {
-                      // Usuario escribió manualmente
-                      updated[index] = {
-                        ...updated[index],
-                        prueba_id: null,
-                        prueba_nombre_manual: newValue
-                      }
-                    } else if (newValue && newValue.prueba_id) {
-                      // Usuario seleccionó de la lista
-                      updated[index] = {
-                        ...updated[index],
-                        prueba_id: newValue.prueba_id,
-                        prueba_nombre_manual: ''
-                      }
-                    } else {
-                      // Limpiar
-                      updated[index] = {
-                        ...updated[index],
-                        prueba_id: null,
-                        prueba_nombre_manual: ''
-                      }
-                    }
-                    setParticipantes(updated)
-                  }}
-                  onInputChange={(event, newInputValue, reason) => {
-                    // Solo actualizar manualmente cuando el usuario escribe (no cuando selecciona)
-                    // 'input' = usuario está escribiendo
-                    // 'clear' = se limpió el campo
-                    // 'reset' = se reseteó el campo
-                    if (reason === 'input') {
-                      // Solo actualizar si no hay una prueba_id seleccionada
-                      // Esto evita sobrescribir cuando se selecciona de la lista
-                      const currentParticipant = participantes[index]
-                      if (!currentParticipant.prueba_id) {
-                        handleParticipanteChange(index, 'prueba_nombre_manual', newInputValue)
-                      }
-                    }
-                  }}
-                  loading={loadingPruebas}
-                  renderInput={(params) => (
-                    <TextField
-                      {...params}
-                      label="Prueba"
-                      required
-                      disabled={loading}
-                      size="small"
-                      helperText="Selecciona de la lista o escribe una nueva"
-                    />
-                  )}
-                  renderOption={(props, option) => {
-                    const { key, ...otherProps } = props
-                    return (
-                      <Box component="li" key={key} {...otherProps}>
-                        {typeof option === 'string' ? option : option.nombre}
-                      </Box>
-                    )
-                  }}
-                  getOptionKey={(option) => {
-                    if (typeof option === 'string') return option
-                    return `prueba-${option.prueba_id}`
-                  }}
-                />
-
-                {/* Hora */}
-                <TimePicker
-                  label="Hora"
-                  value={participante.hora && dayjs.isDayjs(participante.hora) ? participante.hora : null}
-                  onChange={(newValue) => {
-                    // Solo actualizar si el valor es válido o null
-                    if (newValue === null || (dayjs.isDayjs(newValue) && newValue.isValid())) {
-                      handleParticipanteChange(index, 'hora', newValue)
-                    }
-                  }}
-                  disabled={loading}
-                  slotProps={{
-                    textField: {
-                      fullWidth: true,
-                      required: true,
-                      size: 'small'
-                    }
-                  }}
-                  views={['hours', 'minutes']}
-                  format="HH:mm"
-                />
-              </Box>
-
-              {index < participantes.length - 1 && (
-                <Divider sx={{ my: 2 }} />
-              )}
-            </Box>
-          ))}
-
-          {/* Botón para agregar más participantes */}
-          <Button
-            startIcon={<TbPlus />}
-            onClick={handleAddParticipante}
-            disabled={loading}
-            variant="outlined"
-            sx={{ mt: 2 }}
-          >
-            Añadir participante
-          </Button>
-        </Box>
+            {/* Botón para agregar más participantes */}
+            <Button
+              startIcon={<TbPlus />}
+              onClick={handleAddParticipante}
+              disabled={loading}
+              variant="secondary"
+              sx={{ mt: 2 }}
+            >
+              Añadir participante
+            </Button>
+          </Box>
         </LocalizationProvider>
-      </DialogContent>
+        {/* Snackbar flotante para errores */}
+        <Snackbar
+          open={!!error}
+          autoHideDuration={6000}
+          onClose={() => setError(null)}
+          anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+          sx={{ mt: 8 }}
+        >
+          <Alert
+            onClose={() => setError(null)}
+            severity="error"
+            sx={{ width: '100%' }}
+            variant="filled"
+          >
+            {error}
+          </Alert>
+        </Snackbar>
+      </Modal.Body>
 
-      <DialogActions sx={{ px: 3, pb: 2 }}>
-        <Button onClick={onClose} disabled={loading} startIcon={<TbX />}>
+      <Modal.Footer>
+        <Button onClick={onClose} disabled={loading} startIcon={<TbX />} variant="ghost">
           Cancelar
         </Button>
         <Button
           onClick={handleSubmit}
-          variant="contained"
+          variant="primary"
+          isLoading={loading}
           disabled={loading}
-          startIcon={loading ? <CircularProgress size={20} /> : <TbCheck />}
+          startIcon={<TbCheck />}
         >
-          {loading ? 'Guardando...' : 'Guardar'}
+          Guardar
         </Button>
-      </DialogActions>
-
-      {/* Snackbar flotante para errores */}
-      <Snackbar
-        open={!!error}
-        autoHideDuration={6000}
-        onClose={() => setError(null)}
-        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-        sx={{ mt: 8 }}
-      >
-        <Alert 
-          onClose={() => setError(null)} 
-          severity="error" 
-          sx={{ width: '100%' }}
-          variant="filled"
-        >
-          {error}
-        </Alert>
-      </Snackbar>
-    </Dialog>
+      </Modal.Footer>
+    </Modal.Root>
   )
 }
 

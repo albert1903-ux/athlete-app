@@ -1,14 +1,8 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Button,
   Alert,
   CircularProgress,
   Box,
-  Typography,
   Chip,
   Table,
   TableBody,
@@ -20,6 +14,7 @@ import {
   TablePagination
 } from '@mui/material'
 import { TbHeartbeat } from 'react-icons/tb'
+import { Modal, Button, Typography } from './ui'
 import { supabase } from '../lib/supabase'
 
 const STORAGE_KEY = 'selectedAthlete'
@@ -27,7 +22,7 @@ const STORAGE_KEY = 'selectedAthlete'
 // Función para obtener el color del IMC según su valor
 const getIMCStatus = (imc) => {
   if (!imc) return { label: 'N/A', color: 'default' }
-  
+
   if (imc < 18.5) {
     return { label: 'Bajo peso', color: 'warning' }
   } else if (imc < 25) {
@@ -44,10 +39,10 @@ const formatDate = (dateString) => {
   if (!dateString) return 'N/A'
   try {
     const date = new Date(dateString)
-    return date.toLocaleDateString('es-ES', { 
-      year: 'numeric', 
-      month: 'short', 
-      day: 'numeric' 
+    return date.toLocaleDateString('es-ES', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
     })
   } catch (error) {
     return 'Fecha inválida'
@@ -198,19 +193,9 @@ function ViewMeasurementsDialog({ open, onClose }) {
   }, [measurements.length])
 
   return (
-    <Dialog 
-      open={open} 
-      onClose={onClose} 
-      maxWidth="md" 
-      fullWidth
-      PaperProps={{
-        sx: {
-          maxHeight: '90vh'
-        }
-      }}
-    >
-      <DialogTitle sx={{ position: 'sticky', top: 0, zIndex: 2, bgcolor: 'background.paper' }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 1 }}>
+    <Modal.Root open={open} onClose={onClose} maxWidth="md">
+      <Modal.Header onClose={onClose}>
+        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 1, width: '100%' }}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             <TbHeartbeat size={24} />
             <Typography variant="h6" component="span">
@@ -218,23 +203,23 @@ function ViewMeasurementsDialog({ open, onClose }) {
             </Typography>
           </Box>
           {selectedAthlete && (
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap', mr: 4 }}>
               <Typography variant="body2" color="text.secondary">
                 {selectedAthlete.nombre}
               </Typography>
               {selectedAthlete.licencia && selectedAthlete.licencia !== 'N/A' && (
-                <Chip 
-                  label={`Lic: ${selectedAthlete.licencia}`} 
-                  size="small" 
+                <Chip
+                  label={`Lic: ${selectedAthlete.licencia}`}
+                  size="small"
                   variant="outlined"
                 />
               )}
             </Box>
           )}
         </Box>
-      </DialogTitle>
-      
-      <DialogContent dividers>
+      </Modal.Header>
+
+      <Modal.Body>
         {error && (
           <Alert severity="error" sx={{ mb: 2 }} onClose={() => setError(null)}>
             {error}
@@ -292,9 +277,9 @@ function ViewMeasurementsDialog({ open, onClose }) {
                         </TableCell>
                         <TableCell align="center">
                           {measurement.imc ? (
-                            <Chip 
-                              label={imcStatus.label} 
-                              color={imcStatus.color} 
+                            <Chip
+                              label={imcStatus.label}
+                              color={imcStatus.color}
                               size="small"
                               variant="outlined"
                             />
@@ -334,14 +319,14 @@ function ViewMeasurementsDialog({ open, onClose }) {
             labelDisplayedRows={({ from, to, count }) => `${from}-${to} de ${count}`}
           />
         )}
-      </DialogContent>
-      
-      <DialogActions>
-        <Button onClick={onClose}>
+      </Modal.Body>
+
+      <Modal.Footer>
+        <Button onClick={onClose} variant="ghost">
           Cerrar
         </Button>
-      </DialogActions>
-    </Dialog>
+      </Modal.Footer>
+    </Modal.Root>
   )
 }
 

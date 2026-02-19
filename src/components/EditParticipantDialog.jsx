@@ -1,17 +1,12 @@
 import { useState, useEffect } from 'react'
 import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Button,
   TextField,
   Alert,
   CircularProgress,
   Box,
-  Typography,
   Autocomplete
 } from '@mui/material'
+import { Modal, Button, Input, Typography } from './ui'
 import { TbPencil } from 'react-icons/tb'
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
@@ -116,23 +111,15 @@ function EditParticipantDialog({ open, onClose, onSuccess, participant }) {
   }
 
   return (
-    <Dialog
-      open={open}
-      onClose={onClose}
-      maxWidth="sm"
-      fullWidth
-      PaperProps={{
-        sx: {
-          borderRadius: 2
-        }
-      }}
-    >
-      <DialogTitle sx={{ position: 'sticky', top: 0, zIndex: 2, bgcolor: 'background.paper', display: 'flex', alignItems: 'center', gap: 1 }}>
-        <TbPencil size={24} />
-        <Typography variant="h6" component="span">Editar Participante</Typography>
-      </DialogTitle>
+    <Modal.Root open={open} onClose={onClose} maxWidth="sm">
+      <Modal.Header onClose={onClose}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          <TbPencil size={24} />
+          <Typography variant="h6" component="span">Editar Participante</Typography>
+        </Box>
+      </Modal.Header>
 
-      <DialogContent>
+      <Modal.Body>
         <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="es">
           {error && (
             <Alert severity="error" sx={{ mb: 2 }} onClose={() => setError(null)}>
@@ -142,8 +129,7 @@ function EditParticipantDialog({ open, onClose, onSuccess, participant }) {
 
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 1 }}>
             {/* Nombre del atleta */}
-            <TextField
-              fullWidth
+            <Input
               label="Nombre del atleta"
               value={nombreAtleta}
               onChange={(e) => setNombreAtleta(e.target.value)}
@@ -228,22 +214,22 @@ function EditParticipantDialog({ open, onClose, onSuccess, participant }) {
             />
           </Box>
         </LocalizationProvider>
-      </DialogContent>
+      </Modal.Body>
 
-      <DialogActions sx={{ px: 3, pb: 2 }}>
-        <Button onClick={onClose} disabled={loading}>
+      <Modal.Footer>
+        <Button onClick={onClose} disabled={loading} variant="ghost">
           Cancelar
         </Button>
         <Button
           onClick={handleSubmit}
-          variant="contained"
+          variant="primary"
+          isLoading={loading}
           disabled={loading}
-          startIcon={loading ? <CircularProgress size={20} /> : null}
         >
-          {loading ? 'Guardando...' : 'Guardar'}
+          Guardar
         </Button>
-      </DialogActions>
-    </Dialog>
+      </Modal.Footer>
+    </Modal.Root>
   )
 }
 

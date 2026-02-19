@@ -4,14 +4,11 @@ import {
   Card,
   CardContent,
   Typography,
-  Button,
+
   TextField,
   Alert,
   CircularProgress,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
+
   IconButton,
   Table,
   TableBody,
@@ -22,6 +19,7 @@ import {
   Paper,
   Chip
 } from '@mui/material'
+import { Button, Modal, Input } from './ui'
 import { TbPlus, TbPencil, TbTrash, TbBarbell, TbHeartPlus } from 'react-icons/tb'
 import { supabase } from '../lib/supabase'
 
@@ -34,7 +32,7 @@ function AthleteBodyMeasurements() {
   const [error, setError] = useState(null)
   const [openDialog, setOpenDialog] = useState(false)
   const [editingMeasure, setEditingMeasure] = useState(null)
-  
+
   // Form states
   const [formData, setFormData] = useState({
     fecha: new Date().toISOString().split('T')[0],
@@ -62,7 +60,7 @@ function AthleteBodyMeasurements() {
 
     loadAthlete()
     const interval = setInterval(loadAthlete, 500)
-    
+
     const handleStorageChange = (e) => {
       if (e.key === STORAGE_KEY) {
         loadAthlete()
@@ -255,10 +253,10 @@ function AthleteBodyMeasurements() {
             <Typography variant="h6">Medidas Corporales</Typography>
           </Box>
           <Button
-            variant="contained"
+            variant="primary"
             startIcon={<TbPlus />}
             onClick={() => handleOpenDialog()}
-            size="small"
+            size="sm"
           >
             Añadir
           </Button>
@@ -345,14 +343,16 @@ function AthleteBodyMeasurements() {
         )}
 
         {/* Diálogo de entrada/edición */}
-        <Dialog open={openDialog} onClose={handleCloseDialog} maxWidth="sm" fullWidth>
-          <DialogTitle sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <TbHeartPlus size={24} />
-            <Typography variant="h6" component="span">{editingMeasure ? 'Editar Medición' : 'Nueva Medición'}</Typography>
-          </DialogTitle>
-          <DialogContent>
+        <Modal.Root open={openDialog} onClose={handleCloseDialog} maxWidth="sm">
+          <Modal.Header onClose={handleCloseDialog}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <TbHeartPlus size={24} />
+              <Typography variant="h6" component="span">{editingMeasure ? 'Editar Medición' : 'Nueva Medición'}</Typography>
+            </Box>
+          </Modal.Header>
+          <Modal.Body>
             <Box display="flex" flexDirection="column" gap={2} sx={{ pt: 1 }}>
-              <TextField
+              <Input
                 label="Fecha"
                 type="date"
                 name="fecha"
@@ -362,7 +362,7 @@ function AthleteBodyMeasurements() {
                 InputLabelProps={{ shrink: true }}
                 required
               />
-              <TextField
+              <Input
                 label="Altura (cm)"
                 type="number"
                 name="altura"
@@ -372,7 +372,7 @@ function AthleteBodyMeasurements() {
                 inputProps={{ min: 0, max: 300, step: 0.1 }}
                 helperText="Altura en centímetros (ej: 175.5)"
               />
-              <TextField
+              <Input
                 label="Peso (kg)"
                 type="number"
                 name="peso"
@@ -382,7 +382,7 @@ function AthleteBodyMeasurements() {
                 inputProps={{ min: 0, max: 300, step: 0.1 }}
                 helperText="Peso en kilogramos (ej: 65.0)"
               />
-              <TextField
+              <Input
                 label="Envergadura (cm)"
                 type="number"
                 name="envergadura"
@@ -396,18 +396,19 @@ function AthleteBodyMeasurements() {
                 El IMC se calculará automáticamente si hay altura y peso
               </Alert>
             </Box>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={handleCloseDialog}>Cancelar</Button>
+          </Modal.Body>
+          <Modal.Footer>
+            <Button onClick={handleCloseDialog} variant="ghost">Cancelar</Button>
             <Button
               onClick={handleSubmit}
-              variant="contained"
+              variant="primary"
               disabled={loading}
+              isLoading={loading}
             >
-              {loading ? <CircularProgress size={24} /> : 'Guardar'}
+              Guardar
             </Button>
-          </DialogActions>
-        </Dialog>
+          </Modal.Footer>
+        </Modal.Root>
       </CardContent>
     </Card>
   )

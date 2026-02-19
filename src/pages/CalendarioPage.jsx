@@ -1,9 +1,7 @@
 import { useState, useEffect, useMemo } from 'react'
 import Box from '@mui/material/Box'
-import Typography from '@mui/material/Typography'
-import Card from '@mui/material/Card'
-import CardContent from '@mui/material/CardContent'
 import Chip from '@mui/material/Chip'
+import { Card, Typography } from '../components/ui'
 import CircularProgress from '@mui/material/CircularProgress'
 import Drawer from '@mui/material/Drawer'
 import IconButton from '@mui/material/IconButton'
@@ -90,7 +88,7 @@ const CalendarioPage = () => {
   const handleEventSuccess = () => {
     // Recargar eventos cuando se crea uno nuevo
     loadEvents()
-    
+
     // Recargar también los participantes del día seleccionado si el bottom sheet está abierto
     if (bottomSheetOpen) {
       loadDayParticipants(selectedDate)
@@ -99,54 +97,54 @@ const CalendarioPage = () => {
 
   // Componente personalizado para el header del calendario (no se usa actualmente, pero se mantiene por si se necesita)
   const CustomCalendarHeader = (props) => {
-    const { 
-      currentMonth: monthFromProps, 
+    const {
+      currentMonth: monthFromProps,
       onMonthChange,
       leftArrowButtonProps,
       rightArrowButtonProps
     } = props
-    
+
     // Usar el mes del prop o el estado local
     const displayMonth = monthFromProps || currentMonth
-    
+
     const handlePrevMonth = (event) => {
       if (event) {
         event.preventDefault()
         event.stopPropagation()
       }
-      
+
       const newMonth = dayjs(displayMonth).subtract(1, 'month')
       setCurrentMonth(newMonth)
-      
+
       if (onMonthChange) {
         onMonthChange(newMonth, 'left')
       }
-      
+
       // Llamar también al handler original si existe
       if (leftArrowButtonProps?.onClick) {
         leftArrowButtonProps.onClick(event)
       }
     }
-    
+
     const handleNextMonth = (event) => {
       if (event) {
         event.preventDefault()
         event.stopPropagation()
       }
-      
+
       const newMonth = dayjs(displayMonth).add(1, 'month')
       setCurrentMonth(newMonth)
-      
+
       if (onMonthChange) {
         onMonthChange(newMonth, 'right')
       }
-      
+
       // Llamar también al handler original si existe
       if (rightArrowButtonProps?.onClick) {
         rightArrowButtonProps.onClick(event)
       }
     }
-    
+
     return (
       <Box
         sx={{
@@ -189,7 +187,7 @@ const CalendarioPage = () => {
             <TbChevronLeft size={20} />
           </IconButton>
         </Box>
-        
+
         <Box
           sx={{
             display: 'flex',
@@ -226,7 +224,7 @@ const CalendarioPage = () => {
             {displayMonth.format('YYYY')}
           </Typography>
         </Box>
-        
+
         <Box
           sx={{
             position: 'absolute',
@@ -365,7 +363,7 @@ const CalendarioPage = () => {
     setCalendarMonth(newMonth)
     setCalendarKey(prev => prev + 1)
   }
-  
+
   // Sincronizar calendarMonth con currentMonth cuando cambia selectedDate
   useEffect(() => {
     if (selectedDate && !selectedDate.isSame(calendarMonth, 'month')) {
@@ -376,7 +374,7 @@ const CalendarioPage = () => {
 
   // Forzar remontaje del calendario cuando cambia calendarMonth (usando useMemo para la key)
   const calendarMonthKey = useMemo(() => calendarMonth.format('YYYY-MM'), [calendarMonth])
-  
+
   useEffect(() => {
     setShouldRenderCalendar(false)
     // Temporalmente mover selectedDate al nuevo mes para forzar que el calendario lo muestre
@@ -394,7 +392,7 @@ const CalendarioPage = () => {
     setLoadingDayParticipants(true)
     try {
       const fechaStr = date.format('YYYY-MM-DD')
-      
+
       // Obtener eventos del día
       const { data: eventosData, error: eventosError } = await supabase
         .from('eventos')
@@ -431,7 +429,7 @@ const CalendarioPage = () => {
       const pruebaIds = participantesData
         .map(p => p.prueba_id)
         .filter(Boolean)
-      
+
       let pruebasMap = new Map()
       if (pruebaIds.length > 0) {
         const { data: pruebasData } = await supabase
@@ -448,8 +446,8 @@ const CalendarioPage = () => {
 
       // Combinar datos
       const participantesConInfo = participantesData.map(p => {
-        const pruebaNombre = p.prueba_id 
-          ? pruebasMap.get(p.prueba_id) 
+        const pruebaNombre = p.prueba_id
+          ? pruebasMap.get(p.prueba_id)
           : p.prueba_nombre_manual
         return {
           ...p,
@@ -459,7 +457,7 @@ const CalendarioPage = () => {
       })
 
       setDayParticipants(participantesConInfo)
-      
+
       // Obtener la ubicación (si todos los eventos tienen la misma ubicación, usar esa)
       const ubicaciones = [...new Set(eventosData.map(e => e.ubicacion).filter(Boolean))]
       setDayLocation(ubicaciones.length === 1 ? ubicaciones[0] : null)
@@ -568,7 +566,7 @@ const CalendarioPage = () => {
       if (bottomSheetOpen) {
         loadDayParticipants(selectedDate)
       }
-      
+
       // Recargar eventos para actualizar los puntos en el calendario
       loadEvents()
     } catch (err) {
@@ -603,13 +601,10 @@ const CalendarioPage = () => {
         {/* Calendario */}
         <Card
           sx={{
-            borderRadius: 3,
-            boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
-            backgroundColor: '#FFFFFF',
             position: 'relative',
           }}
         >
-          <CardContent sx={{ p: 3, position: 'relative' }}>
+          <Box sx={{ p: 3, position: 'relative' }}>
             {/* Header personalizado fuera del DatePicker */}
             <Box
               sx={{
@@ -655,7 +650,7 @@ const CalendarioPage = () => {
                   <TbChevronLeft size={20} />
                 </IconButton>
               </Box>
-              
+
               <Box
                 sx={{
                   display: 'flex',
@@ -690,9 +685,9 @@ const CalendarioPage = () => {
                   }}
                 >
                   {currentMonth.format('YYYY')}
-        </Typography>
+                </Typography>
               </Box>
-              
+
               <Box
                 sx={{
                   position: 'absolute',
@@ -726,7 +721,7 @@ const CalendarioPage = () => {
                 </IconButton>
               </Box>
             </Box>
-            
+
             <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="es">
               <Box
                 key={`wrapper-${currentMonth.format('YYYY-MM')}-${calendarKey}`}
@@ -754,131 +749,131 @@ const CalendarioPage = () => {
                       day: CustomDay,
                     }}
                     sx={{
-                    width: '100%',
-                    '& .MuiDateCalendar-root': {
-                      overflow: 'visible !important',
-                      maxHeight: 'none !important',
-                      height: 'auto !important',
-                    },
-                  '& .MuiDayCalendar-root': {
-                    overflow: 'visible !important',
-                    maxHeight: 'none !important',
-                    height: 'auto !important',
-                  },
-                  '& .MuiDayCalendar-monthContainer': {
-                    overflow: 'visible !important',
-                    maxHeight: 'none !important',
-                    height: 'auto !important',
-                  },
-                  '& .MuiPickersSlideTransition-root': {
-                    maxHeight: 'none !important',
-                    height: 'auto !important',
-                    overflow: 'visible !important',
-                    transition: 'none !important',
-                    '& > *': {
-                      transition: 'none !important',
-                      transform: 'none !important',
-                      animation: 'none !important',
-                    },
-                  },
-                  '& .MuiDayCalendar-slideTransition': {
-                    transition: 'none !important',
-                    '& > *': {
-                      transition: 'none !important',
-                      transform: 'none !important',
-                      animation: 'none !important',
-                      position: 'relative !important',
-                      '&[aria-hidden="true"]': {
+                      width: '100%',
+                      '& .MuiDateCalendar-root': {
+                        overflow: 'visible !important',
+                        maxHeight: 'none !important',
+                        height: 'auto !important',
+                      },
+                      '& .MuiDayCalendar-root': {
+                        overflow: 'visible !important',
+                        maxHeight: 'none !important',
+                        height: 'auto !important',
+                      },
+                      '& .MuiDayCalendar-monthContainer': {
+                        overflow: 'visible !important',
+                        maxHeight: 'none !important',
+                        height: 'auto !important',
+                      },
+                      '& .MuiPickersSlideTransition-root': {
+                        maxHeight: 'none !important',
+                        height: 'auto !important',
+                        overflow: 'visible !important',
+                        transition: 'none !important',
+                        '& > *': {
+                          transition: 'none !important',
+                          transform: 'none !important',
+                          animation: 'none !important',
+                        },
+                      },
+                      '& .MuiDayCalendar-slideTransition': {
+                        transition: 'none !important',
+                        '& > *': {
+                          transition: 'none !important',
+                          transform: 'none !important',
+                          animation: 'none !important',
+                          position: 'relative !important',
+                          '&[aria-hidden="true"]': {
+                            display: 'none !important',
+                          },
+                        },
+                        '& > *:not([aria-hidden="true"])': {
+                          display: 'block !important',
+                        },
+                      },
+                      '& .MuiPickersFadeTransitionGroup-root': {
+                        transition: 'none !important',
+                        '& > *': {
+                          transition: 'none !important',
+                          animation: 'none !important',
+                          opacity: '1 !important',
+                          '&[aria-hidden="true"]': {
+                            display: 'none !important',
+                          },
+                        },
+                        '& > *:not([aria-hidden="true"])': {
+                          display: 'block !important',
+                          opacity: '1 !important',
+                        },
+                      },
+                      '& .MuiDateCalendar-viewTransitionContainer': {
+                        '& > *[aria-hidden="true"]': {
+                          display: 'none !important',
+                          opacity: '0 !important',
+                        },
+                        '& > *:not([aria-hidden="true"])': {
+                          display: 'block !important',
+                          opacity: '1 !important',
+                        },
+                      },
+                      // Ocultar el campo de texto "Select Date" que aparece arriba
+                      '& .MuiPickersToolbar-title': {
                         display: 'none !important',
                       },
-                    },
-                    '& > *:not([aria-hidden="true"])': {
-                      display: 'block !important',
-                    },
-                  },
-                  '& .MuiPickersFadeTransitionGroup-root': {
-                    transition: 'none !important',
-                    '& > *': {
-                      transition: 'none !important',
-                      animation: 'none !important',
-                      opacity: '1 !important',
-                      '&[aria-hidden="true"]': {
+                      '& .MuiPickersLayout-root > div:first-of-type': {
                         display: 'none !important',
                       },
-                    },
-                    '& > *:not([aria-hidden="true"])': {
-                      display: 'block !important',
-                      opacity: '1 !important',
-                    },
-                  },
-                  '& .MuiDateCalendar-viewTransitionContainer': {
-                    '& > *[aria-hidden="true"]': {
-                      display: 'none !important',
-                      opacity: '0 !important',
-                    },
-                    '& > *:not([aria-hidden="true"])': {
-                      display: 'block !important',
-                      opacity: '1 !important',
-                    },
-                  },
-                  // Ocultar el campo de texto "Select Date" que aparece arriba
-                  '& .MuiPickersToolbar-title': {
-                    display: 'none !important',
-                  },
-                  '& .MuiPickersLayout-root > div:first-of-type': {
-                    display: 'none !important',
-                  },
-                  '& .MuiPickersTextField-root': {
-                    display: 'none !important',
-                  },
-                  '& .MuiPickersInput-root': {
-                    display: 'none !important',
-                  },
-                  '& h4': {
-                    display: 'none !important',
-                  },
-                  '& .MuiTypography-h4': {
-                    display: 'none !important',
-                  },
-                  '& .MuiPickersCalendarHeader-root': {
-                    display: 'none !important',
-                    visibility: 'hidden !important',
-                    height: '0 !important',
-                    minHeight: '0 !important',
-                    padding: '0 !important',
-                    margin: '0 !important',
-                  },
-                  '& .MuiPickersCalendarHeader-labelContainer': {
-                    display: 'none !important',
-                  },
-                  '& .MuiPickersCalendarHeader-switchViewButton': {
-                    display: 'none !important',
-                  },
-                  '& .MuiDayCalendar-weekContainer': {
-                    margin: '0 !important',
-                    padding: '0 !important',
-                  },
-                  '& .MuiDayCalendar-weekDayLabel': {
-                    fontSize: '0.75rem',
-                    fontWeight: 400,
-                    color: '#9CA3AF',
-                    width: '100%',
-                    fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
-                    padding: '8px 0',
-                  },
-                  '& .MuiDayCalendar-header': {
-                    paddingBottom: 1,
-                    marginBottom: 1,
-                  },
-                  '& .MuiPickersDay-root': {
-                    fontSize: '0.9375rem',
-                    fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
-                    margin: '2px',
-                    '&:focus': {
-                      backgroundColor: 'transparent',
-                    },
-                  },
-                }}
+                      '& .MuiPickersTextField-root': {
+                        display: 'none !important',
+                      },
+                      '& .MuiPickersInput-root': {
+                        display: 'none !important',
+                      },
+                      '& h4': {
+                        display: 'none !important',
+                      },
+                      '& .MuiTypography-h4': {
+                        display: 'none !important',
+                      },
+                      '& .MuiPickersCalendarHeader-root': {
+                        display: 'none !important',
+                        visibility: 'hidden !important',
+                        height: '0 !important',
+                        minHeight: '0 !important',
+                        padding: '0 !important',
+                        margin: '0 !important',
+                      },
+                      '& .MuiPickersCalendarHeader-labelContainer': {
+                        display: 'none !important',
+                      },
+                      '& .MuiPickersCalendarHeader-switchViewButton': {
+                        display: 'none !important',
+                      },
+                      '& .MuiDayCalendar-weekContainer': {
+                        margin: '0 !important',
+                        padding: '0 !important',
+                      },
+                      '& .MuiDayCalendar-weekDayLabel': {
+                        fontSize: '0.75rem',
+                        fontWeight: 400,
+                        color: '#9CA3AF',
+                        width: '100%',
+                        fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
+                        padding: '8px 0',
+                      },
+                      '& .MuiDayCalendar-header': {
+                        paddingBottom: 1,
+                        marginBottom: 1,
+                      },
+                      '& .MuiPickersDay-root': {
+                        fontSize: '0.9375rem',
+                        fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
+                        margin: '2px',
+                        '&:focus': {
+                          backgroundColor: 'transparent',
+                        },
+                      },
+                    }}
                   />
                 )}
                 {!shouldRenderCalendar && (
@@ -888,7 +883,7 @@ const CalendarioPage = () => {
                 )}
               </Box>
             </LocalizationProvider>
-          </CardContent>
+          </Box>
         </Card>
       </Box>
 
@@ -944,17 +939,17 @@ const CalendarioPage = () => {
               <TbCalendarEvent style={{ fontSize: 48, color: 'inherit', marginBottom: 16 }} />
               <Typography variant="body1" color="text.secondary">
                 No hay eventos asociados a este día
-            </Typography>
+              </Typography>
             </Box>
           ) : (
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
               {(() => {
                 const conflicts = detectConflicts(dayParticipants)
-                
+
                 // Función para normalizar nombres y ubicaciones
                 const normalizeName = (name) => name.trim().toLowerCase()
                 const normalizeLocation = (location) => location ? location.trim().toLowerCase() : ''
-                
+
                 // Agrupar participantes por nombre de atleta y ubicación
                 const groupedParticipants = new Map()
                 dayParticipants.forEach(p => {
@@ -964,7 +959,7 @@ const CalendarioPage = () => {
                   }
                   groupedParticipants.get(key).push(p)
                 })
-                
+
                 // Convertir a array y ordenar por nombre
                 const groups = Array.from(groupedParticipants.entries()).map(([key, participantes]) => ({
                   key,
@@ -972,24 +967,24 @@ const CalendarioPage = () => {
                   nombreAtleta: participantes[0].nombre_atleta,
                   ubicacion: participantes[0].ubicacion || ''
                 }))
-                
+
                 groups.sort((a, b) => a.nombreAtleta.localeCompare(b.nombreAtleta))
-                
+
                 return groups.map((group) => {
                   // Verificar si algún participante del grupo tiene conflicto
                   const groupHasConflict = group.participantes.some(p => conflicts.has(p.participante_id))
-                  
+
                   return (
                     <Card key={group.key} sx={{ position: 'relative' }}>
-                      <CardContent>
+                      <Box sx={{ p: 2 }}>
                         <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 2 }}>
                           {groupHasConflict && (
-                            <TbAlertTriangle 
-                              style={{ 
-                                color: 'inherit', 
+                            <TbAlertTriangle
+                              style={{
+                                color: 'inherit',
                                 fontSize: 28,
                                 marginTop: 4
-                              }} 
+                              }}
                             />
                           )}
                           <Box sx={{ flex: 1 }}>
@@ -1006,13 +1001,13 @@ const CalendarioPage = () => {
                                 </Box>
                               )}
                             </Box>
-                            
+
                             {/* Mostrar todas las pruebas y horarios del grupo */}
                             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5, mb: 1 }}>
                               {group.participantes.map((participante, idx) => (
                                 <Box key={participante.participante_id} sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-                                  <Chip 
-                                    label={participante.prueba_nombre || 'Sin prueba'} 
+                                  <Chip
+                                    label={participante.prueba_nombre || 'Sin prueba'}
                                     size="small"
                                     color="primary"
                                     variant="outlined"
@@ -1042,22 +1037,22 @@ const CalendarioPage = () => {
                                 </Box>
                               ))}
                             </Box>
-                            
+
                             {groupHasConflict && (
                               <Typography variant="caption" color="warning.main" sx={{ mt: 1, display: 'block' }}>
                                 ⚠️ Conflicto de horario detectado
-            </Typography>
+                              </Typography>
                             )}
                           </Box>
                         </Box>
-          </CardContent>
-        </Card>
+                      </Box>
+                    </Card>
                   )
                 })
               })()}
             </Box>
           )}
-      </Box>
+        </Box>
       </Drawer>
 
       {/* Diálogo para añadir eventos */}

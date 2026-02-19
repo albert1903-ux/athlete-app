@@ -1,24 +1,17 @@
 import { useEffect, useMemo, useState, useCallback } from 'react'
 import {
   Alert,
-  Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  Divider,
+  MenuItem,
   Stack,
-  TextField,
-  Typography,
-  CircularProgress,
   Autocomplete,
-  MenuItem
+  CircularProgress,
+  Divider
 } from '@mui/material'
 import { createFilterOptions } from '@mui/material/Autocomplete'
 import dayjs from 'dayjs'
 import { TbX, TbCheck, TbCircuitCapacitorPolarized } from 'react-icons/tb'
 import { supabase } from '../lib/supabase'
-
+import { Modal, Button, Input, Typography } from './ui'
 const GENERO_OPTIONS = [
   { value: 'MASC', label: 'Masculino' },
   { value: 'FEM', label: 'Femenino' },
@@ -71,6 +64,7 @@ const convertMarcaTextoToValor = (texto) => {
 }
 
 const fetchNextResultadoId = async () => {
+  // Solo necesitamos esto si es INSERT
   const { data, error } = await supabase
     .from('resultados')
     .select('resultado_id')
@@ -89,7 +83,7 @@ const fetchNextResultadoId = async () => {
   return parsed + 1
 }
 
-function AddResultDialog({ open, onClose, onSuccess }) {
+function AddResultDialog({ open, onClose, onSuccess, resultToEdit = null }) {
   const [formValues, setFormValues] = useState(initialFormState)
   const [optionsLoading, setOptionsLoading] = useState(false)
   const [submitLoading, setSubmitLoading] = useState(false)
@@ -104,7 +98,7 @@ function AddResultDialog({ open, onClose, onSuccess }) {
   const [autoAssigningClub, setAutoAssigningClub] = useState(false)
   const [atletaInputValue, setAtletaInputValue] = useState('')
   const [athleteSearchLoading, setAthleteSearchLoading] = useState(false)
-  const [athleteSearchError, setAthleteSearchError] = useState(null)
+  const [, setAthleteSearchError] = useState(null) // Error handling state (value unused, setter used)
   const [pruebaInputValue, setPruebaInputValue] = useState('')
   const pruebaFilter = useMemo(
     () =>
@@ -139,12 +133,61 @@ function AddResultDialog({ open, onClose, onSuccess }) {
     setSubmitSuccess(null)
     setPruebaInputValue('')
     setAtletaInputValue('')
-    setAthleteSearchError(null)
+    // setAthleteSearchError(null)
   }, [])
+
+  // Efecto para cargar datos en modo Edición
+  useEffect(() => {
+    if (open && resultToEdit) {
+      console.debug('Cargando datos para edición:', resultToEdit)
+      // Precargar los valores
+      // Nota: resultToEdit debe venir con los objetos completos de atleta, club, prueba, categoria
+      // o al menos con sus IDs para buscarlos en las opciones cargadas.
+      // Asumiremos que resultToEdit tiene la estructura enriquecida o fetcharemos si falta algo complejo
+
+      const {
+        atleta, // puede ser objeto {atleta_id, nombre, ...}
+        club,
+        prueba,
+        categoria,
+        fecha,
+        marca_texto,
+        marca_valor,
+        unidad,
+        genero,
+        superficie
+      } = resultToEdit
+
+      setFormValues({
+        atleta: atleta || null,
+        club: club || null,
+        prueba: prueba || null,
+        categoria: categoria || null,
+        fecha: fecha || '',
+        anio: resultToEdit.anio || '',
+        mes: resultToEdit.mes || '',
+        genero: genero || 'MASC',
+        superficie: superficie || 'AL',
+        unidad: unidad || '',
+        marcaTexto: marca_texto || '',
+        marcaValor: marca_valor || ''
+      })
+
+      // Precargar inputValues para autocompletes
+      if (atleta?.nombre) setAtletaInputValue(atleta.nombre)
+      if (prueba?.nombre) setPruebaInputValue(prueba.nombre)
+
+    } else if (open && !resultToEdit) {
+      resetForm()
+    }
+  }, [open, resultToEdit, resetForm])
 
   useEffect(() => {
     if (!open) {
-      resetForm()
+      // Al cerrar, si NO estamos en modo edición (o si queremos limpiar siempre), reseteamos
+      // Pero mejor resetear al abrir en modo "nuevo", o al cerrar.
+      // Si cerramos el de editar, queremos que al volver a abrir 'nuevo' esté limpio.
+      // Lo manejamos arriba en el useEffect([open, resultToEdit])
       return
     }
 
@@ -177,12 +220,22 @@ function AddResultDialog({ open, onClose, onSuccess }) {
         if (categoriasError) throw categoriasError
 
         if (!isMounted) return
-        setOptions({
-          atletas: [],
+        setOptions(prev => ({
+          ...prev,
+          atleta: resultToEdit?.atleta ? [resultToEdit.atleta] : [], // Pre-hidratar atleta si es edición
           clubes: clubesData || [],
           pruebas: pruebasData || [],
           categorias: categoriasData || []
-        })
+        }))
+
+        // Si es edición, asegurar que el atleta está en las opciones
+        if (resultToEdit?.atleta) {
+          setOptions((prev) => ({
+            ...prev,
+            atletas: [resultToEdit.atleta]
+          }))
+        }
+
       } catch (error) {
         console.error('Error al cargar datos para el formulario:', error)
         if (isMounted) {
@@ -202,11 +255,16 @@ function AddResultDialog({ open, onClose, onSuccess }) {
     return () => {
       isMounted = false
     }
-  }, [open, resetForm])
+  }, [open, resultToEdit]) // Quitamos resetForm de deps para evitar loop, agregamos resultToEdit
 
   // Búsqueda de atletas en Supabase mientras se escribe (debounced)
   useEffect(() => {
     if (!open) return
+
+    // Si estamos editando y el input coincide con el atleta cargado, no buscamos
+    if (resultToEdit && atletaInputValue === resultToEdit.atleta?.nombre) {
+      return
+    }
 
     const controller = new AbortController()
     const signal = controller.signal
@@ -215,8 +273,11 @@ function AddResultDialog({ open, onClose, onSuccess }) {
     if (!term || term.length < 2) {
       setAthleteSearchLoading(false)
       setAthleteSearchError(null)
-      // No borrar selección actual, sólo vaciar sugerencias
-      setOptions((prev) => ({ ...prev, atletas: [] }))
+      // Mantener el atleta seleccionado en las opciones si existe
+      setOptions((prev) => ({
+        ...prev,
+        atletas: formValues.atleta ? [formValues.atleta] : []
+      }))
       return
     }
 
@@ -250,7 +311,7 @@ function AddResultDialog({ open, onClose, onSuccess }) {
       clearTimeout(timeoutId)
       controller.abort()
     }
-  }, [atletaInputValue, open])
+  }, [atletaInputValue, open, formValues.atleta, resultToEdit])
 
   const handleClose = () => {
     if (!submitLoading) {
@@ -307,6 +368,11 @@ function AddResultDialog({ open, onClose, onSuccess }) {
     if (!newValue?.atleta_id) {
       return
     }
+
+    // Si estamos editando y cambiamos al mismo atleta original, podríamos restaurar su club original?
+    // Por simplicidad, ejecutamos la lógica de auto-asignar club siempre que cambie el atleta,
+    // salvo que estemos cargando el form inicial de edición.
+    // (Este handler se dispara user interaction, así que está bien).
 
     setAutoAssigningClub(true)
     try {
@@ -403,17 +469,22 @@ function AddResultDialog({ open, onClose, onSuccess }) {
     setSubmitSuccess(null)
 
     let nextResultadoId = null
-    try {
-      nextResultadoId = await fetchNextResultadoId()
-    } catch (error) {
-      console.warn('No se pudo obtener el siguiente resultado_id:', error)
-      setSubmitError('No se pudo calcular el identificador del nuevo resultado. Inténtalo de nuevo.')
-      setSubmitLoading(false)
-      return
+
+    // Solo calcular ID si es nuevo registro
+    if (!resultToEdit) {
+      try {
+        nextResultadoId = await fetchNextResultadoId()
+      } catch (error) {
+        console.warn('No se pudo obtener el siguiente resultado_id:', error)
+        setSubmitError('No se pudo calcular el identificador del nuevo resultado. Inténtalo de nuevo.')
+        setSubmitLoading(false)
+        return
+      }
     }
 
     const payload = {
-      resultado_id: nextResultadoId,
+      // Si editamos, no cambiamos el resultado_id
+      ...(resultToEdit ? {} : { resultado_id: nextResultadoId }),
       atleta_id: formValues.atleta.atleta_id,
       club_id: formValues.club.club_id,
       prueba_id: formValues.prueba.prueba_id,
@@ -432,9 +503,17 @@ function AddResultDialog({ open, onClose, onSuccess }) {
     }
 
     try {
-      const { data, error } = await supabase
-        .from('resultados')
-        .insert([payload])
+      let query = supabase.from('resultados')
+
+      if (resultToEdit) {
+        // UPDATE
+        query = query.update(payload).eq('resultado_id', resultToEdit.resultado_id)
+      } else {
+        // INSERT
+        query = query.insert([payload])
+      }
+
+      const { data, error } = await query
         .select(
           'resultado_id, atleta_id, club_id, prueba_id, categoria_id, fecha, anio, mes, marca_texto, marca_valor, unidad, genero, superficie'
         )
@@ -442,10 +521,15 @@ function AddResultDialog({ open, onClose, onSuccess }) {
 
       if (error) throw error
 
-      setSubmitSuccess('Resultado añadido correctamente')
+      setSubmitSuccess(resultToEdit ? 'Resultado actualizado correctamente' : 'Resultado añadido correctamente')
+
+      // Dispatch evento para refrescar (sirve tanto para Add como Edit si la vista escucha 'resultadoCreado' o similar)
       window.dispatchEvent(new CustomEvent('resultadoCreado', { detail: data }))
+
       onSuccess?.(data)
-      resetForm()
+      if (!resultToEdit) {
+        resetForm() // Solo limpiar si era añadir nuevo, si es edit se cierra el dialog habitualmente
+      }
     } catch (error) {
       console.error('Error al guardar resultado:', error)
       setSubmitError(error.message || 'No se pudo guardar el resultado')
@@ -455,17 +539,21 @@ function AddResultDialog({ open, onClose, onSuccess }) {
   }
 
   return (
-    <Dialog
+    <Modal.Root
       open={open}
       onClose={handleClose}
       maxWidth="md"
-      fullWidth
     >
-      <DialogTitle sx={{ position: 'sticky', top: 0, zIndex: 2, bgcolor: 'background.paper', display: 'flex', alignItems: 'center', gap: 1 }}>
-        <TbCircuitCapacitorPolarized size={24} />
-        <Typography variant="h6" component="span">Añadir marca</Typography>
-      </DialogTitle>
-      <DialogContent>
+      {/* Using specific styling to match header pattern but using Modal structure */}
+      <Modal.Header onClose={handleClose}>
+        <Stack direction="row" alignItems="center" gap={1}>
+          <TbCircuitCapacitorPolarized size={24} />
+          <Typography variant="h6" component="span">
+            {resultToEdit ? 'Editar marca' : 'Añadir marca'}
+          </Typography>
+        </Stack>
+      </Modal.Header>
+      <Modal.Body>
         <Stack spacing={2}>
 
           {submitError && <Alert severity="error">{submitError}</Alert>}
@@ -479,7 +567,6 @@ function AddResultDialog({ open, onClose, onSuccess }) {
               loading={optionsLoading || athleteSearchLoading}
               inputValue={atletaInputValue}
               onInputChange={(_, value) => setAtletaInputValue(value)}
-              // las opciones ya vienen filtradas desde el servidor
               filterOptions={(opts) => opts}
               getOptionLabel={(option) =>
                 option?.nombre
@@ -490,7 +577,7 @@ function AddResultDialog({ open, onClose, onSuccess }) {
                 option?.atleta_id === value?.atleta_id
               }
               renderInput={(params) => (
-                <TextField
+                <Input
                   {...params}
                   label="Nombre del atleta"
                   required
@@ -517,7 +604,7 @@ function AddResultDialog({ open, onClose, onSuccess }) {
               getOptionLabel={(option) => option?.nombre || ''}
               isOptionEqualToValue={(option, value) => option?.club_id === value?.club_id}
               renderInput={(params) => (
-                <TextField
+                <Input
                   {...params}
                   label="Club"
                   required
@@ -553,7 +640,7 @@ function AddResultDialog({ open, onClose, onSuccess }) {
                 option?.prueba_id === value?.prueba_id
               }
               renderInput={(params) => (
-                <TextField
+                <Input
                   {...params}
                   label="Prueba disputada"
                   required
@@ -582,7 +669,7 @@ function AddResultDialog({ open, onClose, onSuccess }) {
                 option?.categoria_id === value?.categoria_id
               }
               renderInput={(params) => (
-                <TextField
+                <Input
                   {...params}
                   label="Categoría"
                   required
@@ -602,7 +689,7 @@ function AddResultDialog({ open, onClose, onSuccess }) {
 
           <Divider />
 
-          <TextField
+          <Input
             label="Fecha"
             type="date"
             value={formValues.fecha}
@@ -613,7 +700,7 @@ function AddResultDialog({ open, onClose, onSuccess }) {
           />
 
           <Stack spacing={2} direction={{ xs: 'column', sm: 'row' }}>
-            <TextField
+            <Input
               label="Género"
               select
               value={formValues.genero}
@@ -628,9 +715,9 @@ function AddResultDialog({ open, onClose, onSuccess }) {
                   {option.label}
                 </MenuItem>
               ))}
-            </TextField>
+            </Input>
 
-            <TextField
+            <Input
               label="Superficie"
               select
               value={formValues.superficie}
@@ -645,10 +732,10 @@ function AddResultDialog({ open, onClose, onSuccess }) {
                   {option.label}
                 </MenuItem>
               ))}
-            </TextField>
+            </Input>
           </Stack>
 
-          <TextField
+          <Input
             label="Marca (texto oficial)"
             value={formValues.marcaTexto}
             onChange={(event) => handleMarcaTextoChange(event.target.value)}
@@ -658,10 +745,11 @@ function AddResultDialog({ open, onClose, onSuccess }) {
             fullWidth
           />
         </Stack>
-      </DialogContent>
-      <DialogActions>
+      </Modal.Body>
+      <Modal.Footer>
         <Button
           onClick={handleClose}
+          variant="ghost"
           startIcon={<TbX />}
           disabled={submitLoading}
         >
@@ -669,15 +757,16 @@ function AddResultDialog({ open, onClose, onSuccess }) {
         </Button>
         <Button
           onClick={handleSubmit}
-          variant="contained"
+          variant="primary"
           color="secondary"
           startIcon={<TbCheck />}
           disabled={!isFormValid || submitLoading || optionsLoading}
+          isLoading={submitLoading}
         >
           Guardar
         </Button>
-      </DialogActions>
-    </Dialog>
+      </Modal.Footer>
+    </Modal.Root>
   )
 }
 

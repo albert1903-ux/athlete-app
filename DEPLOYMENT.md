@@ -7,9 +7,10 @@ El backend de análisis biomecánico está diseñado para funcionar en un entorn
 Para ejecutar el backend localmente:
 
 1. **Instalar dependencias**:
-   ```bash
-   cd backend
-   pip install -r requirements.txt
+   ```cd backend
+source ../.venv/bin/activate  
+pip install -r requirements.txt 
+python3 app.py
    ```
 
 2. **Ejecutar servidor**:

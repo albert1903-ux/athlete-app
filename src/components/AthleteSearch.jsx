@@ -3,7 +3,7 @@ import dayjs from 'dayjs'
 import {
   Box,
   TextField,
-  Button,
+
   Card,
   CardContent,
   Typography,
@@ -16,6 +16,7 @@ import {
   ToggleButton,
   ToggleButtonGroup
 } from '@mui/material'
+import { Button } from './ui'
 import { TbSearch } from 'react-icons/tb'
 import { supabase } from '../lib/supabase'
 
@@ -244,10 +245,11 @@ function AthleteSearch({ onResultClick }) {
               }
             />
             <Button
-              variant="contained"
+              variant="primary"
               onClick={handleSearch}
               disabled={loading || !searchQuery.trim()}
-              startIcon={loading ? <CircularProgress size={20} /> : <TbSearch />}
+              isLoading={loading}
+              startIcon={<TbSearch />}
               sx={{ minWidth: 120 }}
             >
               Buscar

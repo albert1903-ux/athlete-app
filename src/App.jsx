@@ -5,7 +5,7 @@ import Toolbar from '@mui/material/Toolbar'
 import Typography from '@mui/material/Typography'
 import Box from '@mui/material/Box'
 import IconButton from '@mui/material/IconButton'
-import { TbPlus, TbEye, TbCalendarPlus, TbHeartPlus, TbCircuitCapacitorPolarized } from 'react-icons/tb'
+import { TbPlus, TbEye, TbCalendarPlus, TbHeartPlus } from 'react-icons/tb'
 import BottomNavigationBar from './components/BottomNavigationBar'
 import SeguimientoPage from './pages/SeguimientoPage'
 import AnalisisPage from './pages/AnalisisPage'
@@ -13,12 +13,12 @@ import BiomecanicaPage from './pages/BiomecanicaPage'
 import CalendarioPage from './pages/CalendarioPage'
 import MasPage from './pages/MasPage'
 import AddAthleteDialog from './components/AddAthleteDialog'
-import AddResultDialog from './components/AddResultDialog'
+
 
 function AppContent() {
   const location = useLocation()
   const [dialogOpen, setDialogOpen] = useState(false)
-  const [resultDialogOpen, setResultDialogOpen] = useState(false)
+
   const isSeguimientoPage = location.pathname === '/seguimiento'
   const isAnalisisPage = location.pathname === '/analisis'
   const isCalendarioPage = location.pathname === '/calendario'
@@ -45,13 +45,7 @@ function AppContent() {
     setDialogOpen(false)
   }
 
-  const handleOpenResultDialog = () => {
-    setResultDialogOpen(true)
-  }
 
-  const handleCloseResultDialog = () => {
-    setResultDialogOpen(false)
-  }
 
   const handleAddAthlete = (athlete) => {
     try {
@@ -91,106 +85,71 @@ function AppContent() {
       }}
     >
       {/* AppBar mobile-optimized */}
-      <AppBar position="fixed" sx={{ width: '100%', zIndex: 1100, pt: 'env(safe-area-inset-top)' }}>
-        <Toolbar sx={{ minHeight: { xs: 56 }, px: 2, display: 'flex', alignItems: 'center' }}>
-          <Typography
-            variant="h6"
-            component="div"
-            sx={{ flexGrow: 1, fontSize: { xs: '1.1rem' }, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
-          >
-            {getPageTitle()}
-          </Typography>
-          {isSeguimientoPage && (
-            <IconButton
-              onClick={handleOpenResultDialog}
-              sx={{
-                width: 40,
-                height: 40,
-                borderRadius: '50%',
-                backgroundColor: 'secondary.main',
-                color: 'white',
-                '&:hover': {
-                  backgroundColor: 'secondary.dark'
-                },
-                ml: 1
-              }}
-              aria-label="añadir resultado"
+      {!isSeguimientoPage && (
+        <AppBar position="fixed" sx={{ width: '100%', zIndex: 1100, pt: 'env(safe-area-inset-top)' }}>
+          <Toolbar sx={{ minHeight: { xs: 56 }, px: 2, display: 'flex', alignItems: 'center' }}>
+            <Typography
+              variant="h6"
+              component="div"
+              sx={{ flexGrow: 1, fontSize: { xs: '1.1rem' }, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
             >
-              <TbCircuitCapacitorPolarized />
-            </IconButton>
-          )}
-          {isAnalisisPage && (
-            <Box sx={{ display: 'flex', gap: 1, ml: 1 }}>
-              <IconButton
-                onClick={handleAddMeasurement}
-                sx={{
-                  width: 40,
-                  height: 40,
-                  borderRadius: '50%',
-                  backgroundColor: 'secondary.main',
-                  color: 'white',
-                  '&:hover': {
-                    backgroundColor: 'secondary.dark',
-                  },
-                }}
-                aria-label="añadir nueva medición"
-              >
-                <TbHeartPlus />
-              </IconButton>
-              <IconButton
-                onClick={handleViewMeasurements}
-                sx={{
-                  width: 40,
-                  height: 40,
-                  borderRadius: '50%',
-                  backgroundColor: 'secondary.main',
-                  color: 'white',
-                  '&:hover': {
-                    backgroundColor: 'secondary.dark',
-                  },
-                }}
-                aria-label="visualizar mediciones"
-              >
-                <TbEye />
-              </IconButton>
-            </Box>
-          )}
-          {isCalendarioPage && (
-            <IconButton
-              onClick={handleAddEvent}
-              sx={{
-                width: 40,
-                height: 40,
-                borderRadius: '50%',
-                backgroundColor: 'secondary.main',
-                color: 'white',
-                '&:hover': {
-                  backgroundColor: 'secondary.dark',
-                },
-                ml: 1
-              }}
-              aria-label="añadir evento"
-            >
-              <TbCalendarPlus />
-            </IconButton>
-          )}
-        </Toolbar>
-      </AppBar>
+              {getPageTitle()}
+            </Typography>
 
-      {/* Spacer para compensar AppBar fixed (56px + safe area) */}
-      <Box sx={{ height: 'calc(56px + env(safe-area-inset-top))' }} />
+            {isAnalisisPage && (
+              <Box sx={{ display: 'flex', gap: 1, ml: 1 }}>
+                <IconButton
+                  onClick={handleAddMeasurement}
+                  sx={{
+                    bgcolor: 'white',
+                    color: 'text.primary',
+                    '&:hover': { bgcolor: 'rgba(255,255,255,0.8)' }
+                  }}
+                  aria-label="añadir nueva medición"
+                >
+                  <TbHeartPlus />
+                </IconButton>
+                <IconButton
+                  onClick={handleViewMeasurements}
+                  sx={{
+                    bgcolor: 'white',
+                    color: 'text.primary',
+                    '&:hover': { bgcolor: 'rgba(255,255,255,0.8)' }
+                  }}
+                  aria-label="visualizar mediciones"
+                >
+                  <TbEye />
+                </IconButton>
+              </Box>
+            )}
+            {isCalendarioPage && (
+              <IconButton
+                onClick={handleAddEvent}
+                sx={{
+                  bgcolor: 'white',
+                  color: 'text.primary',
+                  '&:hover': { bgcolor: 'rgba(255,255,255,0.8)' },
+                  ml: 1
+                }}
+                aria-label="añadir evento"
+              >
+                <TbCalendarPlus />
+              </IconButton>
+            )}
+          </Toolbar>
+        </AppBar>
+      )}
+
+      {/* Spacer para compensar AppBar fixed (56px + safe area), NO en seguimiento */}
+      {!isSeguimientoPage && (
+        <Box sx={{ height: 'calc(56px + env(safe-area-inset-top))' }} />
+      )}
 
       {/* Diálogo para añadir atleta */}
       <AddAthleteDialog
         open={dialogOpen}
         onClose={handleCloseDialog}
         onAdd={handleAddAthlete}
-      />
-
-      <AddResultDialog
-        open={resultDialogOpen}
-        onClose={handleCloseResultDialog}
-        onSuccess={handleCloseResultDialog}
       />
 
       {/* Contenido principal con rutas */}

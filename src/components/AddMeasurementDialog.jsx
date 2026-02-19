@@ -1,17 +1,10 @@
 import { useState, useEffect } from 'react'
 import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Button,
-  TextField,
   Alert,
-  CircularProgress,
   Box,
-  Chip,
-  Typography
+  Chip
 } from '@mui/material'
+import { Modal, Button, Input, Typography } from './ui'
 import { supabase } from '../lib/supabase'
 import { TbX, TbCheck, TbHeartPlus } from 'react-icons/tb'
 
@@ -126,12 +119,14 @@ function AddMeasurementDialog({ open, onClose, onSuccess }) {
   }
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
-      <DialogTitle sx={{ position: 'sticky', top: 0, zIndex: 2, bgcolor: 'background.paper', display: 'flex', alignItems: 'center', gap: 1 }}>
-        <TbHeartPlus size={24} />
-        <Typography variant="h6" component="span">Nueva Medición Corporal</Typography>
-      </DialogTitle>
-      <DialogContent>
+    <Modal.Root open={open} onClose={onClose} maxWidth="sm">
+      <Modal.Header onClose={onClose}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          <TbHeartPlus size={24} />
+          <Typography variant="h6" component="span">Nueva Medición Corporal</Typography>
+        </Box>
+      </Modal.Header>
+      <Modal.Body>
         <Box display="flex" flexDirection="column" gap={2} sx={{ pt: 1 }}>
           {error && (
             <Alert severity="error" onClose={() => setError(null)}>
@@ -156,16 +151,16 @@ function AddMeasurementDialog({ open, onClose, onSuccess }) {
                   {selectedAthlete.nombre}
                 </Typography>
                 {selectedAthlete.licencia && selectedAthlete.licencia !== 'N/A' && (
-                  <Chip 
-                    label={`Lic: ${selectedAthlete.licencia}`} 
-                    size="small" 
+                  <Chip
+                    label={`Lic: ${selectedAthlete.licencia}`}
+                    size="small"
                     variant="outlined"
                   />
                 )}
                 {selectedAthlete.club && selectedAthlete.club !== 'N/A' && selectedAthlete.club !== 'Sin club' && (
-                  <Chip 
-                    label={selectedAthlete.club} 
-                    size="small" 
+                  <Chip
+                    label={selectedAthlete.club}
+                    size="small"
                     color="primary"
                     variant="outlined"
                   />
@@ -174,43 +169,39 @@ function AddMeasurementDialog({ open, onClose, onSuccess }) {
             </Box>
           )}
 
-          <TextField
+          <Input
             label="Fecha"
             type="date"
             name="fecha"
             value={formData.fecha}
             onChange={handleInputChange}
-            fullWidth
             InputLabelProps={{ shrink: true }}
             required
           />
-          <TextField
+          <Input
             label="Altura (cm)"
             type="number"
             name="altura"
             value={formData.altura}
             onChange={handleInputChange}
-            fullWidth
             inputProps={{ min: 0, max: 300, step: 0.1 }}
             helperText="Altura en centímetros (ej: 175.5)"
           />
-          <TextField
+          <Input
             label="Peso (kg)"
             type="number"
             name="peso"
             value={formData.peso}
             onChange={handleInputChange}
-            fullWidth
             inputProps={{ min: 0, max: 300, step: 0.1 }}
             helperText="Peso en kilogramos (ej: 65.0)"
           />
-          <TextField
+          <Input
             label="Envergadura (cm)"
             type="number"
             name="envergadura"
             value={formData.envergadura}
             onChange={handleInputChange}
-            fullWidth
             inputProps={{ min: 0, max: 300, step: 0.1 }}
             helperText="Envergadura de brazos en centímetros"
           />
@@ -218,21 +209,22 @@ function AddMeasurementDialog({ open, onClose, onSuccess }) {
             El IMC se calculará automáticamente si hay altura y peso
           </Alert>
         </Box>
-      </DialogContent>
-      <DialogActions>
-        <Button onClick={onClose} disabled={loading} startIcon={<TbX />}>
+      </Modal.Body>
+      <Modal.Footer>
+        <Button onClick={onClose} variant="ghost" disabled={loading} startIcon={<TbX />}>
           Cancelar
         </Button>
         <Button
           onClick={handleSubmit}
-          variant="contained"
+          variant="primary"
+          isLoading={loading}
           disabled={loading}
-          startIcon={!loading ? <TbCheck /> : undefined}
+          startIcon={<TbCheck />}
         >
-          {loading ? <CircularProgress size={24} /> : 'Guardar'}
+          Guardar
         </Button>
-      </DialogActions>
-    </Dialog>
+      </Modal.Footer>
+    </Modal.Root>
   )
 }
 

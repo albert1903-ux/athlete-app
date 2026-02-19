@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import Box from '@mui/material/Box'
-import Typography from '@mui/material/Typography'
+
 import AddMeasurementDialog from '../components/AddMeasurementDialog'
 import ViewMeasurementsDialog from '../components/ViewMeasurementsDialog'
 import AthleteHeightWeightScatter from '../components/AthleteHeightWeightScatter'
@@ -64,7 +64,7 @@ const AnalisisPage = () => {
         <AthleteBodyMeasurementsChart />
 
         {/* Gráfico de dispersión Altura-Peso */}
-        <AthleteHeightWeightScatter />          
+        <AthleteHeightWeightScatter />
       </Box>
 
       {/* Diálogo para añadir mediciones */}

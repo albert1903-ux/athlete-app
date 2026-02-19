@@ -2,24 +2,22 @@ import { useState, useEffect } from 'react'
 import dayjs from 'dayjs'
 import {
   Box,
-  Button,
+
   Card,
   CardContent,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
+
   Typography,
   Chip,
   IconButton,
   Alert
 } from '@mui/material'
+import { Button, Modal } from './ui'
 import { TbX, TbCheck, TbTrash, TbPlus, TbUserPlus, TbSwords } from 'react-icons/tb'
 import AthleteSearch from './AthleteSearch'
 
 const STORAGE_KEY_COMPARATORS = 'comparatorAthletes'
 
-function AthleteComparator({ onComparatorsChange }) {
+function AthleteComparator({ onComparatorsChange, hideAddButton = false }) {
   const [comparators, setComparators] = useState([])
   const [open, setOpen] = useState(false)
   const [tempSelectedAthlete, setTempSelectedAthlete] = useState(null)
@@ -108,35 +106,22 @@ function AthleteComparator({ onComparatorsChange }) {
   if (comparators.length === 0) {
     return (
       <Box sx={{ width: '100%' }}>
-        <Card sx={{ width: '100%' }}>
-          <CardContent sx={{ px: { xs: 2 }, py: { xs: 2 } }}>
-            <Button
-              fullWidth
-              variant="outlined"
-              color="secondary"
-              onClick={handleOpen}
-              sx={{ py: 2 }}
-              startIcon={<TbSwords />}
-            >
-              AÑADIR ATLETA A COMPARAR
-            </Button>
-          </CardContent>
-        </Card>
+
 
         {/* Popup con búsqueda */}
-        <Dialog
+        <Modal.Root
           open={open}
           onClose={handleClose}
           maxWidth="sm"
-          fullWidth
         >
-          <DialogTitle sx={{ flexShrink: 0, position: 'sticky', top: 0, zIndex: 2, bgcolor: 'background.paper', display: 'flex', alignItems: 'center', gap: 1 }}>
-            <TbSwords size={24} />
-            <Typography variant="h6" component="span">Añadir Atleta para Comparar</Typography>
-          </DialogTitle>
+          <Modal.Header onClose={handleClose}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <TbSwords size={24} />
+              <Typography variant="h6" component="span">Añadir Atleta para Comparar</Typography>
+            </Box>
+          </Modal.Header>
 
-          <DialogContent
-            dividers
+          <Modal.Body
             sx={{
               pb: 0,
               position: 'relative',
@@ -201,26 +186,26 @@ function AthleteComparator({ onComparatorsChange }) {
                 </Card>
               </Box>
             )}
-          </DialogContent>
+          </Modal.Body>
 
-          <DialogActions sx={{ flexShrink: 0, py: 1.5 }}>
+          <Modal.Footer>
             <Button
               onClick={handleClose}
+              variant="ghost"
               startIcon={<TbX />}
             >
               Cancelar
             </Button>
             <Button
               onClick={handleSelect}
-              variant="contained"
+              variant="primary"
               disabled={!tempSelectedAthlete}
               startIcon={<TbCheck />}
-              color="secondary"
             >
               Añadir
             </Button>
-          </DialogActions>
-        </Dialog>
+          </Modal.Footer>
+        </Modal.Root>
       </Box>
     )
   }
@@ -286,34 +271,35 @@ function AthleteComparator({ onComparatorsChange }) {
       ))}
 
       {/* Botón para añadir más */}
-      <Card sx={{ width: '100%', mt: 2 }}>
-        <CardContent sx={{ px: { xs: 2 }, py: { xs: 2 } }}>
-          <Button
-            fullWidth
-            variant="outlined"
-            color="secondary"
-            onClick={handleOpen}
-            startIcon={<TbSwords />}
-          >
-            AÑADIR ATLETA A COMPARAR
-          </Button>
-        </CardContent>
-      </Card>
+      {!hideAddButton && (
+        <Card sx={{ width: '100%', mt: 2 }}>
+          <CardContent sx={{ px: { xs: 2 }, py: { xs: 2 } }}>
+            <Button
+              fullWidth
+              variant="secondary"
+              onClick={handleOpen}
+              startIcon={<TbSwords />}
+            >
+              AÑADIR ATLETA A COMPARAR
+            </Button>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Popup con búsqueda */}
-      <Dialog
+      <Modal.Root
         open={open}
         onClose={handleClose}
         maxWidth="sm"
-        fullWidth
       >
-        <DialogTitle sx={{ flexShrink: 0, position: 'sticky', top: 0, zIndex: 2, bgcolor: 'background.paper', display: 'flex', alignItems: 'center', gap: 1 }}>
-          <TbSwords size={24} />
-          <Typography variant="h6" component="span">Añadir Atleta para Comparar</Typography>
-        </DialogTitle>
+        <Modal.Header onClose={handleClose}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <TbSwords size={24} />
+            <Typography variant="h6" component="span">Añadir Atleta para Comparar</Typography>
+          </Box>
+        </Modal.Header>
 
-        <DialogContent
-          dividers
+        <Modal.Body
           sx={{
             pb: 0,
             position: 'relative',
@@ -385,26 +371,26 @@ function AthleteComparator({ onComparatorsChange }) {
               </Card>
             </Box>
           )}
-        </DialogContent>
+        </Modal.Body>
 
-        <DialogActions sx={{ flexShrink: 0, py: 1.5 }}>
+        <Modal.Footer>
           <Button
             onClick={handleClose}
+            variant="ghost"
             startIcon={<TbX />}
           >
             Cancelar
           </Button>
           <Button
             onClick={handleSelect}
-            variant="contained"
+            variant="primary"
             disabled={!tempSelectedAthlete}
             startIcon={<TbCheck />}
-            color="secondary"
           >
             Añadir
           </Button>
-        </DialogActions>
-      </Dialog>
+        </Modal.Footer>
+      </Modal.Root>
     </Box>
   )
 }

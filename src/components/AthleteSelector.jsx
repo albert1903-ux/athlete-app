@@ -2,17 +2,15 @@ import { useState, useEffect } from 'react'
 import dayjs from 'dayjs'
 import {
   Box,
-  Button,
+
   Card,
   CardContent,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
+
   Typography,
   Chip,
   IconButton
 } from '@mui/material'
+import { Button, Modal } from './ui'
 import { TbX, TbCheck, TbPencil, TbUser } from 'react-icons/tb'
 import AthleteSearch from './AthleteSearch'
 
@@ -169,8 +167,7 @@ function AthleteSelector() {
           <CardContent sx={{ px: { xs: 2 }, py: { xs: 2 } }}>
             <Button
               fullWidth
-              variant="outlined"
-              color="primary"
+              variant="secondary"
               onClick={handleOpen}
               sx={{ py: 2 }}
             >
@@ -181,19 +178,19 @@ function AthleteSelector() {
       )}
 
       {/* Popup con búsqueda */}
-      <Dialog
+      <Modal.Root
         open={open}
         onClose={handleClose}
         maxWidth="sm"
-        fullWidth
       >
-        <DialogTitle sx={{ flexShrink: 0, display: 'flex', alignItems: 'center', gap: 1 }}>
-          <TbUser size={24} />
-          <Typography variant="h6" component="span">Seleccionar Atleta</Typography>
-        </DialogTitle>
+        <Modal.Header onClose={handleClose}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <TbUser size={24} />
+            <Typography variant="h6" component="span">Seleccionar Atleta</Typography>
+          </Box>
+        </Modal.Header>
 
-        <DialogContent
-          dividers
+        <Modal.Body
           sx={{
             pb: 0,
             position: 'relative',
@@ -279,25 +276,26 @@ function AthleteSelector() {
               </Card>
             </Box>
           )}
-        </DialogContent>
+        </Modal.Body>
 
-        <DialogActions sx={{ flexShrink: 0, py: 1.5 }}>
+        <Modal.Footer>
           <Button
             onClick={handleClose}
+            variant="ghost"
             startIcon={<TbX />}
           >
             Cancelar
           </Button>
           <Button
             onClick={handleSelect}
-            variant="contained"
+            variant="primary"
             disabled={!tempSelectedAthlete}
             startIcon={<TbCheck />}
           >
             Seleccionar
           </Button>
-        </DialogActions>
-      </Dialog>
+        </Modal.Footer>
+      </Modal.Root>
     </Box>
   )
 }
