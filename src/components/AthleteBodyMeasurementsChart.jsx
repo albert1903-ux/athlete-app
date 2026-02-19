@@ -24,7 +24,7 @@ import { supabase } from '../lib/supabase'
 const STORAGE_KEY = 'selectedAthlete'
 
 const MEASUREMENT_TYPES = {
-  peso: { label: 'Peso', unit: 'kg', color: '#1976d2' },
+  peso: { label: 'Peso', unit: 'kg', color: '#E11141' },
   altura: { label: 'Altura', unit: 'cm', color: '#d32f2f' },
   imc: { label: 'IMC', unit: '', color: '#388e3c' },
   envergadura: { label: 'Envergadura', unit: 'cm', color: '#f57c00' }
@@ -182,7 +182,7 @@ function AthleteBodyMeasurementsChart() {
     if (active && payload && payload.length) {
       const measurementType = MEASUREMENT_TYPES[selectedMeasurement]
       const unit = measurementType.unit ? ` ${measurementType.unit}` : ''
-      
+
       return (
         <Paper sx={{ p: 1.5, backgroundColor: 'rgba(255, 255, 255, 0.95)' }} elevation={3}>
           <Typography variant="body2" sx={{ fontWeight: 'bold', mb: 1 }}>
@@ -190,8 +190,8 @@ function AthleteBodyMeasurementsChart() {
           </Typography>
           {payload.map((entry, index) => {
             if (entry.value !== null && entry.value !== undefined) {
-              const valorFormateado = typeof entry.value === 'number' 
-                ? entry.value.toFixed(2) 
+              const valorFormateado = typeof entry.value === 'number'
+                ? entry.value.toFixed(2)
                 : entry.value
               return (
                 <Typography
@@ -270,7 +270,7 @@ function AthleteBodyMeasurementsChart() {
         <Typography variant="h6" gutterBottom sx={{ fontSize: { xs: '1.1rem' } }}>
           Evolución de Medidas Corporales
         </Typography>
-        
+
         {/* Segmented Control para seleccionar tipo de medida */}
         <Box sx={{ mt: 2, mb: 2, display: 'flex', justifyContent: 'center', flexWrap: 'wrap', gap: 1 }}>
           <ToggleButtonGroup

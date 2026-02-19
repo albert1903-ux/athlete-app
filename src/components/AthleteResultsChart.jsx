@@ -684,7 +684,7 @@ function AthleteResultsChart({ comparatorAthletes = [] }) {
           pruebas: [{
             nombre: pruebaData.name,
             unidad: pruebaData.unidad,
-            color: '#0275d8'
+            color: '#E11141'
           }]
         })
 
@@ -942,7 +942,7 @@ function AthleteResultsChart({ comparatorAthletes = [] }) {
       pruebas: [{
         nombre: pruebaData.name,
         unidad: pruebaData.unidad,
-        color: '#0275d8'
+        color: '#E11141'
       }]
     })
   }
@@ -1019,7 +1019,7 @@ function AthleteResultsChart({ comparatorAthletes = [] }) {
   }
 
   // Obtener colores para los comparadores evitando colores similares al principal
-  const getColorForAthleteIndex = (index, mainColor = '#1976d2') => {
+  const getColorForAthleteIndex = (index, mainColor = '#E11141') => {
     const allColors = [
       '#d32f2f', // Rojo
       '#388e3c', // Verde
@@ -1167,7 +1167,7 @@ function AthleteResultsChart({ comparatorAthletes = [] }) {
   // Función para asignar colores a las pruebas
   const getColorForPrueba = (nombrePrueba) => {
     const colors = [
-      '#1976d2', // Azul
+      '#E11141', // Rojo
       '#d32f2f', // Rojo
       '#388e3c', // Verde
       '#f57c00', // Naranja
@@ -1516,7 +1516,7 @@ function AthleteResultsChart({ comparatorAthletes = [] }) {
                       key={index}
                       type="monotone"
                       dataKey="marca"
-                      stroke={prueba.color || '#0275d8'}
+                      stroke={prueba.color || '#E11141'}
                       strokeWidth={3}
                       dot={{ r: 4, strokeWidth: 2, fill: '#fff' }}
                       activeDot={{ r: 6, strokeWidth: 0 }}
@@ -1528,7 +1528,7 @@ function AthleteResultsChart({ comparatorAthletes = [] }) {
                   <Line
                     type="monotone"
                     dataKey="marca"
-                    stroke="#0275d8"
+                    stroke="#E11141"
                     strokeWidth={3}
                     dot={{ r: 4, strokeWidth: 2, fill: '#fff' }}
                     activeDot={{ r: 6, strokeWidth: 0 }}
@@ -1543,7 +1543,7 @@ function AthleteResultsChart({ comparatorAthletes = [] }) {
                   if (compData && compData[selectedPrueba]) {
                     const compPruebaData = compData[selectedPrueba]
                     const atletaDataKey = `marca_comp_${athlete.atleta_id}`
-                    const athleteColor = getColorForAthlete(athlete.atleta_id) || athleteColors[athlete.atleta_id] || '#0275d8'
+                    const athleteColor = getColorForAthlete(athlete.atleta_id) || athleteColors[athlete.atleta_id] || '#E11141'
                     return (
                       <Line
                         key={`comp_${athlete.atleta_id}`}

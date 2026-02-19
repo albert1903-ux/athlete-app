@@ -627,7 +627,7 @@ const BiomecanicaPage = () => {
                                 height: 120,
                                 borderRadius: '50%',
                                 border: '8px solid rgba(255, 255, 255, 0.1)',
-                                borderTop: '8px solid #1976d2',
+                                borderTop: '8px solid #E11141',
                                 animation: 'spin 1s linear infinite',
                                 '@keyframes spin': {
                                     '0%': { transform: 'rotate(0deg)' },

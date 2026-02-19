@@ -3,9 +3,9 @@
 export const tokens = {
     colors: {
         primary: {
-            main: '#1976d2',
-            light: '#42a5f5',
-            dark: '#1565c0',
+            main: '#E11141',
+            light: '#FF4D6A',
+            dark: '#B80D34',
             contrastText: '#ffffff',
         },
         secondary: {

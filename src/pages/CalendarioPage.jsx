@@ -319,7 +319,7 @@ const CalendarioPage = () => {
               width: '4px',
               height: '4px',
               borderRadius: '50%',
-              backgroundColor: '#4285F4',
+              backgroundColor: '#E11141',
             }}
           />
         )}

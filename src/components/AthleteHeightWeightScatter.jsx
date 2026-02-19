@@ -168,25 +168,25 @@ function AthleteHeightWeightScatter() {
   // Calcular dominios para los ejes
   const alturaDomain = chartData.length > 0
     ? [
-        Math.min(...chartData.map(d => d.altura)) - 5,
-        Math.max(...chartData.map(d => d.altura)) + 5
-      ]
+      Math.min(...chartData.map(d => d.altura)) - 5,
+      Math.max(...chartData.map(d => d.altura)) + 5
+    ]
     : [0, 200]
 
   const pesoDomain = chartData.length > 0
     ? [
-        Math.min(...chartData.map(d => d.peso)) - 5,
-        Math.max(...chartData.map(d => d.peso)) + 5
-      ]
+      Math.min(...chartData.map(d => d.peso)) - 5,
+      Math.max(...chartData.map(d => d.peso)) + 5
+    ]
     : [0, 100]
 
   if (!selectedAthlete) {
     return (
       <Card sx={{ width: '100%' }}>
-      <CardContent sx={{ px: { xs: 2 }, py: { xs: 2 } }}>
-        <Typography variant="h6" gutterBottom sx={{ fontSize: { xs: '1.1rem' } }}>
-          Relación Altura-Peso
-        </Typography>
+        <CardContent sx={{ px: { xs: 2 }, py: { xs: 2 } }}>
+          <Typography variant="h6" gutterBottom sx={{ fontSize: { xs: '1.1rem' } }}>
+            Relación Altura-Peso
+          </Typography>
           <Alert severity="info">
             Selecciona un atleta para ver su gráfico de altura vs peso
           </Alert>
@@ -229,38 +229,38 @@ function AthleteHeightWeightScatter() {
                   height={400}
                   margin={{ top: 20, right: 20, bottom: 40, left: 40 }}
                 >
-                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(0,0,0,0.1)" />
-                    <XAxis
-                      type="number"
-                      dataKey="altura"
-                      name="Altura"
-                      unit=" cm"
-                      domain={alturaDomain}
-                      label={{
-                        value: 'Altura (cm)',
-                        position: 'insideBottom',
-                        offset: -5
-                      }}
-                    />
-                    <YAxis
-                      type="number"
-                      dataKey="peso"
-                      name="Peso"
-                      unit=" kg"
-                      domain={pesoDomain}
-                      label={{
-                        value: 'Peso (kg)',
-                        angle: -90,
-                        position: 'insideLeft'
-                      }}
-                    />
-                    <Tooltip content={<CustomTooltip />} />
-                    <Scatter
-                      name="Mediciones"
-                      data={chartData}
-                      fill="#1976d2"
-                    />
-                  </ScatterChart>
+                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(0,0,0,0.1)" />
+                  <XAxis
+                    type="number"
+                    dataKey="altura"
+                    name="Altura"
+                    unit=" cm"
+                    domain={alturaDomain}
+                    label={{
+                      value: 'Altura (cm)',
+                      position: 'insideBottom',
+                      offset: -5
+                    }}
+                  />
+                  <YAxis
+                    type="number"
+                    dataKey="peso"
+                    name="Peso"
+                    unit=" kg"
+                    domain={pesoDomain}
+                    label={{
+                      value: 'Peso (kg)',
+                      angle: -90,
+                      position: 'insideLeft'
+                    }}
+                  />
+                  <Tooltip content={<CustomTooltip />} />
+                  <Scatter
+                    name="Mediciones"
+                    data={chartData}
+                    fill="#E11141"
+                  />
+                </ScatterChart>
               </Box>
             ) : (
               <Alert severity="info" sx={{ mt: 2 }}>

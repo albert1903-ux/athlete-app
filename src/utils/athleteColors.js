@@ -1,7 +1,7 @@
 // Gestión centralizada de colores para atletas
 // Los colores se asignan basándose en atleta_id para mantener consistencia
 
-const MAIN_ATHLETE_COLOR = '#0275d8' // rgb(2, 117, 216)
+const MAIN_ATHLETE_COLOR = '#E11141'
 
 const COMPARATOR_COLORS = [
   '#d9534f', // rgb(217, 83, 79) - Rojo
@@ -34,7 +34,7 @@ export function getColorForAthlete(atletaId, isMainAthlete = false) {
   // Si no tiene color asignado, encontrar el primer color disponible
   // que no esté siendo usado por otro atleta comparador activo
   const usedColors = new Set(Array.from(colorAssignments.values()))
-  
+
   // Buscar el primer color de la lista que no esté en uso
   for (const color of COMPARATOR_COLORS) {
     if (!usedColors.has(color)) {
@@ -54,7 +54,7 @@ export function getColorForAthlete(atletaId, isMainAthlete = false) {
 // Función para limpiar colores de atletas que ya no están en la lista
 export function cleanupUnusedColors(currentAthleteIds) {
   const currentIds = new Set(currentAthleteIds.map(id => Number(id)))
-  
+
   // Eliminar colores de atletas que ya no están en la lista
   for (const [atletaId] of colorAssignments) {
     if (!currentIds.has(Number(atletaId))) {
