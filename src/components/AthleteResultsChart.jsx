@@ -14,7 +14,7 @@ import {
   Select,
   MenuItem
 } from '@mui/material'
-import { TbCalendar, TbUser } from 'react-icons/tb'
+import { TbCalendar, TbUser, TbChevronDown } from 'react-icons/tb'
 import {
   LineChart,
   Line,
@@ -1360,111 +1360,132 @@ function AthleteResultsChart({ comparatorAthletes = [] }) {
     : []
 
   return (
-    <Card sx={{ width: '100%' }}>
-      <CardContent sx={{ px: { xs: 2 }, py: { xs: 2 } }}>
-        {/* Fila superior: título a la izquierda, desplegable de pruebas a la derecha */}
-        <Box
-          sx={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            mb: 0.5,
-            gap: 1
-          }}
-        >
-          <Typography
-            variant="h6"
-            gutterBottom
-            sx={{ fontSize: { xs: '1.1rem' }, mb: 0 }}
-          >
-            Evolución de Marcas
-          </Typography>
-          {pruebasDisponibles.length > 0 && (
-            <FormControl
-              size="small"
-              sx={{ minWidth: 160 }}
-            >
-              <InputLabel id="prueba-select-label">Prueba</InputLabel>
-              <Select
-                labelId="prueba-select-label"
-                id="prueba-select"
-                value={selectedPrueba || ''}
-                label="Prueba"
-                onChange={(event) => handlePruebaChange(event, event.target.value)}
-              >
-                {pruebasDisponibles.map((pruebaNombre) => (
-                  <MenuItem key={pruebaNombre} value={pruebaNombre}>
-                    {pruebaNombre}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          )}
-        </Box>
+    <Box sx={{ width: '100%' }}>
+      {/* Header Row */}
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2, px: 1 }}>
+        <Typography variant="h6" sx={{ fontFamily: 'Poppins', fontWeight: 500, fontSize: '20px', color: '#000000' }}>
+          Evolución de Marcas
+        </Typography>
 
-        {/* Fila inferior: botones para cambiar entre vista por fecha y por edad, debajo del título */}
-        <Box
+        {pruebasDisponibles.length > 0 && (
+          <FormControl size="small" sx={{ minWidth: 160 }}>
+            <Select
+              value={selectedPrueba || ''}
+              onChange={(event) => handlePruebaChange(event, event.target.value)}
+              displayEmpty
+              renderValue={(selected) => selected || 'Prueba'}
+              sx={{
+                borderRadius: '20px',
+                bgcolor: '#F2F3F7',
+                border: 'none',
+                fontWeight: 'medium',
+                color: '#000',
+                px: 1,
+                py: 0.5,
+                '& .MuiOutlinedInput-notchedOutline': { border: 'none' },
+                '&:hover': { bgcolor: '#e0e0e0' },
+                '& .MuiSelect-select': { py: 0.5, pr: '32px !important' },
+                boxShadow: 'none',
+              }}
+              IconComponent={(props) => (
+                <Box {...props} sx={{ ...props.sx, right: '10px !important', top: 'calc(50% - 0.5em) !important' }}>
+                  <TbChevronDown size={20} color="#000" />
+                </Box>
+              )}
+            >
+              {pruebasDisponibles.map((pruebaNombre) => (
+                <MenuItem key={pruebaNombre} value={pruebaNombre}>
+                  {pruebaNombre}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        )}
+      </Box>
+
+      {/* Controls Row - View Mode */}
+      <Box sx={{ display: 'flex', justifyContent: 'flex-start', mb: 2, px: 1 }}>
+        <Paper
+          elevation={0}
           sx={{
             display: 'flex',
-            justifyContent: 'flex-start',
-            alignItems: 'center',
-            gap: 0.5,
-            mb: 1
+            border: '1px solid #e0e0e0',
+            borderRadius: '20px',
+            overflow: 'hidden',
+            bgcolor: 'white'
           }}
         >
           <MuiTooltip title="Vista por Fecha">
             <IconButton
               size="small"
               onClick={() => setViewMode('fecha')}
-              color={viewMode === 'fecha' ? 'primary' : 'default'}
               sx={{
-                backgroundColor: viewMode === 'fecha' ? 'action.selected' : 'transparent'
+                borderRadius: 0,
+                px: 2,
+                py: 0.5,
+                bgcolor: viewMode === 'fecha' ? '#f5f5f5' : 'transparent',
+                color: viewMode === 'fecha' ? 'primary.main' : '#757575',
+                '&:hover': { bgcolor: viewMode === 'fecha' ? '#eeeeee' : '#fafafa' }
               }}
             >
-              <TbCalendar size={20} />
+              <TbCalendar size={18} />
+              <Typography variant="caption" sx={{ ml: 0.5, fontWeight: viewMode === 'fecha' ? 600 : 400 }}>
+                Fecha
+              </Typography>
             </IconButton>
           </MuiTooltip>
+          <Box sx={{ width: '1px', bgcolor: '#e0e0e0' }} />
           <MuiTooltip title="Vista por Edad">
             <IconButton
               size="small"
               onClick={() => setViewMode('edad')}
-              color={viewMode === 'edad' ? 'primary' : 'default'}
               sx={{
-                backgroundColor: viewMode === 'edad' ? 'action.selected' : 'transparent'
+                borderRadius: 0,
+                px: 2,
+                py: 0.5,
+                bgcolor: viewMode === 'edad' ? '#f5f5f5' : 'transparent',
+                color: viewMode === 'edad' ? 'primary.main' : '#757575',
+                '&:hover': { bgcolor: viewMode === 'edad' ? '#eeeeee' : '#fafafa' }
               }}
             >
-              <TbUser size={20} />
+              <TbUser size={18} />
+              <Typography variant="caption" sx={{ ml: 0.5, fontWeight: viewMode === 'edad' ? 600 : 400 }}>
+                Edad
+              </Typography>
             </IconButton>
           </MuiTooltip>
-        </Box>
+        </Paper>
+      </Box>
 
-        {/* Gráfico */}
-        {combinedChartData && combinedChartData.length > 0 && chartWidth > 0 ? (
-          <>
-            <Box sx={{ mt: 2, width: '100%', overflow: 'hidden' }}>
+      {/* Chart Card */}
+      <Card sx={{ width: '100%', bgcolor: '#F2F3F7', borderRadius: '20px', boxShadow: 'none' }}>
+        <CardContent sx={{ px: { xs: 2 }, py: { xs: 3 } }}>
+          {combinedChartData && combinedChartData.length > 0 && chartWidth > 0 ? (
+            <Box sx={{ width: '100%', overflow: 'hidden' }}>
               <LineChart
                 width={chartWidth}
                 height={300}
                 data={combinedChartData}
-                margin={{ top: 5, right: 10, left: 10, bottom: 80 }}
+                margin={{ top: 5, right: 10, left: 10, bottom: 20 }}
               >
-                <CartesianGrid strokeDasharray="3 3" />
+                <CartesianGrid strokeDasharray="3 3" stroke="#d1d1d1" vertical={false} />
                 <XAxis
                   dataKey={viewMode === 'edad' ? 'edad' : 'fecha'}
                   angle={viewMode === 'edad' ? 0 : -45}
                   textAnchor={viewMode === 'edad' ? 'middle' : 'end'}
                   height={viewMode === 'edad' ? 40 : 80}
                   interval="preserveStartEnd"
-                  tick={{ fontSize: 10 }}
+                  tick={{ fontSize: 10, fill: '#666' }}
+                  tickLine={false}
+                  axisLine={{ stroke: '#999' }}
                   label={{
-                    value: viewMode === 'edad' ? 'Edad (años)' : 'Fecha',
+                    value: viewMode === 'edad' ? 'Edad (años)' : '',
                     position: 'insideBottom',
-                    offset: viewMode === 'edad' ? -5 : -10,
-                    style: { textAnchor: 'middle', fontSize: '10px' }
+                    offset: -5,
+                    style: { textAnchor: 'middle', fontSize: '10px', fill: '#666' }
                   }}
                   tickFormatter={(value) => {
                     if (viewMode === 'edad') {
-                      // Formatear edad como número con un decimal
                       return typeof value === 'number' ? value.toFixed(1) : value
                     }
                     return value
@@ -1475,16 +1496,20 @@ function AthleteResultsChart({ comparatorAthletes = [] }) {
                     value: chartData.pruebas?.[0]?.unidad ? `Valor (${chartData.pruebas[0].unidad})` : 'Valor',
                     angle: -90,
                     position: 'insideLeft',
-                    style: { textAnchor: 'middle', fontSize: '10px' }
+                    style: { textAnchor: 'middle', fontSize: '10px', fill: '#666' }
                   }}
-                  tick={{ fontSize: 10 }}
+                  tick={{ fontSize: 10, fill: '#666' }}
+                  tickLine={false}
+                  axisLine={{ stroke: '#999' }}
                   tickFormatter={(value) => {
                     const unidad = chartData.pruebas?.[0]?.unidad || ''
                     return formatTiempo(value, unidad)
                   }}
                 />
                 <Tooltip content={<CustomTooltip />} />
-                <Legend wrapperStyle={{ bottom: 60 }} />
+                <Legend wrapperStyle={{ paddingTop: '20px', color: '#333' }} />
+
+                {/* Lines for main athlete */}
                 {chartData.pruebas && chartData.pruebas.length > 0 ? (
                   chartData.pruebas.map((prueba, index) => (
                     <Line
@@ -1492,9 +1517,9 @@ function AthleteResultsChart({ comparatorAthletes = [] }) {
                       type="monotone"
                       dataKey="marca"
                       stroke={prueba.color || '#0275d8'}
-                      strokeWidth={2}
-                      dot={{ r: 4 }}
-                      activeDot={{ r: 6 }}
+                      strokeWidth={3}
+                      dot={{ r: 4, strokeWidth: 2, fill: '#fff' }}
+                      activeDot={{ r: 6, strokeWidth: 0 }}
                       connectNulls={true}
                       name={selectedAthlete?.nombre || 'Atleta Principal'}
                     />
@@ -1504,20 +1529,20 @@ function AthleteResultsChart({ comparatorAthletes = [] }) {
                     type="monotone"
                     dataKey="marca"
                     stroke="#0275d8"
-                    strokeWidth={2}
-                    dot={{ r: 4 }}
-                    activeDot={{ r: 6 }}
+                    strokeWidth={3}
+                    dot={{ r: 4, strokeWidth: 2, fill: '#fff' }}
+                    activeDot={{ r: 6, strokeWidth: 0 }}
                     connectNulls={true}
                     name={selectedAthlete?.nombre || 'Atleta Principal'}
                   />
                 )}
-                {/* Líneas para cada comparador */}
+
+                {/* Lines for comparators */}
                 {comparatorAthletes.map((athlete, index) => {
                   const compData = comparatorData[athlete.atleta_id]
                   if (compData && compData[selectedPrueba]) {
                     const compPruebaData = compData[selectedPrueba]
                     const atletaDataKey = `marca_comp_${athlete.atleta_id}`
-                    // Usar el color consistente asignado al atleta desde el módulo compartido
                     const athleteColor = getColorForAthlete(athlete.atleta_id) || athleteColors[athlete.atleta_id] || '#0275d8'
                     return (
                       <Line
@@ -1526,8 +1551,9 @@ function AthleteResultsChart({ comparatorAthletes = [] }) {
                         dataKey={atletaDataKey}
                         stroke={athleteColor}
                         strokeWidth={2}
-                        dot={{ r: 4 }}
-                        activeDot={{ r: 6 }}
+                        strokeDasharray="5 5"
+                        dot={{ r: 3, strokeWidth: 1, fill: '#fff' }}
+                        activeDot={{ r: 5, strokeWidth: 0 }}
                         connectNulls={true}
                         name={athlete.nombre}
                       />
@@ -1537,18 +1563,16 @@ function AthleteResultsChart({ comparatorAthletes = [] }) {
                 })}
               </LineChart>
             </Box>
-
-
-          </>
-        ) : selectedPrueba && (
-          <Box sx={{ mt: 2, p: 2 }}>
-            <Typography variant="body2" color="text.secondary" align="center">
-              No hay datos disponibles para esta prueba
-            </Typography>
-          </Box>
-        )}
-      </CardContent>
-    </Card>
+          ) : selectedPrueba && (
+            <Box sx={{ py: 4, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+              <Typography variant="body2" color="text.secondary" align="center">
+                No hay datos disponibles para esta prueba
+              </Typography>
+            </Box>
+          )}
+        </CardContent>
+      </Card>
+    </Box>
   )
 }
 

@@ -138,7 +138,7 @@ const SeguimientoPage = () => {
         }}
       >
         <Box sx={{ mt: 2 }}>
-          <Typography variant="h5" component="h1" fontWeight="bold" sx={{ mb: 1 }}>
+          <Typography component="h1" sx={{ fontFamily: 'Poppins', fontWeight: 500, fontSize: '24px', color: '#000000', mb: 1 }}>
             {selectedAthlete ? selectedAthlete.nombre : 'Selecciona un atleta'}
           </Typography>
 
@@ -185,18 +185,18 @@ const SeguimientoPage = () => {
       >
         {selectedAthlete ? (
           <>
-            {/* Componente gráfico de resultados */}
-            <Box sx={{ width: '100%' }}>
-              <AthleteResultsChart
-                key={`results-${resultsRefreshKey}`}
-                comparatorAthletes={comparatorAthletes}
-              />
-            </Box>
-
             {/* Componente gráfico de araña */}
             <Box sx={{ width: '100%' }}>
               <AthleteSpiderChart
                 key={`spider-${resultsRefreshKey}`}
+                comparatorAthletes={comparatorAthletes}
+              />
+            </Box>
+
+            {/* Componente gráfico de resultados */}
+            <Box sx={{ width: '100%' }}>
+              <AthleteResultsChart
+                key={`results-${resultsRefreshKey}`}
                 comparatorAthletes={comparatorAthletes}
               />
             </Box>

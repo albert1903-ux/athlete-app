@@ -1116,74 +1116,104 @@ function AthleteSpiderChart({ comparatorAthletes = [] }) {
   }
 
   return (
-    <>
-      <Card sx={{ width: '100%' }}>
-        <CardContent sx={{ px: { xs: 2 }, py: { xs: 2 } }}>
-          <Box
-            sx={{
-              display: 'flex',
-              flexDirection: 'row',
-              alignItems: 'center',
-              gap: 2,
-              flexWrap: 'wrap'
-            }}
-          >
-            <Typography variant="h6" gutterBottom sx={{ fontSize: { xs: '1.1rem' }, mb: 0 }}>
-              Mejores Marcas
-            </Typography>
-            {availableCategories.length > 0 && (
-              <FormControl size="small" sx={{ minWidth: 160, ml: 'auto' }}>
-                <InputLabel id="radar-category-select-label">Categoría</InputLabel>
-                <Select
-                  labelId="radar-category-select-label"
-                  value={selectedCategory || ''}
-                  label="Categoría"
-                  onChange={(event) => setSelectedCategory(event.target.value)}
-                >
-                  {(() => {
-                    const getRank = (key) => {
-                      const label = categoryLabels[key] || key
-                      const match = /\d+/.exec(label)
-                      return match ? parseInt(match[0], 10) : -Infinity
-                    }
-                    const sorted = [...availableCategories].sort((a, b) => {
-                      const ra = getRank(a)
-                      const rb = getRank(b)
-                      if (rb !== ra) return rb - ra
-                      const la = (categoryLabels[a] || a).toString()
-                      const lb = (categoryLabels[b] || b).toString()
-                      return lb.localeCompare(la, 'es', { sensitivity: 'base' })
-                    })
-                    return sorted.map((categoriaKey) => (
-                      <MenuItem key={categoriaKey} value={categoriaKey}>
-                        {categoryLabels[categoriaKey] || categoriaKey}
-                      </MenuItem>
-                    ))
-                  })()}
-                </Select>
-              </FormControl>
-            )}
-          </Box>
+    <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column', gap: 2 }}>
+      {/* Header Row: Title and Pill Selector */}
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          flexWrap: 'wrap',
+          gap: 2
+        }}
+      >
+        <Typography variant="h6" sx={{ fontFamily: 'Poppins', fontWeight: 500, fontSize: '20px', mb: 0, color: '#000000' }}>
+          Mejores Marcas
+        </Typography>
 
-          <Box sx={{ mt: 2, width: '100%' }}>
-            {chartDimensions.width > 0 && chartDimensions.height > 0 ? (
+        {availableCategories.length > 0 && (
+          <FormControl size="small" sx={{ minWidth: 120 }}>
+            <Select
+              value={selectedCategory || ''}
+              onChange={(event) => setSelectedCategory(event.target.value)}
+              displayEmpty
+              renderValue={(selected) => {
+                if (!selected) return 'Categoría';
+                return categoryLabels[selected] || selected;
+              }}
+              sx={{
+                borderRadius: '20px',
+                bgcolor: '#F2F3F7',
+                border: 'none',
+                fontWeight: 'medium',
+                color: '#000',
+                px: 1,
+                py: 0.5,
+                '& .MuiOutlinedInput-notchedOutline': { border: 'none' },
+                '&:hover': { bgcolor: '#e0e0e0' },
+                '& .MuiSelect-select': { py: 0.5, pr: '32px !important' }, // Adjust padding for pill shape
+                boxShadow: 'none',
+              }}
+              IconComponent={(props) => (
+                <Box {...props} sx={{ ...props.sx, right: '10px !important', top: 'calc(50% - 0.5em) !important' }}>
+                  <TbChevronDown size={20} color="#000" />
+                </Box>
+              )}
+            >
+              {(() => {
+                const getRank = (key) => {
+                  const label = categoryLabels[key] || key
+                  const match = /\d+/.exec(label)
+                  return match ? parseInt(match[0], 10) : -Infinity
+                }
+                const sorted = [...availableCategories].sort((a, b) => {
+                  const ra = getRank(a)
+                  const rb = getRank(b)
+                  if (rb !== ra) return rb - ra
+                  const la = (categoryLabels[a] || a).toString()
+                  const lb = (categoryLabels[b] || b).toString()
+                  return lb.localeCompare(la, 'es', { sensitivity: 'base' })
+                })
+                return sorted.map((categoriaKey) => (
+                  <MenuItem key={categoriaKey} value={categoriaKey}>
+                    {categoryLabels[categoriaKey] || categoriaKey}
+                  </MenuItem>
+                ))
+              })()}
+            </Select>
+          </FormControl>
+        )}
+      </Box>
+
+      {/* Chart Card */}
+      <Card
+        sx={{
+          width: '100%',
+          bgcolor: '#F2F3F7',
+          borderRadius: '20px',
+          boxShadow: 'none',
+          overflow: 'visible' // Ensure tooltips aren't clipped if possible, though Card usually clips
+        }}
+      >
+        <CardContent sx={{ px: { xs: 1, sm: 2 }, py: { xs: 2, sm: 4 }, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+          {chartDimensions.width > 0 && chartDimensions.height > 0 ? (
+            <Box sx={{ width: '100%', height: chartDimensions.height, display: 'flex', justifyContent: 'center' }}>
               <RadarChart width={chartDimensions.width} height={chartDimensions.height} data={radarData}>
-                <PolarGrid />
+                <PolarGrid stroke="#d1d1d1" />
                 <PolarAngleAxis
                   dataKey="prueba"
-                  tick={{ fontSize: 12 }}
+                  tick={{ fontSize: 12, fill: '#333333' }}
                 />
                 <PolarRadiusAxis
                   angle={90}
                   domain={[0, 100]}
-                  tick={{ fontSize: 10 }}
+                  tick={{ fontSize: 10, fill: '#555555' }}
+                  axisLine={false}
                 />
                 <Tooltip content={CustomTooltip} />
-                <Legend />
+                <Legend iconType="circle" wrapperStyle={{ color: '#333', paddingTop: '20px' }} />
                 {allAthletes.map((athlete) => {
                   const atletaIdKey = String(athlete.atleta_id)
-                  // Mostrar siempre el Radar, incluso si no hay datos (mostrará valores en 0)
-
                   return (
                     <Radar
                       key={athlete.atleta_id}
@@ -1198,91 +1228,109 @@ function AthleteSpiderChart({ comparatorAthletes = [] }) {
                   )
                 })}
               </RadarChart>
-            ) : (
-              <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '400px' }}>
-                <CircularProgress />
-              </Box>
-            )}
-          </Box>
-
-          {/* Leyenda con valores reales */}
-          <Accordion sx={{ mt: 3 }}>
-            <AccordionSummary expandIcon={<TbChevronDown />}>
-              <Typography variant="subtitle2">Mejores Resultados por Prueba</Typography>
-            </AccordionSummary>
-            <AccordionDetails>
-              {radarData.map((entry, idx) => (
-                <Box key={idx} sx={{ mt: 1, p: 1, bgcolor: 'grey.50', borderRadius: 1 }}>
-                  {/* Header with Title and Ranking Button */}
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
-                    <Typography variant="body2" fontWeight="bold">
-                      {entry.prueba} {entry.unidad && `(${entry.unidad})`}
-                    </Typography>
-
-                    <IconButton
-                      size="small"
-                      color="primary"
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        handleOpenRanking(entry.prueba, selectedCategory)
-                      }}
-                      title="Ver Ranking Top 50"
-                      sx={{ transition: 'background-color 0.2s' }}
-                    >
-                      <PiRanking size={20} />
-                    </IconButton>
-                  </Box>
-
-                  {allAthletes.map((athlete) => {
-                    const atletaIdKey = String(athlete.atleta_id)
-                    const realKey = `${atletaIdKey}_real`
-                    const unidadKey = `${atletaIdKey}_unidad`
-                    const valorReal = entry[realKey]
-                    const unidadReal = entry[unidadKey]
-
-                    // Mostrar siempre el atleta, incluso si no tiene esta prueba
-                    if (valorReal === undefined || valorReal === null) {
-                      return (
-                        <Typography
-                          key={athlete.atleta_id}
-                          variant="caption"
-                          sx={{
-                            display: 'block',
-                            color: athleteColors[athlete.atleta_id] || getColorForAthlete(athlete.atleta_id, athlete.atleta_id === selectedAthlete?.atleta_id) || 'text.secondary',
-                            fontWeight: 'medium',
-                            fontStyle: 'italic'
-                          }}
-                        >
-                          {athlete.nombre}: No tiene esta prueba
-                        </Typography>
-                      )
-                    }
-
-                    const isTimeBased =
-                      athleteData[atletaIdKey]?.categorias?.[selectedCategory]?.pruebas?.[entry.prueba]
-                        ?.isTimeBased ?? true
-                    const valorFormateado = formatValue(valorReal, unidadReal, isTimeBased)
-
-                    return (
-                      <Typography
-                        key={athlete.atleta_id}
-                        variant="caption"
-                        sx={{
-                          display: 'block',
-                          color: athleteColors[athlete.atleta_id] || getColorForAthlete(athlete.atleta_id, athlete.atleta_id === selectedAthlete?.atleta_id) || 'text.primary',
-                          fontWeight: 'medium'
-                        }}
-                      >
-                        {athlete.nombre}: {valorFormateado} {unidadReal || ''}
-                      </Typography>
-                    )
-                  })}
-                </Box>
-              ))}
-            </AccordionDetails>
-          </Accordion>
+            </Box>
+          ) : (
+            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '400px' }}>
+              <CircularProgress />
+            </Box>
+          )}
         </CardContent>
       </Card>
+
+      {/* Accordion Pills */}
+      <Accordion
+        disableGutters
+        sx={{
+          borderRadius: '20px !important',
+          bgcolor: '#F2F3F7',
+          boxShadow: 'none',
+          '&:before': { display: 'none' }, // Remove default divider
+          '&.Mui-expanded': { margin: 0, borderRadius: '20px !important' } // Change shape when expanded
+        }}
+      >
+        <AccordionSummary
+          expandIcon={<Box sx={{ bgcolor: 'transparent', borderRadius: '50%', border: '2px solid #000', display: 'flex', p: 0.5 }}><TbChevronDown size={14} color="#000" /></Box>}
+          sx={{
+            px: 3,
+            minHeight: '60px',
+            '& .MuiAccordionSummary-content': { margin: '16px 0' }
+          }}
+        >
+          <Typography variant="subtitle1" fontWeight="bold" sx={{ color: '#000' }}>
+            Mejores Resultados por Prueba
+          </Typography>
+        </AccordionSummary>
+        <AccordionDetails sx={{ px: 3, pb: 3, pt: 0 }}>
+          {radarData.map((entry, idx) => (
+            <Box key={idx} sx={{ mt: 1, p: 1.5, bgcolor: '#fff', borderRadius: '20px', boxShadow: '0 2px 8px rgba(0,0,0,0.05)' }}>
+              {/* Header with Title and Ranking Button */}
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+                <Typography variant="body2" fontWeight="bold" color="text.primary">
+                  {entry.prueba} {entry.unidad && `(${entry.unidad})`}
+                </Typography>
+
+                <IconButton
+                  size="small"
+                  color="primary"
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    handleOpenRanking(entry.prueba, selectedCategory)
+                  }}
+                  title="Ver Ranking Top 50"
+                  sx={{ transition: 'background-color 0.2s', bgcolor: '#f0f7ff', '&:hover': { bgcolor: '#e0efff' } }}
+                >
+                  <PiRanking size={18} />
+                </IconButton>
+              </Box>
+
+              {allAthletes.map((athlete) => {
+                const atletaIdKey = String(athlete.atleta_id)
+                const realKey = `${atletaIdKey}_real`
+                const unidadKey = `${atletaIdKey}_unidad`
+                const valorReal = entry[realKey]
+                const unidadReal = entry[unidadKey]
+
+                if (valorReal === undefined || valorReal === null) {
+                  return (
+                    <Typography
+                      key={athlete.atleta_id}
+                      variant="caption"
+                      sx={{
+                        display: 'block',
+                        color: 'text.secondary',
+                        fontStyle: 'italic',
+                        ml: 1
+                      }}
+                    >
+                      {athlete.nombre}: -
+                    </Typography>
+                  )
+                }
+
+                const isTimeBased =
+                  athleteData[atletaIdKey]?.categorias?.[selectedCategory]?.pruebas?.[entry.prueba]
+                    ?.isTimeBased ?? true
+                const valorFormateado = formatValue(valorReal, unidadReal, isTimeBased)
+
+                return (
+                  <Typography
+                    key={athlete.atleta_id}
+                    variant="caption"
+                    sx={{
+                      display: 'block',
+                      color: athleteColors[athlete.atleta_id] || getColorForAthlete(athlete.atleta_id, athlete.atleta_id === selectedAthlete?.atleta_id) || 'text.primary',
+                      fontWeight: 'bold',
+                      ml: 1
+                    }}
+                  >
+                    {athlete.nombre}: <span style={{ fontWeight: 'normal', color: '#000' }}>{valorFormateado} {unidadReal || ''}</span>
+                  </Typography>
+                )
+              })}
+            </Box>
+          ))}
+        </AccordionDetails>
+      </Accordion>
 
       <RankingDialog
         open={rankingDialogState.open}
@@ -1316,7 +1364,7 @@ function AthleteSpiderChart({ comparatorAthletes = [] }) {
           }
         }}
       />
-    </>
+    </Box>
   )
 }
 
