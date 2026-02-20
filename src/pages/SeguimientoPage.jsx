@@ -123,7 +123,6 @@ const SeguimientoPage = () => {
         backgroundColor: 'background.default', // Should be grey/blueish from theme
         display: 'flex',
         flexDirection: 'column',
-        pb: '80px', // Espacio para BottomNavigation
       }}
     >
       {/* Custom Header */}
@@ -180,7 +179,8 @@ const SeguimientoPage = () => {
           display: 'flex',
           flexDirection: 'column',
           gap: 3,
-          overflow: 'hidden' // For children
+          overflow: 'hidden', // For children
+          pb: 'calc(80px + env(safe-area-inset-bottom))' // Espacio reservado para BottomNavigation
         }}
       >
         {selectedAthlete ? (
