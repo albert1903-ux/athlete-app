@@ -75,7 +75,8 @@ function AppContent() {
     <Box
       sx={{
         width: '100%',
-        minHeight: '100vh',
+        minHeight: '100dvh',
+        pb: 'env(safe-area-inset-bottom)',
         backgroundColor: 'background.default',
         display: 'flex',
         flexDirection: 'column'
