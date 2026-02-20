@@ -19,6 +19,86 @@ import dayjs from 'dayjs'
 import 'dayjs/locale/es'
 import { supabase } from '../lib/supabase'
 
+function AthleteAutocomplete({ value, onChange, disabled }) {
+  const [options, setOptions] = useState([])
+  const [inputValue, setInputValue] = useState('')
+  const [loading, setLoading] = useState(false)
+
+  useEffect(() => {
+    let isActive = true
+    const term = inputValue.trim()
+
+    if (term.length < 2) {
+      if (value) {
+        setOptions([value])
+      } else {
+        setOptions([])
+      }
+      return
+    }
+
+    const fetchAthletes = async () => {
+      setLoading(true)
+      try {
+        const { data, error } = await supabase
+          .from('atletas')
+          .select('atleta_id, nombre, licencia')
+          .ilike('nombre', `%${term}%`)
+          .order('nombre', { ascending: true })
+          .limit(50)
+
+        if (error) throw error
+        if (isActive) setOptions(data || [])
+      } catch (err) {
+        console.error('Error fetching athletes:', err)
+      } finally {
+        if (isActive) setLoading(false)
+      }
+    }
+
+    const timer = setTimeout(fetchAthletes, 300)
+    return () => {
+      isActive = false
+      clearTimeout(timer)
+    }
+  }, [inputValue, value])
+
+  return (
+    <Autocomplete
+      value={value}
+      onChange={(e, newValue) => onChange(newValue)}
+      inputValue={inputValue}
+      onInputChange={(e, newInputValue) => setInputValue(newInputValue)}
+      options={options}
+      loading={loading}
+      getOptionLabel={(option) =>
+        option?.nombre
+          ? `${option.nombre}${option.licencia ? ` · ${option.licencia}` : ''}`
+          : ''
+      }
+      isOptionEqualToValue={(option, val) => option?.atleta_id === val?.atleta_id}
+      disabled={disabled}
+      renderInput={(params) => (
+        <Input
+          {...params}
+          label="Nombre del atleta"
+          required
+          size="small"
+          InputProps={{
+            ...params.InputProps,
+            endAdornment: (
+              <>
+                {loading ? <CircularProgress size={20} /> : null}
+                {params.InputProps.endAdornment}
+              </>
+            )
+          }}
+        />
+      )}
+    />
+  )
+}
+
 function AddEventDialog({ open, onClose, onSuccess, selectedDate }) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
@@ -30,7 +110,7 @@ function AddEventDialog({ open, onClose, onSuccess, selectedDate }) {
   const [ubicacion, setUbicacion] = useState('')
   const [participantes, setParticipantes] = useState([
     {
-      nombre_atleta: '',
+      atleta: null,
       prueba_id: null,
       prueba_nombre_manual: '',
       hora: null
@@ -70,7 +150,7 @@ function AddEventDialog({ open, onClose, onSuccess, selectedDate }) {
       setUbicacion('')
       setParticipantes([
         {
-          nombre_atleta: '',
+          atleta: null,
           prueba_id: null,
           prueba_nombre_manual: '',
           hora: null
@@ -84,7 +164,7 @@ function AddEventDialog({ open, onClose, onSuccess, selectedDate }) {
     setParticipantes([
       ...participantes,
       {
-        nombre_atleta: '',
+        atleta: null,
         prueba_id: null,
         prueba_nombre_manual: '',
         hora: ''
@@ -130,8 +210,8 @@ function AddEventDialog({ open, onClose, onSuccess, selectedDate }) {
     // Validar que todos los participantes tengan datos
     for (let i = 0; i < participantes.length; i++) {
       const p = participantes[i]
-      if (!p.nombre_atleta || !p.nombre_atleta.trim()) {
-        setError(`El nombre del atleta es obligatorio en el participante ${i + 1}`)
+      if (!p.atleta || !p.atleta.nombre.trim()) {
+        setError(`El atleta es obligatorio en el participante ${i + 1}`)
         return
       }
       // Validar que haya una prueba (ya sea por ID o nombre manual)
@@ -169,7 +249,7 @@ function AddEventDialog({ open, onClose, onSuccess, selectedDate }) {
       // Crear los participantes
       const participantesData = participantes.map(p => ({
         evento_id: eventoData.evento_id,
-        nombre_atleta: p.nombre_atleta.trim(),
+        nombre_atleta: p.atleta.nombre.trim(),
         prueba_id: p.prueba_id || null,
         prueba_nombre_manual: p.prueba_nombre_manual.trim() || null,
         hora: p.hora && dayjs.isDayjs(p.hora) && p.hora.isValid() ? p.hora.format('HH:mm:ss') : null
@@ -260,13 +340,10 @@ function AddEventDialog({ open, onClose, onSuccess, selectedDate }) {
 
                 <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, pl: 2, borderLeft: '2px solid', borderColor: 'divider' }}>
                   {/* Nombre del atleta */}
-                  <Input
-                    label="Nombre del atleta"
-                    value={participante.nombre_atleta}
-                    onChange={(e) => handleParticipanteChange(index, 'nombre_atleta', e.target.value)}
-                    required
+                  <AthleteAutocomplete
+                    value={participante.atleta}
+                    onChange={(newValue) => handleParticipanteChange(index, 'atleta', newValue)}
                     disabled={loading}
-                    size="small"
                   />
 
                   {/* Prueba - Autocompletado */}
