@@ -306,13 +306,13 @@ function AthleteSearch({ onResultClick }) {
                           variant="outlined"
                         />
                       )}
-                      {item.licencia && item.licencia !== 'N/A' && (
+                      {/* {item.licencia && item.licencia !== 'N/A' && (
                         <Chip
                           label={`Lic: ${item.licencia}`}
                           size="small"
                           variant="outlined"
                         />
-                      )}
+                      )} */}
                       {item.club && item.club !== 'N/A' && item.club !== 'Sin club' && (
                         <Chip
                           label={item.club}

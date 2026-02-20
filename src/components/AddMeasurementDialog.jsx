@@ -150,13 +150,13 @@ function AddMeasurementDialog({ open, onClose, onSuccess }) {
                 <Typography variant="body1" fontWeight="bold">
                   {selectedAthlete.nombre}
                 </Typography>
-                {selectedAthlete.licencia && selectedAthlete.licencia !== 'N/A' && (
+                {/* {selectedAthlete.licencia && selectedAthlete.licencia !== 'N/A' && (
                   <Chip
                     label={`Lic: ${selectedAthlete.licencia}`}
                     size="small"
                     variant="outlined"
                   />
-                )}
+                )} */}
                 {selectedAthlete.club && selectedAthlete.club !== 'N/A' && selectedAthlete.club !== 'Sin club' && (
                   <Chip
                     label={selectedAthlete.club}

@@ -110,14 +110,14 @@ function AddAthleteDialog({ open, onClose, onAdd }) {
                 </Typography>
 
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
-                  {tempSelectedAthlete.licencia && tempSelectedAthlete.licencia !== 'N/A' && (
+                  {/* {tempSelectedAthlete.licencia && tempSelectedAthlete.licencia !== 'N/A' && (
                     <Chip
                       label={`Lic: ${tempSelectedAthlete.licencia}`}
                       size="small"
                       variant="outlined"
                       sx={{ bgcolor: 'white', color: 'secondary.main' }}
                     />
-                  )}
+                  )} */}
                   {tempSelectedAthlete.club && tempSelectedAthlete.club !== 'N/A' && tempSelectedAthlete.club !== 'Sin club' && (
                     <Chip
                       label={tempSelectedAthlete.club}

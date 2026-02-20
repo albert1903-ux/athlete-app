@@ -139,14 +139,14 @@ function SelectAthleteDialog({ open, onClose, onSelect }) {
                                             sx={{ bgcolor: 'white', color: 'primary.main' }}
                                         />
                                     )}
-                                    {tempSelectedAthlete.licencia && tempSelectedAthlete.licencia !== 'N/A' && (
+                                    {/* {tempSelectedAthlete.licencia && tempSelectedAthlete.licencia !== 'N/A' && (
                                         <Chip
                                             label={`Lic: ${tempSelectedAthlete.licencia}`}
                                             size="small"
                                             variant="outlined"
                                             sx={{ bgcolor: 'white', color: 'primary.main' }}
                                         />
-                                    )}
+                                    )} */}
                                     {tempSelectedAthlete.club && tempSelectedAthlete.club !== 'N/A' && tempSelectedAthlete.club !== 'Sin club' && (
                                         <Chip
                                             label={tempSelectedAthlete.club}

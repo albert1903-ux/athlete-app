@@ -144,13 +144,13 @@ function AthleteSelector() {
                   variant="outlined"
                 />
               )}
-              {selectedAthlete.licencia && selectedAthlete.licencia !== 'N/A' && (
+              {/* {selectedAthlete.licencia && selectedAthlete.licencia !== 'N/A' && (
                 <Chip
                   label={`Lic: ${selectedAthlete.licencia}`}
                   size="small"
                   variant="outlined"
                 />
-              )}
+              )} */}
               {selectedAthlete.club && selectedAthlete.club !== 'N/A' && selectedAthlete.club !== 'Sin club' && (
                 <Chip
                   label={selectedAthlete.club}
@@ -255,14 +255,14 @@ function AthleteSelector() {
                         sx={{ bgcolor: 'white', color: 'primary.main' }}
                       />
                     )}
-                    {tempSelectedAthlete.licencia && tempSelectedAthlete.licencia !== 'N/A' && (
+                    {/* {tempSelectedAthlete.licencia && tempSelectedAthlete.licencia !== 'N/A' && (
                       <Chip
                         label={`Lic: ${tempSelectedAthlete.licencia}`}
                         size="small"
                         variant="outlined"
                         sx={{ bgcolor: 'white', color: 'primary.main' }}
                       />
-                    )}
+                    )} */}
                     {tempSelectedAthlete.club && tempSelectedAthlete.club !== 'N/A' && tempSelectedAthlete.club !== 'Sin club' && (
                       <Chip
                         label={tempSelectedAthlete.club}

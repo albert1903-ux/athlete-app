@@ -207,13 +207,13 @@ function ViewMeasurementsDialog({ open, onClose }) {
               <Typography variant="body2" color="text.secondary">
                 {selectedAthlete.nombre}
               </Typography>
-              {selectedAthlete.licencia && selectedAthlete.licencia !== 'N/A' && (
+              {/* {selectedAthlete.licencia && selectedAthlete.licencia !== 'N/A' && (
                 <Chip
                   label={`Lic: ${selectedAthlete.licencia}`}
                   size="small"
                   variant="outlined"
                 />
-              )}
+              )} */}
             </Box>
           )}
         </Box>

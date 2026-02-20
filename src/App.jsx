@@ -9,7 +9,6 @@ import { TbPlus, TbEye, TbCalendarPlus, TbHeartPlus } from 'react-icons/tb'
 import BottomNavigationBar from './components/BottomNavigationBar'
 import SeguimientoPage from './pages/SeguimientoPage'
 import AnalisisPage from './pages/AnalisisPage'
-import BiomecanicaPage from './pages/BiomecanicaPage'
 import CalendarioPage from './pages/CalendarioPage'
 import MasPage from './pages/MasPage'
 import AddAthleteDialog from './components/AddAthleteDialog'
@@ -30,8 +29,6 @@ function AppContent() {
         return 'Seguimiento Deportivo'
       case '/analisis':
         return 'Análisis Físico'
-      case '/biomecanica':
-        return 'Biomecánica'
       case '/calendario':
         return 'Calendario'
       case '/mas':
@@ -166,7 +163,6 @@ function AppContent() {
           <Route path="/" element={<Navigate to="/seguimiento" replace />} />
           <Route path="/seguimiento" element={<SeguimientoPage />} />
           <Route path="/analisis" element={<AnalisisPage />} />
-          {import.meta.env.DEV && <Route path="/biomecanica" element={<BiomecanicaPage />} />}
           <Route path="/calendario" element={<CalendarioPage />} />
           <Route path="/mas" element={<MasPage />} />
         </Routes>

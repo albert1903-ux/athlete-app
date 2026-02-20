@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom'
 import BottomNavigation from '@mui/material/BottomNavigation'
 import BottomNavigationAction from '@mui/material/BottomNavigationAction'
 import Box from '@mui/material/Box'
-import { TbChartRadar, TbHeartbeat, TbCalendar, TbDots, TbActivity } from 'react-icons/tb'
+import { TbChartRadar, TbHeartbeat, TbCalendar, TbDots } from 'react-icons/tb'
 const BottomNavigationBar = () => {
   const navigate = useNavigate()
   const location = useLocation()
@@ -17,7 +17,6 @@ const BottomNavigationBar = () => {
 
     if (normalizedPath === '/' || normalizedPath.startsWith('/seguimiento')) return 'seguimiento'
     if (normalizedPath.startsWith('/analisis')) return 'analisis'
-    if (normalizedPath.startsWith('/biomecanica')) return 'biomecanica'
     if (normalizedPath.startsWith('/calendario')) return 'calendario'
     if (normalizedPath.startsWith('/mas')) return 'mas'
     return 'seguimiento'
@@ -40,9 +39,6 @@ const BottomNavigationBar = () => {
         break
       case 'analisis':
         navigate('/analisis')
-        break
-      case 'biomecanica':
-        navigate('/biomecanica')
         break
       case 'calendario':
         navigate('/calendario')
@@ -92,14 +88,6 @@ const BottomNavigationBar = () => {
             icon={<TbHeartbeat size={24} />}
             aria-label="Análisis físico"
           />
-          {import.meta.env.DEV && (
-            <BottomNavigationAction
-              label="Biomecánica"
-              value="biomecanica"
-              icon={<TbActivity size={24} />}
-              aria-label="Biomecánica"
-            />
-          )}
           <BottomNavigationAction
             label="Calendario"
             value="calendario"
