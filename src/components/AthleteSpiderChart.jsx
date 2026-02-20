@@ -1214,14 +1214,15 @@ function AthleteSpiderChart({ comparatorAthletes = [] }) {
                 <Legend iconType="circle" wrapperStyle={{ color: '#333', paddingTop: '20px' }} />
                 {allAthletes.map((athlete) => {
                   const atletaIdKey = String(athlete.atleta_id)
+                  const isMain = athlete.atleta_id === selectedAthlete?.atleta_id
                   return (
                     <Radar
                       key={athlete.atleta_id}
                       name={athlete.nombre}
                       dataKey={atletaIdKey}
-                      stroke={athleteColors[athlete.atleta_id] || getColorForAthlete(athlete.atleta_id, athlete.atleta_id === selectedAthlete?.atleta_id) || '#8884d8'}
-                      fill={athleteColors[athlete.atleta_id] || getColorForAthlete(athlete.atleta_id, athlete.atleta_id === selectedAthlete?.atleta_id) || '#8884d8'}
-                      fillOpacity={0.4}
+                      stroke={athleteColors[athlete.atleta_id] || getColorForAthlete(athlete.atleta_id, isMain) || '#8884d8'}
+                      fill={athleteColors[athlete.atleta_id] || getColorForAthlete(athlete.atleta_id, isMain) || '#8884d8'}
+                      fillOpacity={isMain ? 0.5 : 0.15}
                       connectNulls={true}
                       isAnimationActive={false}
                     />
