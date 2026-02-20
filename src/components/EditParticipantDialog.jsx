@@ -15,6 +15,86 @@ import dayjs from 'dayjs'
 import 'dayjs/locale/es'
 import { supabase } from '../lib/supabase'
 
+function AthleteAutocomplete({ value, onChange, disabled }) {
+  const [options, setOptions] = useState([])
+  const [inputValue, setInputValue] = useState('')
+  const [loading, setLoading] = useState(false)
+
+  useEffect(() => {
+    let isActive = true
+    const term = inputValue.trim()
+
+    if (term.length < 2) {
+      if (value) {
+        setOptions([value])
+      } else {
+        setOptions([])
+      }
+      return
+    }
+
+    const fetchAthletes = async () => {
+      setLoading(true)
+      try {
+        const { data, error } = await supabase
+          .from('atletas')
+          .select('atleta_id, nombre, licencia')
+          .ilike('nombre', `%${term}%`)
+          .order('nombre', { ascending: true })
+          .limit(50)
+
+        if (error) throw error
+        if (isActive) setOptions(data || [])
+      } catch (err) {
+        console.error('Error fetching athletes:', err)
+      } finally {
+        if (isActive) setLoading(false)
+      }
+    }
+
+    const timer = setTimeout(fetchAthletes, 300)
+    return () => {
+      isActive = false
+      clearTimeout(timer)
+    }
+  }, [inputValue, value])
+
+  return (
+    <Autocomplete
+      value={value}
+      onChange={(e, newValue) => onChange(newValue)}
+      inputValue={inputValue}
+      onInputChange={(e, newInputValue) => setInputValue(newInputValue)}
+      options={options}
+      loading={loading}
+      getOptionLabel={(option) =>
+        option?.nombre
+          ? `${option.nombre}${option.licencia ? ` · ${option.licencia}` : ''}`
+          : ''
+      }
+      isOptionEqualToValue={(option, val) => option?.atleta_id === val?.atleta_id}
+      disabled={disabled}
+      renderInput={(params) => (
+        <Input
+          {...params}
+          label="Nombre del atleta"
+          required
+          size="small"
+          InputProps={{
+            ...params.InputProps,
+            endAdornment: (
+              <>
+                {loading ? <CircularProgress size={20} /> : null}
+                {params.InputProps.endAdornment}
+              </>
+            )
+          }}
+        />
+      )}
+    />
+  )
+}
+
 function EditParticipantDialog({ open, onClose, onSuccess, participant }) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
@@ -22,7 +102,7 @@ function EditParticipantDialog({ open, onClose, onSuccess, participant }) {
   const [loadingPruebas, setLoadingPruebas] = useState(false)
 
   // Estado del formulario
-  const [nombreAtleta, setNombreAtleta] = useState('')
+  const [atleta, setAtleta] = useState(null)
   const [pruebaId, setPruebaId] = useState(null)
   const [pruebaNombreManual, setPruebaNombreManual] = useState('')
   const [hora, setHora] = useState(null)
@@ -56,7 +136,10 @@ function EditParticipantDialog({ open, onClose, onSuccess, participant }) {
   // Cargar datos del participante cuando se abre el diálogo
   useEffect(() => {
     if (open && participant) {
-      setNombreAtleta(participant.nombre_atleta || '')
+      setAtleta({
+        atleta_id: participant.atleta_id || null,
+        nombre: participant.nombre_atleta || ''
+      })
       setPruebaId(participant.prueba_id || null)
       setPruebaNombreManual(participant.prueba_nombre_manual || '')
       setHora(participant.hora ? dayjs(participant.hora, 'HH:mm:ss') : null)
@@ -66,8 +149,8 @@ function EditParticipantDialog({ open, onClose, onSuccess, participant }) {
 
   const handleSubmit = async () => {
     // Validaciones
-    if (!nombreAtleta.trim()) {
-      setError('El nombre del atleta es obligatorio')
+    if (!atleta || !atleta.nombre.trim()) {
+      setError('El atleta es obligatorio')
       return
     }
 
@@ -88,7 +171,8 @@ function EditParticipantDialog({ open, onClose, onSuccess, participant }) {
       const { error: updateError } = await supabase
         .from('participantes_eventos')
         .update({
-          nombre_atleta: nombreAtleta.trim(),
+          atleta_id: atleta.atleta_id || null,
+          nombre_atleta: atleta.nombre.trim(),
           prueba_id: pruebaId || null,
           prueba_nombre_manual: pruebaNombreManual.trim() || null,
           hora: hora.format('HH:mm:ss')
@@ -129,11 +213,9 @@ function EditParticipantDialog({ open, onClose, onSuccess, participant }) {
 
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 1 }}>
             {/* Nombre del atleta */}
-            <Input
-              label="Nombre del atleta"
-              value={nombreAtleta}
-              onChange={(e) => setNombreAtleta(e.target.value)}
-              required
+            <AthleteAutocomplete
+              value={atleta}
+              onChange={(newValue) => setAtleta(newValue)}
               disabled={loading}
             />
 
