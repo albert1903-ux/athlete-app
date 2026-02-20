@@ -194,7 +194,7 @@ const SeguimientoPage = () => {
             </Box>
 
             {/* Componente gráfico de resultados */}
-            <Box sx={{ width: '100%' }}>
+            <Box sx={{ width: '100%', pt: '30px' }}>
               <AthleteResultsChart
                 key={`results-${resultsRefreshKey}`}
                 comparatorAthletes={comparatorAthletes}
