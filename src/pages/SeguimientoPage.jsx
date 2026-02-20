@@ -6,7 +6,7 @@ import Chip from '@mui/material/Chip'
 import Menu from '@mui/material/Menu'
 import MenuItem from '@mui/material/MenuItem'
 import ListItemIcon from '@mui/material/ListItemIcon'
-import { TbDots, TbList, TbCircuitCapacitorPolarized, TbUser, TbSwords } from 'react-icons/tb'
+import { TbDots, TbList, TbCircuitCapacitorPolarized, TbUser, TbSwords, TbUserMinus } from 'react-icons/tb'
 import dayjs from 'dayjs'
 
 import AthleteComparator from '../components/AthleteComparator'
@@ -111,6 +111,13 @@ const SeguimientoPage = () => {
 
   const handleComparatorAdded = (athlete) => {
     const newComparators = [...comparatorAthletes, athlete]
+    setComparatorAthletes(newComparators)
+    setComparatorCache(newComparators)
+  }
+
+  const handleRemoveComparator = (atletaId) => {
+    handleMenuClose()
+    const newComparators = comparatorAthletes.filter(c => c.atleta_id !== atletaId)
     setComparatorAthletes(newComparators)
     setComparatorCache(newComparators)
   }
@@ -247,6 +254,16 @@ const SeguimientoPage = () => {
           <ListItemIcon><TbSwords /></ListItemIcon>
           Añadir atleta a comparar
         </MenuItem>
+        {comparatorAthletes.map(athlete => (
+          <MenuItem
+            key={`remove-${athlete.atleta_id}`}
+            onClick={() => handleRemoveComparator(athlete.atleta_id)}
+            sx={{ color: 'error.main' }}
+          >
+            <ListItemIcon sx={{ color: 'error.main' }}><TbUserMinus /></ListItemIcon>
+            Eliminar {athlete.nombre}
+          </MenuItem>
+        ))}
       </Menu>
 
       {/* Dialogs */}
