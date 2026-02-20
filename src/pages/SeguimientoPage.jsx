@@ -160,7 +160,7 @@ const SeguimientoPage = () => {
         </Box>
 
         <IconButton
-          sx={{ mt: 2, bgcolor: 'white', '&:hover': { bgcolor: 'rgba(255,255,255,0.8)' } }}
+          sx={{ mt: 2, bgcolor: 'white', color: 'rgb(28, 27, 31)', '&:hover': { bgcolor: 'rgba(255,255,255,0.8)' } }}
           onClick={handleMenuOpen}
         >
           <TbDots />
