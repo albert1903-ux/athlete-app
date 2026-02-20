@@ -1,11 +1,11 @@
 import { useState, useEffect, useMemo } from 'react'
 import Box from '@mui/material/Box'
 import Chip from '@mui/material/Chip'
-import { Card, Typography } from '../components/ui'
+import { Card, Typography, Button } from '../components/ui'
 import CircularProgress from '@mui/material/CircularProgress'
 import Drawer from '@mui/material/Drawer'
 import IconButton from '@mui/material/IconButton'
-import { TbCalendar, TbCalendarEvent, TbBallFootball, TbAlertTriangle, TbClock, TbPencil, TbTrash, TbChevronLeft, TbChevronRight, TbMapPin } from 'react-icons/tb'
+import { TbCalendar, TbCalendarEvent, TbBallFootball, TbAlertTriangle, TbClock, TbPencil, TbTrash, TbChevronLeft, TbChevronRight, TbMapPin, TbPlus } from 'react-icons/tb'
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import { StaticDatePicker } from '@mui/x-date-pickers/StaticDatePicker'
@@ -937,9 +937,22 @@ const CalendarioPage = () => {
           ) : dayParticipants.length === 0 ? (
             <Box sx={{ textAlign: 'center', py: 4 }}>
               <TbCalendarEvent style={{ fontSize: 48, color: 'inherit', marginBottom: 16 }} />
-              <Typography variant="body1" color="text.secondary">
+              <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
                 No hay eventos asociados a este día
               </Typography>
+              <Button
+                variant="contained"
+                onClick={() => setAddEventDialogOpen(true)}
+                startIcon={<TbPlus />}
+                sx={{
+                  borderRadius: 2,
+                  textTransform: 'none',
+                  fontWeight: 600,
+                  px: 4
+                }}
+              >
+                Añadir Evento
+              </Button>
             </Box>
           ) : (
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
