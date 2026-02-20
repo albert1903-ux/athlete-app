@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect } from 'react'
 import Box from '@mui/material/Box'
 import { Typography } from '../components/ui'
 import IconButton from '@mui/material/IconButton'
@@ -9,7 +9,7 @@ import ListItemIcon from '@mui/material/ListItemIcon'
 import { TbDots, TbList, TbCircuitCapacitorPolarized, TbUser, TbSwords, TbUserMinus } from 'react-icons/tb'
 import dayjs from 'dayjs'
 
-import AthleteComparator from '../components/AthleteComparator'
+
 import AthleteSpiderChart from '../components/AthleteSpiderChart'
 import AthleteResultsChart from '../components/AthleteResultsChart'
 import SelectAthleteDialog from '../components/SelectAthleteDialog'
@@ -50,11 +50,6 @@ const SeguimientoPage = () => {
       setSelectAthleteOpen(true)
     }
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
-
-  const handleComparatorsChange = useCallback((comparators) => {
-    setComparatorAthletes(comparators)
-    setComparatorCache(comparators)
-  }, [])
 
   useEffect(() => {
     const handleResultadoCreado = () => {
@@ -208,14 +203,7 @@ const SeguimientoPage = () => {
               />
             </Box>
 
-            {/* Lista de comparadores */}
-            <Box sx={{ width: '100%' }}>
-              <AthleteComparator
-                comparators={comparatorAthletes}
-                onComparatorsChange={handleComparatorsChange}
-                hideAddButton={true}
-              />
-            </Box>
+
           </>
         ) : (
           <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '200px' }}>
