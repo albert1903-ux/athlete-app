@@ -35,7 +35,7 @@ const theme = createTheme({
                 paper: {
                     borderRadius: tokens.borderRadius.lg,
                     maxWidth: 'calc(100% - 32px)',
-                    maxHeight: 'calc(100% - 32px)',
+                    maxHeight: 'calc(90% - 32px)',
                     margin: 16,
                     width: '100%',
                 },
