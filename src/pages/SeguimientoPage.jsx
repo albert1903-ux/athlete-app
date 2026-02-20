@@ -231,17 +231,17 @@ const SeguimientoPage = () => {
           sx: { borderRadius: 2, mt: 1, minWidth: 200 }
         }}
       >
-        <MenuItem onClick={() => handleAction('marks')}>
-          <ListItemIcon><TbList /></ListItemIcon>
-          Gestión de marcas
+        <MenuItem onClick={() => handleAction('select_athlete')}>
+          <ListItemIcon><TbUser /></ListItemIcon>
+          Seleccionar atleta
         </MenuItem>
         <MenuItem onClick={() => handleAction('add_result')}>
           <ListItemIcon><TbCircuitCapacitorPolarized /></ListItemIcon>
           Añadir marca
         </MenuItem>
-        <MenuItem onClick={() => handleAction('select_athlete')}>
-          <ListItemIcon><TbUser /></ListItemIcon>
-          Seleccionar atleta
+        <MenuItem onClick={() => handleAction('marks')}>
+          <ListItemIcon><TbList /></ListItemIcon>
+          Gestionar marcas
         </MenuItem>
         <MenuItem onClick={() => handleAction('add_comparator')}>
           <ListItemIcon><TbSwords /></ListItemIcon>

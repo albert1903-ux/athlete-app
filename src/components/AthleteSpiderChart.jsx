@@ -1155,7 +1155,7 @@ function AthleteSpiderChart({ comparatorAthletes = [] }) {
                 boxShadow: 'none',
               }}
               IconComponent={(props) => (
-                <Box {...props} sx={{ ...props.sx, right: '10px !important', top: 'calc(50% - 0.5em) !important' }}>
+                <Box {...props} sx={{ ...props.sx, right: '10px !important', top: '0 !important', bottom: '0 !important', height: '100%', display: 'flex !important', alignItems: 'center' }}>
                   <TbChevronDown size={20} color="#000" />
                 </Box>
               )}

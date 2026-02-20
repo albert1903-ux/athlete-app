@@ -1388,7 +1388,7 @@ function AthleteResultsChart({ comparatorAthletes = [] }) {
                 boxShadow: 'none',
               }}
               IconComponent={(props) => (
-                <Box {...props} sx={{ ...props.sx, right: '10px !important', top: 'calc(50% - 0.5em) !important' }}>
+                <Box {...props} sx={{ ...props.sx, right: '10px !important', top: '0 !important', bottom: '0 !important', height: '100%', display: 'flex !important', alignItems: 'center' }}>
                   <TbChevronDown size={20} color="#000" />
                 </Box>
               )}
@@ -1466,7 +1466,7 @@ function AthleteResultsChart({ comparatorAthletes = [] }) {
                 width={chartWidth}
                 height={300}
                 data={combinedChartData}
-                margin={{ top: 5, right: 10, left: 10, bottom: 20 }}
+                margin={{ top: 5, right: 30, left: 10, bottom: 20 }}
               >
                 <CartesianGrid strokeDasharray="3 3" stroke="#d1d1d1" vertical={false} />
                 <XAxis
@@ -1478,6 +1478,7 @@ function AthleteResultsChart({ comparatorAthletes = [] }) {
                   tick={{ fontSize: 10, fill: '#666' }}
                   tickLine={false}
                   axisLine={{ stroke: '#999' }}
+                  padding={{ left: 10, right: 30 }}
                   label={{
                     value: viewMode === 'edad' ? 'Edad (años)' : '',
                     position: 'insideBottom',
