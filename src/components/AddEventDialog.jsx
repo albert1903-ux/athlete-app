@@ -249,6 +249,7 @@ function AddEventDialog({ open, onClose, onSuccess, selectedDate }) {
       // Crear los participantes
       const participantesData = participantes.map(p => ({
         evento_id: eventoData.evento_id,
+        atleta_id: p.atleta.atleta_id,
         nombre_atleta: p.atleta.nombre.trim(),
         prueba_id: p.prueba_id || null,
         prueba_nombre_manual: p.prueba_nombre_manual.trim() || null,

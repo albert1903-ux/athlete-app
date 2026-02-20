@@ -47,84 +47,178 @@ def query_db():
     try:
         data = request.json
         table = data.get('table')
-        select_fields = data.get('select', '*')
-        filters = data.get('filters', [])
-        order = data.get('order')
-        limit = data.get('limit')
+        query_type = data.get('type', 'select')
         
         if not table:
             return jsonify({'error': 'Table name is required'}), 400
             
-        # Basic SQL Construction
-        # Note: This is a basic implementation for local dev. 
-        # In production, use an ORM or strict validation to prevent SQL injection.
-        
-        query = f"SELECT {select_fields} FROM {table}"
-        params = []
-        where_clauses = []
-        
-        for f in filters:
-            col = f['column']
-            op = f['operator']
-            val = f['value']
-            
-            if op == 'eq':
-                where_clauses.append(f"{col} = ?")
-                params.append(val)
-            elif op == 'ilike':
-                where_clauses.append(f"LOWER({col}) LIKE LOWER(?)")
-                params.append(val) # val should already include % if needed or we add it
-            elif op == 'in':
-                placeholders = ', '.join(['?'] * len(val))
-                where_clauses.append(f"{col} IN ({placeholders})")
-                params.extend(val)
-            elif op == 'gt':
-                where_clauses.append(f"{col} > ?")
-                params.append(val)
-            elif op == 'lt':
-                where_clauses.append(f"{col} < ?")
-                params.append(val)
-            elif op == 'gte':
-                where_clauses.append(f"{col} >= ?")
-                params.append(val)
-            elif op == 'lte':
-                where_clauses.append(f"{col} <= ?")
-                params.append(val)
-                
-        if where_clauses:
-            query += " WHERE " + " AND ".join(where_clauses)
-            
-        if order:
-            # Expected order: {'column': 'name', 'ascending': True, 'nullsFirst': False}
-            # or just a list of such objects
-            if isinstance(order, dict):
-                orders = [order]
-            else:
-                orders = order
-            
-            order_clauses = []
-            for o in orders:
-                col = o.get('column')
-                asc = o.get('ascending', True)
-                direction = 'ASC' if asc else 'DESC'
-                order_clauses.append(f"{col} {direction}")
-            
-            if order_clauses:
-                query += " ORDER BY " + ", ".join(order_clauses)
-                
-        if limit:
-            query += " LIMIT ?"
-            params.append(limit)
-            
-        print(f"Executing SQL: {query} with params {params}")
-        
         conn = get_db_connection()
         cursor = conn.cursor()
-        cursor.execute(query, params)
-        rows = cursor.fetchall()
-        conn.close()
         
-        results = [dict_from_row(row) for row in rows]
+        if query_type == 'select':
+            select_fields = data.get('select', '*')
+            filters = data.get('filters', [])
+            order = data.get('order')
+            limit = data.get('limit')
+            
+            query = f"SELECT {select_fields} FROM {table}"
+            params = []
+            where_clauses = []
+            
+            for f in filters:
+                col = f['column']
+                op = f['operator']
+                val = f['value']
+                
+                if op == 'eq':
+                    where_clauses.append(f"{col} = ?")
+                    params.append(val)
+                elif op == 'ilike':
+                    where_clauses.append(f"LOWER({col}) LIKE LOWER(?)")
+                    params.append(val)
+                elif op == 'in':
+                    placeholders = ', '.join(['?'] * len(val))
+                    where_clauses.append(f"{col} IN ({placeholders})")
+                    params.extend(val)
+                elif op == 'gt':
+                    where_clauses.append(f"{col} > ?")
+                    params.append(val)
+                elif op == 'lt':
+                    where_clauses.append(f"{col} < ?")
+                    params.append(val)
+                elif op == 'gte':
+                    where_clauses.append(f"{col} >= ?")
+                    params.append(val)
+                elif op == 'lte':
+                    where_clauses.append(f"{col} <= ?")
+                    params.append(val)
+                    
+            if where_clauses:
+                query += " WHERE " + " AND ".join(where_clauses)
+                
+            if order:
+                if isinstance(order, dict):
+                    orders = [order]
+                else:
+                    orders = order
+                
+                order_clauses = []
+                for o in orders:
+                    col = o.get('column')
+                    asc = o.get('ascending', True)
+                    direction = 'ASC' if asc else 'DESC'
+                    order_clauses.append(f"{col} {direction}")
+                
+                if order_clauses:
+                    query += " ORDER BY " + ", ".join(order_clauses)
+                    
+            if limit:
+                query += " LIMIT ?"
+                params.append(limit)
+                
+            print(f"Executing SQL SELECT: {query} with params {params}")
+            cursor.execute(query, params)
+            rows = cursor.fetchall()
+            results = [dict_from_row(row) for row in rows]
+            
+        elif query_type == 'insert':
+            insert_data = data.get('data')
+            if not insert_data:
+                return jsonify({'error': 'No data provided for insert'}), 400
+            
+            # Handle both single dict and list of dicts
+            is_list = isinstance(insert_data, list)
+            records = insert_data if is_list else [insert_data]
+            
+            if not records:
+                return jsonify({'data': [], 'error': None})
+                
+            columns = list(records[0].keys())
+            placeholders = ', '.join(['?' for _ in columns])
+            columns_str = ', '.join(columns)
+            
+            query = f"INSERT INTO {table} ({columns_str}) VALUES ({placeholders}) RETURNING *"
+            
+            print(f"Executing SQL INSERT: {query}")
+            results = []
+            for record in records:
+                params = [record.get(col) for col in columns]
+                cursor.execute(query, params)
+                row = cursor.fetchone()
+                if row:
+                    results.append(dict_from_row(row))
+            conn.commit()
+            
+            # If a single object was inserted, match supabase behavior and return a single object or list based on input type
+            # Supabase actually returns a list of inserted objects even on single objects but lets stay safe
+            if not is_list and len(results) == 1:
+                pass # usually returns the list in modern supabase 
+                
+        elif query_type == 'update':
+            update_data = data.get('data')
+            filters = data.get('filters', [])
+            
+            if not update_data:
+                return jsonify({'error': 'No data provided for update'}), 400
+                
+            set_clauses = []
+            params = []
+            for k, v in update_data.items():
+                set_clauses.append(f"{k} = ?")
+                params.append(v)
+                
+            query = f"UPDATE {table} SET {', '.join(set_clauses)}"
+            
+            where_clauses = []
+            for f in filters:
+                col = f['column']
+                op = f['operator']
+                val = f['value']
+                if op == 'eq':
+                    where_clauses.append(f"{col} = ?")
+                    params.append(val)
+                # Ignore other operations for updates for simplicity, usually it's eq
+            
+            if where_clauses:
+                query += " WHERE " + " AND ".join(where_clauses)
+                
+            query += " RETURNING *"
+            
+            print(f"Executing SQL UPDATE: {query} with params {params}")
+            cursor.execute(query, params)
+            rows = cursor.fetchall()
+            results = [dict_from_row(row) for row in rows]
+            conn.commit()
+            
+        elif query_type == 'delete':
+            filters = data.get('filters', [])
+            query = f"DELETE FROM {table}"
+            params = []
+            where_clauses = []
+            
+            for f in filters:
+                col = f['column']
+                op = f['operator']
+                val = f['value']
+                if op == 'eq':
+                    where_clauses.append(f"{col} = ?")
+                    params.append(val)
+            
+            if where_clauses:
+                query += " WHERE " + " AND ".join(where_clauses)
+                
+            query += " RETURNING *"
+            
+            print(f"Executing SQL DELETE: {query} with params {params}")
+            cursor.execute(query, params)
+            rows = cursor.fetchall()
+            results = [dict_from_row(row) for row in rows]
+            conn.commit()
+            
+        else:
+            return jsonify({'error': f"Unsupported query type: {query_type}"}), 400
+            
+        conn.close()
         return jsonify({'data': results, 'error': None})
         
     except Exception as e:
