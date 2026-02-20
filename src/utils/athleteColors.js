@@ -4,12 +4,12 @@
 const MAIN_ATHLETE_COLOR = '#E11141'
 
 const COMPARATOR_COLORS = [
-  '#d9534f', // rgb(217, 83, 79) - Rojo
-  '#5cb85c', // rgb(92, 184, 92) - Verde
+  '#009688', // Teal
+  '#5cb85c', // Verde
   '#f0ad4e', // Naranja
-  '#292b2c', // Gris oscuro
   '#7289da', // Azul claro
-  '#e81e63'  // Rosa
+  '#9c27b0', // Morado
+  '#292b2c', // Gris oscuro
 ]
 
 // Mapa global para almacenar asignaciones de color por atleta_id
