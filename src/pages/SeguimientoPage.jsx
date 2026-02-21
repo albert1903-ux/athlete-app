@@ -16,6 +16,7 @@ import SelectAthleteDialog from '../components/SelectAthleteDialog'
 import AddComparatorDialog from '../components/AddComparatorDialog'
 import MarksManagementDialog from '../components/MarksManagementDialog'
 import AddResultDialog from '../components/AddResultDialog'
+import NextEventCard from '../components/NextEventCard'
 import { getComparatorCache, setComparatorCache } from '../store/comparatorStore'
 
 const STORAGE_KEY = 'selectedAthlete'
@@ -192,6 +193,9 @@ const SeguimientoPage = () => {
       >
         {selectedAthlete ? (
           <>
+            {/* Próximo Competición */}
+            <NextEventCard athlete={selectedAthlete} />
+
             {/* Componente gráfico de araña */}
             <Box sx={{ width: '100%' }}>
               <AthleteSpiderChart

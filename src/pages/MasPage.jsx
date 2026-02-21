@@ -57,7 +57,7 @@ const MasPage = () => {
                 <Typography variant="h6" sx={{ fontWeight: 600, lineHeight: 1.2, fontFamily: 'Poppins' }}>
                   Entrenador
                 </Typography>
-                <Typography variant="body2" sx={{ opacity: 0.8, fontFamily: 'Inter' }}>
+                <Typography variant="body2" sx={{ opacity: 0.8, fontFamily: 'Poppins' }}>
                   {user.email}
                 </Typography>
               </Box>
@@ -88,10 +88,10 @@ const MasPage = () => {
                     primaryTypographyProps={{
                       color: item.text === 'Cerrar sesión' ? 'error.main' : 'text.primary',
                       fontWeight: item.text === 'Cerrar sesión' ? 600 : 500,
-                      fontFamily: 'Inter'
+                      fontFamily: 'Poppins'
                     }}
                     secondaryTypographyProps={{
-                      fontFamily: 'Inter'
+                      fontFamily: 'Poppins'
                     }}
                   />
                 </ListItem>
