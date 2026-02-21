@@ -11,8 +11,30 @@ import SeguimientoPage from './pages/SeguimientoPage'
 import AnalisisPage from './pages/AnalisisPage'
 import CalendarioPage from './pages/CalendarioPage'
 import MasPage from './pages/MasPage'
+import LoginPage from './pages/LoginPage'
+import RegisterPage from './pages/RegisterPage'
 import AddAthleteDialog from './components/AddAthleteDialog'
+import { AuthProvider, useAuth } from './context/AuthContext'
+import CircularProgress from '@mui/material/CircularProgress'
 
+
+function ProtectedRoute({ children }) {
+  const { user, loading } = useAuth()
+
+  if (loading) {
+    return (
+      <Box sx={{ display: 'flex', minHeight: '100dvh', justifyContent: 'center', alignItems: 'center' }}>
+        <CircularProgress />
+      </Box>
+    )
+  }
+
+  if (!user) {
+    return <Navigate to="/login" replace />
+  }
+
+  return children
+}
 
 function AppContent() {
   const location = useLocation()
@@ -21,6 +43,10 @@ function AppContent() {
   const isSeguimientoPage = location.pathname === '/seguimiento'
   const isAnalisisPage = location.pathname === '/analisis'
   const isCalendarioPage = location.pathname === '/calendario'
+  const isLoginPage = location.pathname === '/login'
+  const isRegisterPage = location.pathname === '/register'
+
+  const hideChrome = isLoginPage || isRegisterPage
 
   // Función para obtener el título de la página actual
   const getPageTitle = () => {
@@ -83,7 +109,7 @@ function AppContent() {
       }}
     >
       {/* AppBar mobile-optimized */}
-      {!isSeguimientoPage && (
+      {!isSeguimientoPage && !hideChrome && (
         <AppBar position="fixed" sx={{ width: '100%', zIndex: 1100, pt: 'env(safe-area-inset-top)' }}>
           <Toolbar sx={{ minHeight: { xs: 56 }, px: 2, display: 'flex', alignItems: 'center' }}>
             <Typography
@@ -139,7 +165,7 @@ function AppContent() {
       )}
 
       {/* Spacer para compensar AppBar fixed (56px + safe area), NO en seguimiento */}
-      {!isSeguimientoPage && (
+      {!isSeguimientoPage && !hideChrome && (
         <Box sx={{ height: 'calc(56px + env(safe-area-inset-top))' }} />
       )}
 
@@ -161,16 +187,18 @@ function AppContent() {
         }}
       >
         <Routes>
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
           <Route path="/" element={<Navigate to="/seguimiento" replace />} />
-          <Route path="/seguimiento" element={<SeguimientoPage />} />
-          <Route path="/analisis" element={<AnalisisPage />} />
-          <Route path="/calendario" element={<CalendarioPage />} />
-          <Route path="/mas" element={<MasPage />} />
+          <Route path="/seguimiento" element={<ProtectedRoute><SeguimientoPage /></ProtectedRoute>} />
+          <Route path="/analisis" element={<ProtectedRoute><AnalisisPage /></ProtectedRoute>} />
+          <Route path="/calendario" element={<ProtectedRoute><CalendarioPage /></ProtectedRoute>} />
+          <Route path="/mas" element={<ProtectedRoute><MasPage /></ProtectedRoute>} />
         </Routes>
       </Box>
 
       {/* Bottom Navigation Bar - fijo en la parte inferior */}
-      <BottomNavigationBar />
+      {!hideChrome && <BottomNavigationBar />}
     </Box>
   )
 }
@@ -187,7 +215,9 @@ function App() {
         v7_relativeSplatPath: true
       }}
     >
-      <AppContent />
+      <AuthProvider>
+        <AppContent />
+      </AuthProvider>
     </Router>
   )
 }
