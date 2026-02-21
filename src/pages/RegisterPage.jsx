@@ -62,10 +62,14 @@ export default function RegisterPage() {
 
     const handleGoogleLogin = async () => {
         setError(null);
+        const baseUrl = import.meta.env.BASE_URL || '/';
+        const redirectPath = baseUrl.endsWith('/') ? `${baseUrl}seguimiento` : `${baseUrl}/seguimiento`;
+        const redirectUrl = `${window.location.origin}${redirectPath}`;
+
         const { error } = await supabase.auth.signInWithOAuth({
             provider: 'google',
             options: {
-                redirectTo: window.location.origin + '/seguimiento'
+                redirectTo: redirectUrl
             }
         });
         if (error) setError(error.message);
