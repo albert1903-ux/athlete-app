@@ -130,6 +130,9 @@ const SeguimientoPage = () => {
       {/* Custom Header */}
       <Box
         sx={{
+          position: 'sticky',
+          top: 0,
+          zIndex: 0,
           pt: 'env(safe-area-inset-top)',
           px: 3,
           pb: 3,
@@ -172,6 +175,8 @@ const SeguimientoPage = () => {
       {/* Main Content Container - White Rounded */}
       <Box
         sx={{
+          position: 'relative',
+          zIndex: 10,
           flex: 1,
           bgcolor: 'white',
           borderTopLeftRadius: 32,
