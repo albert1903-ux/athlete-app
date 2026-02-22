@@ -1,14 +1,9 @@
 import { useState, useEffect } from 'react'
-import dayjs from 'dayjs'
-import {
-    Box,
-    Card,
-    CardContent,
-    Chip,
-} from '@mui/material'
+import { Box } from '@mui/material'
 import { TbX, TbCheck, TbUser } from 'react-icons/tb'
 import AthleteSearch from './AthleteSearch'
 import { Modal, Button, Typography } from './ui'
+import SelectedAthleteCard from './SelectedAthleteCard'
 
 // Función helper para cargar desde localStorage de forma síncrona
 const STORAGE_KEY = 'selectedAthlete'
@@ -117,47 +112,7 @@ function SelectAthleteDialog({ open, onClose, onSelect }) {
                             zIndex: (theme) => theme.zIndex.appBar
                         }}
                     >
-                        <Card
-                            sx={{
-                                bgcolor: 'primary.light',
-                                color: 'primary.contrastText'
-                            }}
-                        >
-                            <CardContent>
-                                <Typography variant="subtitle2" gutterBottom>
-                                    Atleta seleccionado:
-                                </Typography>
-                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
-                                    <Typography variant="body1" fontWeight="bold">
-                                        {tempSelectedAthlete.nombre}
-                                    </Typography>
-                                    {tempSelectedAthlete.fecha_nacimiento && (
-                                        <Chip
-                                            label={dayjs(tempSelectedAthlete.fecha_nacimiento).format('DD/MM/YYYY')}
-                                            size="small"
-                                            variant="outlined"
-                                            sx={{ bgcolor: 'white', color: 'primary.main' }}
-                                        />
-                                    )}
-                                    {/* {tempSelectedAthlete.licencia && tempSelectedAthlete.licencia !== 'N/A' && (
-                                        <Chip
-                                            label={`Lic: ${tempSelectedAthlete.licencia}`}
-                                            size="small"
-                                            variant="outlined"
-                                            sx={{ bgcolor: 'white', color: 'primary.main' }}
-                                        />
-                                    )} */}
-                                    {tempSelectedAthlete.club && tempSelectedAthlete.club !== 'N/A' && tempSelectedAthlete.club !== 'Sin club' && (
-                                        <Chip
-                                            label={tempSelectedAthlete.club}
-                                            size="small"
-                                            variant="outlined"
-                                            sx={{ bgcolor: 'white', color: 'primary.main' }}
-                                        />
-                                    )}
-                                </Box>
-                            </CardContent>
-                        </Card>
+                        <SelectedAthleteCard athlete={tempSelectedAthlete} />
                     </Box>
                 )}
             </Modal.Body>

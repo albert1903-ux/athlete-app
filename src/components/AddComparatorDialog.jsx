@@ -1,14 +1,9 @@
 import { useState, useEffect } from 'react'
-import dayjs from 'dayjs'
-import {
-    Box,
-    Card,
-    CardContent,
-    Chip,
-} from '@mui/material'
+import { Box } from '@mui/material'
 import { TbX, TbCheck, TbSwords } from 'react-icons/tb'
 import AthleteSearch from './AthleteSearch'
 import { Modal, Button, Typography } from './ui'
+import SelectedAthleteCard from './SelectedAthleteCard'
 
 function AddComparatorDialog({ open, onClose, onAdd, currentComparators = [] }) {
     const [tempSelectedAthlete, setTempSelectedAthlete] = useState(null)
@@ -89,42 +84,11 @@ function AddComparatorDialog({ open, onClose, onAdd, currentComparators = [] }) 
                             px: 2
                         }}
                     >
-                        <Card
-                            sx={{
-                                bgcolor: duplicateError ? 'error.light' : 'secondary.light',
-                                color: duplicateError ? 'error.contrastText' : 'secondary.contrastText'
-                            }}
-                        >
-                            <CardContent>
-                                <Typography variant="subtitle2" gutterBottom>
-                                    {duplicateError ? 'Este atleta ya está en la lista:' : 'Atleta seleccionado:'}
-                                </Typography>
-                                {/* Nombre del atleta */}
-                                <Typography variant="body1" fontWeight="bold" sx={{ mb: 1 }}>
-                                    {tempSelectedAthlete.nombre}
-                                </Typography>
-
-                                {/* Chips de licencia y club */}
-                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
-                                    {/* {tempSelectedAthlete.licencia && tempSelectedAthlete.licencia !== 'N/A' && (
-                                        <Chip
-                                            label={`Lic: ${tempSelectedAthlete.licencia}`}
-                                            size="small"
-                                            variant="outlined"
-                                            sx={{ bgcolor: 'white', color: duplicateError ? 'error.main' : 'secondary.main' }}
-                                        />
-                                    )} */}
-                                    {tempSelectedAthlete.club && tempSelectedAthlete.club !== 'N/A' && tempSelectedAthlete.club !== 'Sin club' && (
-                                        <Chip
-                                            label={tempSelectedAthlete.club}
-                                            size="small"
-                                            variant="outlined"
-                                            sx={{ bgcolor: 'white', color: duplicateError ? 'error.main' : 'secondary.main' }}
-                                        />
-                                    )}
-                                </Box>
-                            </CardContent>
-                        </Card>
+                        <SelectedAthleteCard
+                            athlete={tempSelectedAthlete}
+                            label={duplicateError ? 'Este atleta ya está en la lista:' : 'Atleta seleccionado:'}
+                            error={duplicateError}
+                        />
                     </Box>
                 )}
             </Modal.Body>

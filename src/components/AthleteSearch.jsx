@@ -207,10 +207,6 @@ function AthleteSearch({ onResultClick }) {
     <Box>
       <Card sx={{ mb: 3 }}>
         <CardContent>
-          <Typography variant="h5" component="h2" gutterBottom>
-            Búsqueda de Atletas
-          </Typography>
-
           {/* Selector de tipo de búsqueda */}
           <Box sx={{ mb: 2, display: 'flex', justifyContent: 'center' }}>
             <ToggleButtonGroup
