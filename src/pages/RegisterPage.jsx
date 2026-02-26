@@ -15,7 +15,6 @@ export default function RegisterPage() {
     const [step, setStep] = useState(1);
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [otp, setOtp] = useState('');
     const [error, setError] = useState(null);
     const [loading, setLoading] = useState(false);
 
@@ -33,29 +32,6 @@ export default function RegisterPage() {
             setError(signUpError.message);
         } else {
             setStep(2);
-        }
-        setLoading(false);
-    };
-
-    const handleVerifyOtp = async (e) => {
-        e.preventDefault();
-        if (otp.length !== 6) {
-            setError("El código debe tener 6 dígitos");
-            return;
-        }
-        setLoading(true);
-        setError(null);
-
-        const { error: verifyError } = await supabase.auth.verifyOtp({
-            email,
-            token: otp,
-            type: 'signup',
-        });
-
-        if (verifyError) {
-            setError(verifyError.message);
-        } else {
-            navigate('/seguimiento', { replace: true });
         }
         setLoading(false);
     };
@@ -108,7 +84,7 @@ export default function RegisterPage() {
                     <Typography color="text.secondary" sx={{ mt: 1 }}>
                         {step === 1
                             ? 'Crea tu cuenta de entrenador'
-                            : `Hemos enviado un código de 6 dígitos a ${email}`}
+                            : `Hemos enviado un enlace de confirmación a ${email}`}
                     </Typography>
                 </Box>
 
@@ -150,21 +126,14 @@ export default function RegisterPage() {
                         </Button>
                     </form>
                 ) : (
-                    <form onSubmit={handleVerifyOtp} style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-                        <TextField
-                            label="Código de 6 dígitos"
-                            type="text"
-                            required
-                            fullWidth
-                            value={otp}
-                            onChange={(e) => setOtp(e.target.value)}
-                            inputProps={{ maxLength: 6, style: { textAlign: 'center', letterSpacing: '8px', fontSize: '20px' } }}
-                        />
+                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: '24px', textAlign: 'center' }}>
+                        <Typography variant="body1">
+                            Haz clic en el enlace del correo para verificar tu dirección. Una vez verificado, podrás iniciar sesión (tu cuenta requerirá de aprobación previa).
+                        </Typography>
                         <Button
-                            type="submit"
                             variant="contained"
                             fullWidth
-                            disabled={loading}
+                            onClick={() => navigate('/login')}
                             sx={{
                                 py: 1.5,
                                 borderRadius: 2,
@@ -174,16 +143,9 @@ export default function RegisterPage() {
                                 '&:hover': { bgcolor: 'primary.dark' }
                             }}
                         >
-                            {loading ? <CircularProgress size={24} color="inherit" /> : 'Verificar y Entrar'}
+                            Ir a Iniciar Sesión
                         </Button>
-                        <Button
-                            variant="text"
-                            onClick={() => setStep(1)}
-                            sx={{ textTransform: 'none', color: 'text.secondary' }}
-                        >
-                            Volver
-                        </Button>
-                    </form>
+                    </Box>
                 )}
 
                 {step === 1 && (
