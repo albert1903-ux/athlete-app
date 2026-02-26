@@ -68,6 +68,7 @@ function RoleProtectedRoute({ children, allowedRoles }) {
 }
 
 function AppContent() {
+  const { user } = useAuth()
   const location = useLocation()
   const [dialogOpen, setDialogOpen] = useState(false)
 
