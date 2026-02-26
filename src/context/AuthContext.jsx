@@ -8,16 +8,24 @@ export const AuthProvider = ({ children }) => {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        // Check active sessions and sets the user
         supabase.auth.getSession().then(({ data: { session } }) => {
-            setUser(session?.user ?? null);
+            const currentUser = session?.user ?? null;
+            if (currentUser) {
+                // Determine the role from user_metadata, default to 'consulta'
+                currentUser.role = currentUser.user_metadata?.role || 'consulta';
+            }
+            setUser(currentUser);
             setLoading(false);
         });
 
         // Listen for changes on auth state (log in, log out, etc.)
         const { data: { subscription } } = supabase.auth.onAuthStateChange(
             (_event, session) => {
-                setUser(session?.user ?? null);
+                const currentUser = session?.user ?? null;
+                if (currentUser) {
+                    currentUser.role = currentUser.user_metadata?.role || 'consulta';
+                }
+                setUser(currentUser);
                 setLoading(false);
             }
         );

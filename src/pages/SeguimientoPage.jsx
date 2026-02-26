@@ -9,6 +9,7 @@ import ListItemIcon from '@mui/material/ListItemIcon'
 import { TbDots, TbList, TbCircuitCapacitorPolarized, TbUser, TbSwords, TbUserMinus, TbStar } from 'react-icons/tb'
 import dayjs from 'dayjs'
 import { useFavorites } from '../store/favoritesStore'
+import { useAuth } from '../context/AuthContext'
 
 
 import AthleteSpiderChart from '../components/AthleteSpiderChart'
@@ -50,6 +51,7 @@ const SeguimientoPage = () => {
 
   // Favorites
   const { favorites } = useFavorites()
+  const { user } = useAuth()
 
   // Initial load: if no athlete selected, open selection dialog
   useEffect(() => {
@@ -293,14 +295,21 @@ const SeguimientoPage = () => {
           <ListItemIcon><TbUser /></ListItemIcon>
           Seleccionar atleta
         </MenuItem>
-        <MenuItem onClick={() => handleAction('add_result')}>
-          <ListItemIcon><TbCircuitCapacitorPolarized /></ListItemIcon>
-          Añadir marca
-        </MenuItem>
-        <MenuItem onClick={() => handleAction('marks')}>
-          <ListItemIcon><TbList /></ListItemIcon>
-          Gestionar marcas
-        </MenuItem>
+
+        {user?.role === 'admin' && (
+          <MenuItem onClick={() => handleAction('add_result')}>
+            <ListItemIcon><TbCircuitCapacitorPolarized /></ListItemIcon>
+            Añadir marca
+          </MenuItem>
+        )}
+
+        {user?.role === 'admin' && (
+          <MenuItem onClick={() => handleAction('marks')}>
+            <ListItemIcon><TbList /></ListItemIcon>
+            Gestionar marcas
+          </MenuItem>
+        )}
+
         <MenuItem onClick={() => handleAction('add_comparator')}>
           <ListItemIcon><TbSwords /></ListItemIcon>
           Añadir atleta a comparar

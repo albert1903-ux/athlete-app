@@ -4,9 +4,11 @@ import BottomNavigation from '@mui/material/BottomNavigation'
 import BottomNavigationAction from '@mui/material/BottomNavigationAction'
 import Box from '@mui/material/Box'
 import { TbChartRadar, TbHeartbeat, TbCalendar, TbDots } from 'react-icons/tb'
+import { useAuth } from '../context/AuthContext'
 const BottomNavigationBar = () => {
   const navigate = useNavigate()
   const location = useLocation()
+  const { user } = useAuth()
 
   // Determinar el valor actual basado en la ruta
   // React Router con basename ya normaliza el pathname, pero por si acaso
@@ -82,12 +84,14 @@ const BottomNavigationBar = () => {
             icon={<TbChartRadar size={24} />}
             aria-label="Seguimiento deportivo"
           />
-          <BottomNavigationAction
-            label="Análisis"
-            value="analisis"
-            icon={<TbHeartbeat size={24} />}
-            aria-label="Análisis físico"
-          />
+          {user?.role === 'admin' && (
+            <BottomNavigationAction
+              label="Análisis"
+              value="analisis"
+              icon={<TbHeartbeat size={24} />}
+              aria-label="Análisis físico"
+            />
+          )}
           <BottomNavigationAction
             label="Calendario"
             value="calendario"

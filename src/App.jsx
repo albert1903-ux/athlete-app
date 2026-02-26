@@ -36,6 +36,28 @@ function ProtectedRoute({ children }) {
   return children
 }
 
+function RoleProtectedRoute({ children, allowedRoles }) {
+  const { user, loading } = useAuth()
+
+  if (loading) {
+    return (
+      <Box sx={{ display: 'flex', minHeight: '100dvh', justifyContent: 'center', alignItems: 'center' }}>
+        <CircularProgress />
+      </Box>
+    )
+  }
+
+  if (!user) {
+    return <Navigate to="/login" replace />
+  }
+
+  if (allowedRoles && !allowedRoles.includes(user.role)) {
+    return <Navigate to="/seguimiento" replace />
+  }
+
+  return children
+}
+
 function AppContent() {
   const location = useLocation()
   const [dialogOpen, setDialogOpen] = useState(false)
@@ -191,7 +213,7 @@ function AppContent() {
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/" element={<Navigate to="/seguimiento" replace />} />
           <Route path="/seguimiento" element={<ProtectedRoute><SeguimientoPage /></ProtectedRoute>} />
-          <Route path="/analisis" element={<ProtectedRoute><AnalisisPage /></ProtectedRoute>} />
+          <Route path="/analisis" element={<RoleProtectedRoute allowedRoles={['admin']}><AnalisisPage /></RoleProtectedRoute>} />
           <Route path="/calendario" element={<ProtectedRoute><CalendarioPage /></ProtectedRoute>} />
           <Route path="/mas" element={<ProtectedRoute><MasPage /></ProtectedRoute>} />
         </Routes>
