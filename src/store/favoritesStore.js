@@ -46,15 +46,24 @@ export function useFavorites() {
 
             if (base.length === 0) {
                 setFavorites([])
+                setLoading(false)
                 return
             }
 
             // Enrich with latest club for each athlete
             const ids = base.map(a => a.atleta_id)
-            const { data: clubData } = await supabase
+
+            const { data: clubData, error: clubError } = await supabase
                 .from('atleta_club_hist')
-                .select('atleta_id, clubs:clubes(nombre), fecha_inicio, fecha_fin')
+                .select(`
+                  atleta_id,
+                  fecha_inicio,
+                  fecha_fin,
+                  clubes!inner(nombre)
+                `)
                 .in('atleta_id', ids)
+
+            if (clubError) throw clubError
 
             // Build a map atletaId -> latest club name
             const clubMap = {}
@@ -66,7 +75,11 @@ export function useFavorites() {
                         (!row.fecha_fin && prev.fecha_fin) ||
                         (row.fecha_inicio > prev.fecha_inicio)
                     if (isBetter) {
-                        clubMap[row.atleta_id] = { nombre: row.clubs?.nombre ?? null, fecha_fin: row.fecha_fin, fecha_inicio: row.fecha_inicio }
+                        clubMap[row.atleta_id] = {
+                            nombre: row.clubes?.nombre ?? null,
+                            fecha_fin: row.fecha_fin,
+                            fecha_inicio: row.fecha_inicio
+                        }
                     }
                 })
             }
