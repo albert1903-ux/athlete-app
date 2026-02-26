@@ -14,6 +14,8 @@ import MasPage from './pages/MasPage'
 import LoginPage from './pages/LoginPage'
 import RegisterPage from './pages/RegisterPage'
 import PendingApprovalPage from './pages/PendingApprovalPage'
+import TermsPage from './pages/TermsPage'
+import PrivacyPage from './pages/PrivacyPage'
 import AddAthleteDialog from './components/AddAthleteDialog'
 import { AuthProvider, useAuth } from './context/AuthContext'
 import CircularProgress from '@mui/material/CircularProgress'
@@ -222,6 +224,8 @@ function AppContent() {
         <Routes>
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
+          <Route path="/terms" element={<TermsPage />} />
+          <Route path="/privacy" element={<PrivacyPage />} />
           <Route path="/pending-approval" element={user && !user.isApproved ? <PendingApprovalPage /> : <Navigate to="/seguimiento" replace />} />
           <Route path="/" element={<Navigate to="/seguimiento" replace />} />
           <Route path="/seguimiento" element={<ProtectedRoute><SeguimientoPage /></ProtectedRoute>} />
