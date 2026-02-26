@@ -13,6 +13,7 @@ import CalendarioPage from './pages/CalendarioPage'
 import MasPage from './pages/MasPage'
 import LoginPage from './pages/LoginPage'
 import RegisterPage from './pages/RegisterPage'
+import PendingApprovalPage from './pages/PendingApprovalPage'
 import AddAthleteDialog from './components/AddAthleteDialog'
 import { AuthProvider, useAuth } from './context/AuthContext'
 import CircularProgress from '@mui/material/CircularProgress'
@@ -33,6 +34,10 @@ function ProtectedRoute({ children }) {
     return <Navigate to="/login" replace />
   }
 
+  if (!user.isApproved) {
+    return <Navigate to="/pending-approval" replace />
+  }
+
   return children
 }
 
@@ -51,6 +56,10 @@ function RoleProtectedRoute({ children, allowedRoles }) {
     return <Navigate to="/login" replace />
   }
 
+  if (!user.isApproved) {
+    return <Navigate to="/pending-approval" replace />
+  }
+
   if (allowedRoles && !allowedRoles.includes(user.role)) {
     return <Navigate to="/seguimiento" replace />
   }
@@ -67,8 +76,9 @@ function AppContent() {
   const isCalendarioPage = location.pathname === '/calendario'
   const isLoginPage = location.pathname === '/login'
   const isRegisterPage = location.pathname === '/register'
+  const isPendingApprovalPage = location.pathname === '/pending-approval'
 
-  const hideChrome = isLoginPage || isRegisterPage
+  const hideChrome = isLoginPage || isRegisterPage || isPendingApprovalPage
 
   // Función para obtener el título de la página actual
   const getPageTitle = () => {
@@ -211,6 +221,7 @@ function AppContent() {
         <Routes>
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
+          <Route path="/pending-approval" element={user && !user.isApproved ? <PendingApprovalPage /> : <Navigate to="/seguimiento" replace />} />
           <Route path="/" element={<Navigate to="/seguimiento" replace />} />
           <Route path="/seguimiento" element={<ProtectedRoute><SeguimientoPage /></ProtectedRoute>} />
           <Route path="/analisis" element={<RoleProtectedRoute allowedRoles={['admin']}><AnalisisPage /></RoleProtectedRoute>} />

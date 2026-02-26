@@ -6,14 +6,16 @@ import List from '@mui/material/List'
 import ListItem from '@mui/material/ListItem'
 import ListItemIcon from '@mui/material/ListItemIcon'
 import ListItemText from '@mui/material/ListItemText'
-import { TbUser, TbSettings, TbHelpCircle, TbInfoCircle, TbLogout, TbStar } from 'react-icons/tb'
+import { TbUser, TbSettings, TbHelpCircle, TbInfoCircle, TbLogout, TbStar, TbUsers } from 'react-icons/tb'
 import { useState } from 'react'
 import FavoritesDialog from '../components/FavoritesDialog'
+import AdminApprovalDialog from '../components/AdminApprovalDialog'
 import { useAuth } from '../context/AuthContext'
 import { supabase } from '../lib/supabase'
 
 const MasPage = () => {
   const [favOpen, setFavOpen] = useState(false)
+  const [adminOpen, setAdminOpen] = useState(false)
   const { user } = useAuth()
 
   const handleLogout = async () => {
@@ -22,6 +24,7 @@ const MasPage = () => {
 
   const menuItems = [
     { icon: <TbStar size={24} />, text: 'Atletas favoritos', description: 'Gestiona tus atletas favoritos', onClick: () => setFavOpen(true) },
+    ...(user?.role === 'admin' ? [{ icon: <TbUsers size={24} />, text: 'Solicitudes de Acceso', description: 'Aprueba o rechaza nuevos usuarios', onClick: () => setAdminOpen(true) }] : []),
     { icon: <TbUser size={24} />, text: 'Perfil', description: 'Configura tu perfil de usuario' },
     { icon: <TbSettings size={24} />, text: 'Configuración', description: 'Ajustes de la aplicación' },
     { icon: <TbHelpCircle size={24} />, text: 'Ayuda', description: 'Centro de ayuda y soporte' },
@@ -108,6 +111,7 @@ const MasPage = () => {
       </Box>
 
       <FavoritesDialog open={favOpen} onClose={() => setFavOpen(false)} />
+      <AdminApprovalDialog open={adminOpen} onClose={() => setAdminOpen(false)} />
     </>
   )
 }

@@ -11,8 +11,11 @@ export const AuthProvider = ({ children }) => {
         supabase.auth.getSession().then(({ data: { session } }) => {
             const currentUser = session?.user ?? null;
             if (currentUser) {
-                // Determine the role from user_metadata, default to 'consulta'
+                // Determine the role and status from user_metadata
                 currentUser.role = currentUser.user_metadata?.role || 'consulta';
+                currentUser.status = currentUser.user_metadata?.status || 'pending';
+                // Admin is automatically approved. Otherwise depends on status.
+                currentUser.isApproved = currentUser.role === 'admin' || currentUser.status === 'approved';
             }
             setUser(currentUser);
             setLoading(false);
@@ -24,6 +27,8 @@ export const AuthProvider = ({ children }) => {
                 const currentUser = session?.user ?? null;
                 if (currentUser) {
                     currentUser.role = currentUser.user_metadata?.role || 'consulta';
+                    currentUser.status = currentUser.user_metadata?.status || 'pending';
+                    currentUser.isApproved = currentUser.role === 'admin' || currentUser.status === 'approved';
                 }
                 setUser(currentUser);
                 setLoading(false);
