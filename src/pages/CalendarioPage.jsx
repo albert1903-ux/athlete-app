@@ -169,7 +169,7 @@ const CalendarioPage = () => {
               handlePrevMonth(e)
             }}
             sx={{
-              color: '#6B7280',
+              color: 'text.secondary',
               backgroundColor: 'rgba(0, 0, 0, 0.04)',
               borderRadius: 2,
               width: 40,
@@ -203,7 +203,7 @@ const CalendarioPage = () => {
             sx={{
               fontSize: '1.5rem',
               fontWeight: 600,
-              color: '#000000',
+              color: 'text.primary',
               fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
               textTransform: 'capitalize',
               lineHeight: 1.2,
@@ -217,7 +217,7 @@ const CalendarioPage = () => {
             sx={{
               fontSize: '0.875rem',
               fontWeight: 400,
-              color: '#9CA3AF',
+              color: 'text.disabled',
               fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
             }}
           >
@@ -237,7 +237,7 @@ const CalendarioPage = () => {
               handleNextMonth(e)
             }}
             sx={{
-              color: '#6B7280',
+              color: 'text.secondary',
               backgroundColor: 'rgba(0, 0, 0, 0.04)',
               borderRadius: 2,
               width: 40,
@@ -598,10 +598,10 @@ const CalendarioPage = () => {
         }}
       >
 
-        {/* Calendario */}
         <Card
           sx={{
             position: 'relative',
+            bgcolor: (theme) => theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.08)' : 'background.paper'
           }}
         >
           <Box sx={{ p: 3, position: 'relative' }}>
@@ -632,7 +632,7 @@ const CalendarioPage = () => {
                     handlePrevMonth(e)
                   }}
                   sx={{
-                    color: '#6B7280',
+                    color: 'text.secondary',
                     backgroundColor: 'rgba(0, 0, 0, 0.04)',
                     borderRadius: 2,
                     width: 40,
@@ -666,7 +666,7 @@ const CalendarioPage = () => {
                   sx={{
                     fontSize: '1.5rem',
                     fontWeight: 600,
-                    color: '#000000',
+                    color: 'text.primary',
                     fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
                     textTransform: 'capitalize',
                     lineHeight: 1.2,
@@ -680,7 +680,7 @@ const CalendarioPage = () => {
                   sx={{
                     fontSize: '0.875rem',
                     fontWeight: 400,
-                    color: '#9CA3AF',
+                    color: 'text.disabled',
                     fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
                   }}
                 >
@@ -702,7 +702,7 @@ const CalendarioPage = () => {
                     handleNextMonth(e)
                   }}
                   sx={{
-                    color: '#6B7280',
+                    color: 'text.secondary',
                     backgroundColor: 'rgba(0, 0, 0, 0.04)',
                     borderRadius: 2,
                     width: 40,
@@ -856,7 +856,7 @@ const CalendarioPage = () => {
                       '& .MuiDayCalendar-weekDayLabel': {
                         fontSize: '0.75rem',
                         fontWeight: 400,
-                        color: '#9CA3AF',
+                        color: 'text.disabled',
                         width: '100%',
                         fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
                         padding: '8px 0',

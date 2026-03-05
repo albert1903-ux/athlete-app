@@ -148,7 +148,7 @@ export default function NextEventCard({ athlete }) {
         <Box sx={{ width: '100%', mb: 3 }}>
             {/* Título y Ubicación */}
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-                <Typography variant="h6" sx={{ fontFamily: 'Poppins', fontWeight: 500, fontSize: '20px', mb: 0, color: '#000000' }}>
+                <Typography variant="h6" sx={{ fontFamily: 'Poppins', fontWeight: 500, fontSize: '20px', mb: 0, color: 'text.primary' }}>
                     Próxima competición
                 </Typography>
                 <Typography sx={{ fontSize: '1.25rem', fontWeight: 600, color: '#E11141' }}>
@@ -187,12 +187,12 @@ export default function NextEventCard({ athlete }) {
                     </Typography>
                 </Box>
 
-                {/* Tarjetas de Pruebas (Gris) */}
+                {/* Tarjetas de Pruebas (Gris/Adaptables) */}
                 {eventData.participations.map((part, idx) => (
                     <Box key={idx} sx={{
                         minWidth: '95px',
                         height: '90px',
-                        bgcolor: '#F3F4F6',
+                        bgcolor: 'action.hover',
                         borderRadius: '20px',
                         display: 'flex',
                         flexDirection: 'column',
@@ -201,10 +201,10 @@ export default function NextEventCard({ athlete }) {
                         flexShrink: 0,
                         px: 1
                     }}>
-                        <Typography sx={{ fontSize: '0.95rem', fontWeight: 500, color: '#4B5563', mb: 0.5, textAlign: 'center', lineHeight: 1.1 }}>
+                        <Typography sx={{ fontSize: '0.95rem', fontWeight: 500, color: 'text.secondary', mb: 0.5, textAlign: 'center', lineHeight: 1.1 }}>
                             {part.prueba_nombre}
                         </Typography>
-                        <Typography sx={{ fontSize: '1.15rem', fontWeight: 700, color: '#000' }}>
+                        <Typography sx={{ fontSize: '1.15rem', fontWeight: 700, color: 'text.primary' }}>
                             {part.hora ? part.hora.substring(0, 5) : '--:--'}
                         </Typography>
                     </Box>

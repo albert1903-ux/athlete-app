@@ -6,7 +6,7 @@ const Card = ({ children, sx = {}, ...props }) => {
     return (
         <Box
             sx={{
-                backgroundColor: tokens.colors.background.paper,
+                bgcolor: 'background.paper',
                 borderRadius: tokens.borderRadius.xl,
                 boxShadow: tokens.shadows.card,
                 overflow: 'hidden',

@@ -32,7 +32,7 @@ function SelectedAthleteCard({ athlete, label = 'Atleta seleccionado:', error = 
                             label={dayjs(athlete.fecha_nacimiento).format('DD/MM/YYYY')}
                             size="small"
                             variant="outlined"
-                            sx={{ bgcolor: 'white', color: chipColor }}
+                            sx={{ bgcolor: 'background.paper', color: chipColor }}
                         />
                     )}
                     {athlete.club && athlete.club !== 'N/A' && athlete.club !== 'Sin club' && (
@@ -40,7 +40,7 @@ function SelectedAthleteCard({ athlete, label = 'Atleta seleccionado:', error = 
                             label={athlete.club}
                             size="small"
                             variant="outlined"
-                            sx={{ bgcolor: 'white', color: chipColor }}
+                            sx={{ bgcolor: 'background.paper', color: chipColor }}
                         />
                     )}
                 </Box>

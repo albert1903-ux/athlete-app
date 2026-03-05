@@ -104,7 +104,7 @@ function SelectAthleteDialog({ open, onClose, onSelect }) {
                             position: 'sticky',
                             bottom: 0,
                             width: '100%',
-                            backgroundColor: 'white',
+                            backgroundColor: 'background.paper',
                             borderTop: '1px solid',
                             borderColor: 'divider',
                             px: { xs: 2, sm: 3 },

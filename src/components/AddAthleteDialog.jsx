@@ -88,7 +88,7 @@ function AddAthleteDialog({ open, onClose, onAdd }) {
           <Box
             sx={{
               flexShrink: 0,
-              backgroundColor: 'white',
+              backgroundColor: 'background.paper',
               borderTop: '1px solid',
               borderColor: 'divider',
               pt: 1.5,
@@ -115,7 +115,7 @@ function AddAthleteDialog({ open, onClose, onAdd }) {
                       label={`Lic: ${tempSelectedAthlete.licencia}`}
                       size="small"
                       variant="outlined"
-                      sx={{ bgcolor: 'white', color: 'secondary.main' }}
+                      sx={{ bgcolor: 'background.paper', color: 'secondary.main' }}
                     />
                   )} */}
                   {tempSelectedAthlete.club && tempSelectedAthlete.club !== 'N/A' && tempSelectedAthlete.club !== 'Sin club' && (
@@ -123,7 +123,7 @@ function AddAthleteDialog({ open, onClose, onAdd }) {
                       label={tempSelectedAthlete.club}
                       size="small"
                       variant="outlined"
-                      sx={{ bgcolor: 'white', color: 'secondary.main' }}
+                      sx={{ bgcolor: 'background.paper', color: 'secondary.main' }}
                     />
                   )}
                 </Box>

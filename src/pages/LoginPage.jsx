@@ -70,7 +70,7 @@ export default function LoginPage() {
                 sx={{
                     width: '100%',
                     maxWidth: 400,
-                    bgcolor: 'white',
+                    bgcolor: 'background.paper',
                     p: 4,
                     borderRadius: 4,
                     boxShadow: '0 4px 12px rgba(0,0,0,0.05)',
@@ -80,7 +80,7 @@ export default function LoginPage() {
                 }}
             >
                 <Box textAlign="center">
-                    <Typography component="h1" sx={{ fontFamily: 'Poppins', fontWeight: 600, fontSize: '28px', color: '#000000' }}>
+                    <Typography component="h1" sx={{ fontFamily: 'Poppins', fontWeight: 600, fontSize: '28px', color: 'text.primary' }}>
                         Bienvenido
                     </Typography>
                     <Typography color="text.secondary" sx={{ mt: 1 }}>

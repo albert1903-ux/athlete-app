@@ -141,7 +141,7 @@ function AthleteComparator({ onComparatorsChange, hideAddButton = false }) {
               <Box
                 sx={{
                   flexShrink: 0,
-                  backgroundColor: 'white',
+                  backgroundColor: 'background.paper',
                   borderTop: '1px solid',
                   borderColor: 'divider',
                   pt: 1.5,
@@ -170,7 +170,7 @@ function AthleteComparator({ onComparatorsChange, hideAddButton = false }) {
                           label={`Lic: ${tempSelectedAthlete.licencia}`}
                           size="small"
                           variant="outlined"
-                          sx={{ bgcolor: 'white', color: 'secondary.main' }}
+                          sx={{ bgcolor: 'background.paper', color: 'secondary.main' }}
                         />
                       )}
                       {tempSelectedAthlete.club && tempSelectedAthlete.club !== 'N/A' && tempSelectedAthlete.club !== 'Sin club' && (
@@ -178,7 +178,7 @@ function AthleteComparator({ onComparatorsChange, hideAddButton = false }) {
                           label={tempSelectedAthlete.club}
                           size="small"
                           variant="outlined"
-                          sx={{ bgcolor: 'white', color: 'secondary.main' }}
+                          sx={{ bgcolor: 'background.paper', color: 'secondary.main' }}
                         />
                       )}
                     </Box>
@@ -321,7 +321,7 @@ function AthleteComparator({ onComparatorsChange, hideAddButton = false }) {
                 position: 'sticky',
                 bottom: 0,
                 zIndex: 10,
-                backgroundColor: 'white',
+                backgroundColor: 'background.paper',
                 borderTop: '1px solid',
                 borderColor: 'divider',
                 mt: 2,
@@ -347,7 +347,7 @@ function AthleteComparator({ onComparatorsChange, hideAddButton = false }) {
                         label={dayjs(tempSelectedAthlete.fecha_nacimiento).format('DD/MM/YYYY')}
                         size="small"
                         variant="outlined"
-                        sx={{ bgcolor: 'white', color: 'secondary.main' }}
+                        sx={{ bgcolor: 'background.paper', color: 'secondary.main' }}
                       />
                     )}
                     {tempSelectedAthlete.licencia && tempSelectedAthlete.licencia !== 'N/A' && (
@@ -355,7 +355,7 @@ function AthleteComparator({ onComparatorsChange, hideAddButton = false }) {
                         label={`Lic: ${tempSelectedAthlete.licencia}`}
                         size="small"
                         variant="outlined"
-                        sx={{ bgcolor: 'white', color: 'secondary.main' }}
+                        sx={{ bgcolor: 'background.paper', color: 'secondary.main' }}
                       />
                     )}
                     {tempSelectedAthlete.club && tempSelectedAthlete.club !== 'N/A' && tempSelectedAthlete.club !== 'Sin club' && (
@@ -363,7 +363,7 @@ function AthleteComparator({ onComparatorsChange, hideAddButton = false }) {
                         label={tempSelectedAthlete.club}
                         size="small"
                         variant="outlined"
-                        sx={{ bgcolor: 'white', color: 'secondary.main' }}
+                        sx={{ bgcolor: 'background.paper', color: 'secondary.main' }}
                       />
                     )}
                   </Box>

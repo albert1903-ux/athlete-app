@@ -160,7 +160,7 @@ function AppContent() {
                 <IconButton
                   onClick={handleAddMeasurement}
                   sx={{
-                    bgcolor: 'white',
+                    bgcolor: 'background.paper',
                     color: 'text.primary',
                     '&:hover': { bgcolor: 'rgba(255,255,255,0.8)' }
                   }}
@@ -171,7 +171,7 @@ function AppContent() {
                 <IconButton
                   onClick={handleViewMeasurements}
                   sx={{
-                    bgcolor: 'white',
+                    bgcolor: 'background.paper',
                     color: 'text.primary',
                     '&:hover': { bgcolor: 'rgba(255,255,255,0.8)' }
                   }}
@@ -185,7 +185,7 @@ function AppContent() {
               <IconButton
                 onClick={handleAddEvent}
                 sx={{
-                  bgcolor: 'white',
+                  bgcolor: 'background.paper',
                   color: 'text.primary',
                   '&:hover': { bgcolor: 'rgba(255,255,255,0.8)' },
                   ml: 1

@@ -73,7 +73,7 @@ function AddComparatorDialog({ open, onClose, onAdd, currentComparators = [] }) 
                     <Box
                         sx={{
                             flexShrink: 0,
-                            backgroundColor: 'white',
+                            backgroundColor: 'background.paper',
                             borderTop: '1px solid',
                             borderColor: 'divider',
                             pt: 1.5,

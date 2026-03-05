@@ -184,7 +184,7 @@ const SeguimientoPage = () => {
         }}
       >
         <Box sx={{ mt: 2 }}>
-          <Typography component="h1" sx={{ fontFamily: 'Poppins', fontWeight: 500, fontSize: '24px', color: '#000000', mb: 1 }}>
+          <Typography component="h1" sx={{ fontFamily: 'Poppins', fontWeight: 500, fontSize: '24px', color: 'text.primary', mb: 1 }}>
             {selectedAthlete ? selectedAthlete.nombre : 'Selecciona un atleta'}
           </Typography>
 
@@ -193,14 +193,14 @@ const SeguimientoPage = () => {
               <Chip
                 label={dayjs(selectedAthlete.fecha_nacimiento).format('DD/MM/YYYY')}
                 size="small"
-                sx={{ bgcolor: 'white', fontWeight: 600 }}
+                sx={{ bgcolor: 'background.paper', color: 'text.primary', fontWeight: 600, border: '1px solid', borderColor: 'divider' }}
               />
             )}
             {selectedAthlete?.club && (
               <Chip
                 label={selectedAthlete.club}
                 size="small"
-                sx={{ bgcolor: 'white', fontWeight: 600 }}
+                sx={{ bgcolor: 'background.paper', color: 'text.primary', fontWeight: 600, border: '1px solid', borderColor: 'divider' }}
               />
             )}
           </Box>
@@ -211,7 +211,7 @@ const SeguimientoPage = () => {
           {/* Favorites quick-access */}
           {favorites.length > 0 && (
             <IconButton
-              sx={{ bgcolor: 'white', color: 'rgb(28, 27, 31)', '&:hover': { bgcolor: 'rgba(255,255,255,0.8)' } }}
+              sx={{ bgcolor: 'background.paper', color: 'text.primary', '&:hover': { bgcolor: 'action.hover' } }}
               onClick={(e) => setFavAnchorEl(e.currentTarget)}
               title="Favoritos"
             >
@@ -221,7 +221,7 @@ const SeguimientoPage = () => {
 
           {/* Context menu */}
           <IconButton
-            sx={{ bgcolor: 'white', color: 'rgb(28, 27, 31)', '&:hover': { bgcolor: 'rgba(255,255,255,0.8)' } }}
+            sx={{ bgcolor: 'background.paper', color: 'text.primary', '&:hover': { bgcolor: 'action.hover' } }}
             onClick={handleMenuOpen}
           >
             <TbDots />
@@ -235,7 +235,7 @@ const SeguimientoPage = () => {
           position: 'relative',
           zIndex: 10,
           flex: 1,
-          bgcolor: 'white',
+          bgcolor: 'background.paper',
           borderTopLeftRadius: 32,
           borderTopRightRadius: 32,
           px: 3,

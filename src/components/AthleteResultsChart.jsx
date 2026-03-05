@@ -1271,7 +1271,7 @@ function AthleteResultsChart({ comparatorAthletes = [] }) {
         : null
 
       return (
-        <Paper sx={{ p: 1.5, backgroundColor: 'rgba(255, 255, 255, 0.95)' }} elevation={3}>
+        <Paper sx={{ p: 1.5, bgcolor: 'background.paper' }} elevation={3}>
           <Typography variant="body2" sx={{ fontWeight: 'bold', mb: 0.5 }}>
             {viewMode === 'edad' ? mostrarEdad || label : mostrarFecha}
           </Typography>
@@ -1363,7 +1363,7 @@ function AthleteResultsChart({ comparatorAthletes = [] }) {
     <Box sx={{ width: '100%' }}>
       {/* Header Row */}
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2, px: 1 }}>
-        <Typography variant="h6" sx={{ fontFamily: 'Poppins', fontWeight: 500, fontSize: '20px', color: '#000000' }}>
+        <Typography variant="h6" sx={{ fontFamily: 'Poppins', fontWeight: 500, fontSize: '20px', color: 'text.primary' }}>
           Evolución de Marcas
         </Typography>
 
@@ -1376,14 +1376,14 @@ function AthleteResultsChart({ comparatorAthletes = [] }) {
               renderValue={(selected) => selected || 'Prueba'}
               sx={{
                 borderRadius: '20px',
-                bgcolor: '#F2F3F7',
+                bgcolor: 'action.hover',
                 border: 'none',
                 fontWeight: 'medium',
-                color: '#000',
+                color: 'text.primary',
                 px: 1,
                 py: 0.5,
                 '& .MuiOutlinedInput-notchedOutline': { border: 'none' },
-                '&:hover': { bgcolor: '#e0e0e0' },
+                '&:hover': { bgcolor: 'action.selected' },
                 '& .MuiSelect-select': { py: 0.5, pr: '32px !important' },
                 boxShadow: 'none',
               }}
@@ -1412,7 +1412,7 @@ function AthleteResultsChart({ comparatorAthletes = [] }) {
             border: '1px solid #e0e0e0',
             borderRadius: '20px',
             overflow: 'hidden',
-            bgcolor: 'white'
+            bgcolor: 'background.paper'
           }}
         >
           <MuiTooltip title="Vista por Fecha">
@@ -1434,7 +1434,7 @@ function AthleteResultsChart({ comparatorAthletes = [] }) {
               </Typography>
             </IconButton>
           </MuiTooltip>
-          <Box sx={{ width: '1px', bgcolor: '#e0e0e0' }} />
+          <Box sx={{ width: '1px', bgcolor: 'action.selected' }} />
           <MuiTooltip title="Vista por Edad">
             <IconButton
               size="small"
@@ -1458,7 +1458,7 @@ function AthleteResultsChart({ comparatorAthletes = [] }) {
       </Box>
 
       {/* Chart Card */}
-      <Card sx={{ width: '100%', bgcolor: '#F2F3F7', borderRadius: '20px', boxShadow: 'none' }}>
+      <Card sx={{ width: '100%', bgcolor: 'action.hover', borderRadius: '20px', boxShadow: 'none' }}>
         <CardContent sx={{ px: { xs: 2 }, py: { xs: 3 } }}>
           {combinedChartData && combinedChartData.length > 0 && chartWidth > 0 ? (
             <Box sx={{ width: '100%', overflow: 'hidden' }}>
@@ -1508,7 +1508,7 @@ function AthleteResultsChart({ comparatorAthletes = [] }) {
                   }}
                 />
                 <Tooltip content={<CustomTooltip />} />
-                <Legend wrapperStyle={{ paddingTop: '20px', color: '#333' }} />
+                <Legend wrapperStyle={{ paddingTop: '20px', color: 'text.primary' }} />
 
                 {/* Lines for main athlete */}
                 {chartData.pruebas && chartData.pruebas.length > 0 ? (

@@ -958,7 +958,7 @@ function AthleteSpiderChart({ comparatorAthletes = [] }) {
         const unidad = payload[0]?.payload?.unidad || ''
 
         return (
-          <Paper sx={{ p: 1.5, backgroundColor: 'rgba(255, 255, 255, 0.95)' }} elevation={3}>
+          <Paper sx={{ p: 1.5, bgcolor: 'background.paper' }} elevation={3}>
             <Typography variant="body2" sx={{ fontWeight: 'bold', mb: 1 }}>
               {prueba}
             </Typography>
@@ -1127,7 +1127,7 @@ function AthleteSpiderChart({ comparatorAthletes = [] }) {
           gap: 2
         }}
       >
-        <Typography variant="h6" sx={{ fontFamily: 'Poppins', fontWeight: 500, fontSize: '20px', mb: 0, color: '#000000' }}>
+        <Typography variant="h6" sx={{ fontFamily: 'Poppins', fontWeight: 500, fontSize: '20px', mb: 0, color: 'text.primary' }}>
           Mejores Marcas
         </Typography>
 
@@ -1143,14 +1143,14 @@ function AthleteSpiderChart({ comparatorAthletes = [] }) {
               }}
               sx={{
                 borderRadius: '20px',
-                bgcolor: '#F2F3F7',
+                bgcolor: 'action.hover',
                 border: 'none',
                 fontWeight: 'medium',
-                color: '#000',
+                color: 'text.primary',
                 px: 1,
                 py: 0.5,
                 '& .MuiOutlinedInput-notchedOutline': { border: 'none' },
-                '&:hover': { bgcolor: '#e0e0e0' },
+                '&:hover': { bgcolor: 'action.selected' },
                 '& .MuiSelect-select': { py: 0.5, pr: '32px !important' }, // Adjust padding for pill shape
                 boxShadow: 'none',
               }}
@@ -1189,7 +1189,7 @@ function AthleteSpiderChart({ comparatorAthletes = [] }) {
       <Card
         sx={{
           width: '100%',
-          bgcolor: '#F2F3F7',
+          bgcolor: 'action.hover',
           borderRadius: '20px',
           boxShadow: 'none',
           overflow: 'visible' // Ensure tooltips aren't clipped if possible, though Card usually clips
@@ -1211,7 +1211,7 @@ function AthleteSpiderChart({ comparatorAthletes = [] }) {
                   axisLine={false}
                 />
                 <Tooltip content={CustomTooltip} />
-                <Legend iconType="circle" wrapperStyle={{ color: '#333', paddingTop: '20px' }} />
+                <Legend iconType="circle" wrapperStyle={{ color: 'text.primary', paddingTop: '20px' }} />
                 {allAthletes.map((athlete) => {
                   const atletaIdKey = String(athlete.atleta_id)
                   const isMain = athlete.atleta_id === selectedAthlete?.atleta_id
@@ -1243,27 +1243,27 @@ function AthleteSpiderChart({ comparatorAthletes = [] }) {
         disableGutters
         sx={{
           borderRadius: '20px !important',
-          bgcolor: '#F2F3F7',
+          bgcolor: 'action.hover',
           boxShadow: 'none',
           '&:before': { display: 'none' }, // Remove default divider
           '&.Mui-expanded': { margin: 0, borderRadius: '20px !important' } // Change shape when expanded
         }}
       >
         <AccordionSummary
-          expandIcon={<Box sx={{ bgcolor: 'transparent', borderRadius: '50%', border: '2px solid #000', display: 'flex', p: 0.5 }}><TbChevronDown size={14} color="#000" /></Box>}
+          expandIcon={<Box sx={{ bgcolor: 'transparent', borderRadius: '50%', border: 2, borderColor: 'text.primary', display: 'flex', p: 0.5, color: 'text.primary' }}><TbChevronDown size={14} color="currentColor" /></Box>}
           sx={{
             px: 3,
             minHeight: '60px',
             '& .MuiAccordionSummary-content': { margin: '16px 0' }
           }}
         >
-          <Typography variant="subtitle1" fontWeight="bold" sx={{ color: '#000' }}>
+          <Typography variant="subtitle1" fontWeight="bold" sx={{ color: 'text.primary' }}>
             Mejores Resultados por Prueba
           </Typography>
         </AccordionSummary>
         <AccordionDetails sx={{ px: 3, pb: 3, pt: 0 }}>
           {radarData.map((entry, idx) => (
-            <Box key={idx} sx={{ mt: 1, p: 1.5, bgcolor: '#fff', borderRadius: '20px', boxShadow: '0 2px 8px rgba(0,0,0,0.05)' }}>
+            <Box key={idx} sx={{ mt: 1, p: 1.5, bgcolor: 'background.paper', borderRadius: '20px', boxShadow: '0 2px 8px rgba(0,0,0,0.05)' }}>
               {/* Header with Title and Ranking Button */}
               <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
                 <Typography variant="body2" fontWeight="bold" color="text.primary">
@@ -1278,7 +1278,7 @@ function AthleteSpiderChart({ comparatorAthletes = [] }) {
                     handleOpenRanking(entry.prueba, selectedCategory)
                   }}
                   title="Ver Ranking Top 50"
-                  sx={{ transition: 'background-color 0.2s', bgcolor: '#f0f7ff', '&:hover': { bgcolor: '#e0efff' } }}
+                  sx={{ transition: 'background-color 0.2s', bgcolor: 'action.selected', '&:hover': { bgcolor: 'action.hover' } }}
                 >
                   <PiRanking size={18} />
                 </IconButton>
@@ -1324,7 +1324,7 @@ function AthleteSpiderChart({ comparatorAthletes = [] }) {
                       ml: 1
                     }}
                   >
-                    {athlete.nombre}: <span style={{ fontWeight: 'normal', color: '#000' }}>{valorFormateado} {unidadReal || ''}</span>
+                    {athlete.nombre}: <span style={{ fontWeight: 'normal', color: 'text.primary' }}>{valorFormateado} {unidadReal || ''}</span>
                   </Typography>
                 )
               })}

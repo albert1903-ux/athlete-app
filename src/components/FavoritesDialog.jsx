@@ -101,12 +101,10 @@ function FavoritesDialog({ open, onClose }) {
                                         />
                                         <ListItemSecondaryAction>
                                             <IconButton
-                                                edge="end"
                                                 onClick={() => toggleFavorite(athlete)}
-                                                sx={{ color: 'warning.main' }}
-                                                title="Quitar de favoritos"
+                                                sx={{ color: 'warning.main', mr: 0 }}
                                             >
-                                                <TbStarFilled size={22} />
+                                                <TbStarFilled size={24} />
                                             </IconButton>
                                         </ListItemSecondaryAction>
                                     </ListItem>

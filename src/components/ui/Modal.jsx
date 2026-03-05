@@ -25,7 +25,7 @@ const ModalRoot = ({ open, onClose, children, title, maxWidth = 'sm', fullScreen
             fullWidth
             PaperProps={{
                 sx: {
-                    borderRadius: isFullScreen ? 0 : theme.shape.borderRadius,
+                    borderRadius: isFullScreen ? 0 : undefined,
                     margin: isFullScreen ? 0 : 2,
                 },
             }}

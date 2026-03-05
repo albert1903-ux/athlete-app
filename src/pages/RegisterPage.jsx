@@ -68,7 +68,7 @@ export default function RegisterPage() {
                 sx={{
                     width: '100%',
                     maxWidth: 400,
-                    bgcolor: 'white',
+                    bgcolor: 'background.paper',
                     p: 4,
                     borderRadius: 4,
                     boxShadow: '0 4px 12px rgba(0,0,0,0.05)',
@@ -78,7 +78,7 @@ export default function RegisterPage() {
                 }}
             >
                 <Box textAlign="center">
-                    <Typography component="h1" sx={{ fontFamily: 'Poppins', fontWeight: 600, fontSize: '28px', color: '#000000' }}>
+                    <Typography component="h1" sx={{ fontFamily: 'Poppins', fontWeight: 600, fontSize: '28px', color: 'text.primary' }}>
                         {step === 1 ? 'Únete' : 'Verifica tu Email'}
                     </Typography>
                     <Typography color="text.secondary" sx={{ mt: 1 }}>

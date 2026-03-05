@@ -7,9 +7,13 @@ import Button from '@mui/material/Button'
 import IconButton from '@mui/material/IconButton'
 import Typography from '@mui/material/Typography'
 import Box from '@mui/material/Box'
-import { TbX, TbTrash } from 'react-icons/tb'
+import { TbX, TbTrash, TbMoon, TbSun, TbDeviceDesktop } from 'react-icons/tb'
+import { Select, MenuItem, FormControl, InputLabel, Divider } from '@mui/material'
+import { useAppTheme } from '../context/ThemeContext'
 
 export default function SettingsDialog({ open, onClose }) {
+    const { modePreference, toggleTheme } = useAppTheme()
+
 
     const handleClearCache = () => {
         if (window.confirm('¿Estás seguro de que quieres limpiar la caché? Esto cerrará la sesión actual y vaciará los atletas guardados.')) {
@@ -28,6 +32,33 @@ export default function SettingsDialog({ open, onClose }) {
             </DialogTitle>
 
             <DialogContent dividers>
+                <Box sx={{ py: 2 }}>
+                    <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 2 }}>Apariencia</Typography>
+                    <FormControl fullWidth size="small">
+                        <InputLabel id="theme-select-label">Tema de la aplicación</InputLabel>
+                        <Select
+                            labelId="theme-select-label"
+                            id="theme-select"
+                            value={modePreference}
+                            label="Tema de la aplicación"
+                            onChange={(e) => toggleTheme(e.target.value)}
+                            sx={{ borderRadius: 2 }}
+                        >
+                            <MenuItem value="light">
+                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}><TbSun /> Claro</Box>
+                            </MenuItem>
+                            <MenuItem value="dark">
+                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}><TbMoon /> Oscuro</Box>
+                            </MenuItem>
+                            <MenuItem value="system">
+                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}><TbDeviceDesktop /> Sistema</Box>
+                            </MenuItem>
+                        </Select>
+                    </FormControl>
+                </Box>
+                
+                <Divider />
+
                 <Box sx={{ py: 2 }}>
                     <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 1 }}>Datos locales</Typography>
                     <Typography variant="body2" color="text.secondary" paragraph>

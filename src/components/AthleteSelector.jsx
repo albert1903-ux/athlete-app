@@ -225,7 +225,7 @@ function AthleteSelector() {
                 position: 'sticky',
                 bottom: 0,
                 width: '100%',
-                backgroundColor: 'white',
+                backgroundColor: 'background.paper',
                 borderTop: '1px solid',
                 borderColor: 'divider',
                 px: { xs: 2, sm: 3 },
@@ -252,7 +252,7 @@ function AthleteSelector() {
                         label={dayjs(tempSelectedAthlete.fecha_nacimiento).format('DD/MM/YYYY')}
                         size="small"
                         variant="outlined"
-                        sx={{ bgcolor: 'white', color: 'primary.main' }}
+                        sx={{ bgcolor: 'background.paper', color: 'primary.main' }}
                       />
                     )}
                     {/* {tempSelectedAthlete.licencia && tempSelectedAthlete.licencia !== 'N/A' && (
@@ -260,7 +260,7 @@ function AthleteSelector() {
                         label={`Lic: ${tempSelectedAthlete.licencia}`}
                         size="small"
                         variant="outlined"
-                        sx={{ bgcolor: 'white', color: 'primary.main' }}
+                        sx={{ bgcolor: 'background.paper', color: 'primary.main' }}
                       />
                     )} */}
                     {tempSelectedAthlete.club && tempSelectedAthlete.club !== 'N/A' && tempSelectedAthlete.club !== 'Sin club' && (
@@ -268,7 +268,7 @@ function AthleteSelector() {
                         label={tempSelectedAthlete.club}
                         size="small"
                         variant="outlined"
-                        sx={{ bgcolor: 'white', color: 'primary.main' }}
+                        sx={{ bgcolor: 'background.paper', color: 'primary.main' }}
                       />
                     )}
                   </Box>
