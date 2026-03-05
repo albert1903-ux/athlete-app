@@ -14,7 +14,8 @@ import {
   InputLabel,
   Select,
   MenuItem,
-  IconButton
+  IconButton,
+  useTheme
 } from '@mui/material'
 import {
   RadarChart,
@@ -57,6 +58,8 @@ const normalizePruebaNombre = (value) => {
 }
 
 function AthleteSpiderChart({ comparatorAthletes = [] }) {
+  const theme = useTheme()
+
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
   const [selectedAthlete, setSelectedAthlete] = useState(null)
@@ -1202,12 +1205,12 @@ function AthleteSpiderChart({ comparatorAthletes = [] }) {
                 <PolarGrid stroke="#d1d1d1" />
                 <PolarAngleAxis
                   dataKey="prueba"
-                  tick={{ fontSize: 12, fill: '#333333' }}
+                  tick={{ fontSize: 12, fill: theme.palette?.text?.primary || '#333333' }}
                 />
                 <PolarRadiusAxis
                   angle={90}
                   domain={[0, 100]}
-                  tick={{ fontSize: 10, fill: '#555555' }}
+                  tick={{ fontSize: 10, fill: theme.palette?.text?.secondary || '#555555' }}
                   axisLine={false}
                 />
                 <Tooltip content={CustomTooltip} />

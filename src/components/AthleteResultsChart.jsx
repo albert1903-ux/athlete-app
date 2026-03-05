@@ -12,7 +12,8 @@ import {
   FormControl,
   InputLabel,
   Select,
-  MenuItem
+  MenuItem,
+  useTheme
 } from '@mui/material'
 import { TbCalendar, TbUser, TbChevronDown } from 'react-icons/tb'
 import {
@@ -30,6 +31,7 @@ import { initializeColorsForComparators, getColorForAthlete } from '../utils/ath
 const STORAGE_KEY = 'selectedAthlete'
 
 function AthleteResultsChart({ comparatorAthletes = [] }) {
+  const theme = useTheme()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
   const [chartData, setChartData] = useState({ datos: [], pruebas: [] })
@@ -1475,15 +1477,15 @@ function AthleteResultsChart({ comparatorAthletes = [] }) {
                   textAnchor={viewMode === 'edad' ? 'middle' : 'end'}
                   height={viewMode === 'edad' ? 40 : 80}
                   interval="preserveStartEnd"
-                  tick={{ fontSize: 10, fill: '#666' }}
+                  tick={{ fontSize: 10, fill: theme.palette?.text?.secondary || '#666' }}
                   tickLine={false}
-                  axisLine={{ stroke: '#999' }}
+                  axisLine={{ stroke: theme.palette?.divider || '#999' }}
                   padding={{ left: 10, right: 30 }}
                   label={{
                     value: viewMode === 'edad' ? 'Edad (años)' : '',
                     position: 'insideBottom',
                     offset: -5,
-                    style: { textAnchor: 'middle', fontSize: '10px', fill: '#666' }
+                    style: { textAnchor: 'middle', fontSize: '10px', fill: theme.palette?.text?.secondary || '#666' }
                   }}
                   tickFormatter={(value) => {
                     if (viewMode === 'edad') {
@@ -1497,11 +1499,11 @@ function AthleteResultsChart({ comparatorAthletes = [] }) {
                     value: chartData.pruebas?.[0]?.unidad ? `Valor (${chartData.pruebas[0].unidad})` : 'Valor',
                     angle: -90,
                     position: 'insideLeft',
-                    style: { textAnchor: 'middle', fontSize: '10px', fill: '#666' }
+                    style: { textAnchor: 'middle', fontSize: '10px', fill: theme.palette?.text?.secondary || '#666' }
                   }}
-                  tick={{ fontSize: 10, fill: '#666' }}
+                  tick={{ fontSize: 10, fill: theme.palette?.text?.secondary || '#666' }}
                   tickLine={false}
-                  axisLine={{ stroke: '#999' }}
+                  axisLine={{ stroke: theme.palette?.divider || '#999' }}
                   tickFormatter={(value) => {
                     const unidad = chartData.pruebas?.[0]?.unidad || ''
                     return formatTiempo(value, unidad)
