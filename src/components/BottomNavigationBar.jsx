@@ -5,10 +5,12 @@ import BottomNavigationAction from '@mui/material/BottomNavigationAction'
 import Box from '@mui/material/Box'
 import { TbChartRadar, TbHeartbeat, TbCalendar, TbDots } from 'react-icons/tb'
 import { useAuth } from '../context/AuthContext'
+import { useTheme } from '@mui/material/styles'
 const BottomNavigationBar = () => {
   const navigate = useNavigate()
   const location = useLocation()
   const { user } = useAuth()
+  const theme = useTheme()
 
   // Determinar el valor actual basado en la ruta
   // React Router con basename ya normaliza el pathname, pero por si acaso
@@ -68,7 +70,9 @@ const BottomNavigationBar = () => {
       <Box
         sx={{
           backgroundColor: 'background.paper',
-          boxShadow: '0 2px 8px rgba(0, 0, 0, 0.08)',
+          boxShadow: theme.palette.mode === 'dark'
+            ? '0 -1px 0 rgba(255,255,255,0.08), 0 4px 24px rgba(0,0,0,0.6)'
+            : '0 2px 8px rgba(0, 0, 0, 0.08)',
           borderRadius: 15,
           overflow: 'hidden',
         }}
