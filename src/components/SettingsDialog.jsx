@@ -7,12 +7,21 @@ import Button from '@mui/material/Button'
 import IconButton from '@mui/material/IconButton'
 import Typography from '@mui/material/Typography'
 import Box from '@mui/material/Box'
-import { TbX, TbTrash, TbMoon, TbSun, TbDeviceDesktop } from 'react-icons/tb'
+import { TbX, TbTrash, TbMoon, TbSun, TbDeviceDesktop, TbCheck } from 'react-icons/tb'
 import { Select, MenuItem, FormControl, InputLabel, Divider } from '@mui/material'
 import { useAppTheme } from '../context/ThemeContext'
 
+const PREDEFINED_COLORS = [
+    { label: 'Original', value: '#E11141' },
+    { label: 'Teal', value: '#00bcdc' },
+    { label: 'Azul', value: '#2196f3' },
+    { label: 'Verde', value: '#4caf50' },
+    { label: 'Naranja', value: '#ff9800' },
+    { label: 'Morado', value: '#9c27b0' }
+]
+
 export default function SettingsDialog({ open, onClose }) {
-    const { modePreference, toggleTheme } = useAppTheme()
+    const { modePreference, toggleTheme, primaryColor, setPrimaryColor, secondaryColor, setSecondaryColor } = useAppTheme()
 
 
     const handleClearCache = () => {
@@ -54,6 +63,62 @@ export default function SettingsDialog({ open, onClose }) {
                             </MenuItem>
                         </Select>
                     </FormControl>
+
+                    <Box sx={{ mt: 3 }}>
+                        <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 1, color: 'text.secondary' }}>Color Primario</Typography>
+                        <Box sx={{ display: 'flex', gap: 1, mb: 2, flexWrap: 'wrap' }}>
+                            {PREDEFINED_COLORS.map((color) => (
+                                <Box
+                                    key={color.value}
+                                    onClick={() => setPrimaryColor(color.value)}
+                                    sx={{
+                                        width: 36,
+                                        height: 36,
+                                        borderRadius: '50%',
+                                        backgroundColor: color.value,
+                                        cursor: 'pointer',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        border: primaryColor === color.value ? '2px solid' : '2px solid transparent',
+                                        borderColor: 'text.primary',
+                                        transition: 'transform 0.2s',
+                                        '&:hover': { transform: 'scale(1.1)' }
+                                    }}
+                                    title={color.label}
+                                >
+                                    {primaryColor === color.value && <TbCheck color="#fff" size={20} />}
+                                </Box>
+                            ))}
+                        </Box>
+
+                        <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 1, color: 'text.secondary' }}>Color Secundario</Typography>
+                        <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+                            {PREDEFINED_COLORS.map((color) => (
+                                <Box
+                                    key={`sec-${color.value}`}
+                                    onClick={() => setSecondaryColor(color.value)}
+                                    sx={{
+                                        width: 36,
+                                        height: 36,
+                                        borderRadius: '50%',
+                                        backgroundColor: color.value,
+                                        cursor: 'pointer',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        border: secondaryColor === color.value ? '2px solid' : '2px solid transparent',
+                                        borderColor: 'text.primary',
+                                        transition: 'transform 0.2s',
+                                        '&:hover': { transform: 'scale(1.1)' }
+                                    }}
+                                    title={color.label}
+                                >
+                                    {secondaryColor === color.value && <TbCheck color="#fff" size={20} />}
+                                </Box>
+                            ))}
+                        </Box>
+                    </Box>
                 </Box>
                 
                 <Divider />

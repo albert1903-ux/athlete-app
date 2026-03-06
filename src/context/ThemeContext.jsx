@@ -6,9 +6,16 @@ import useMediaQuery from '@mui/material/useMediaQuery'
 const ThemeContext = createContext()
 
 export function ThemeProvider({ children }) {
-    // Check local storage for preference, default to 'system'
     const [modePreference, setModePreference] = useState(() => {
         return localStorage.getItem('themeMode') || 'system'
+    })
+
+    const [primaryColor, setPrimaryColor] = useState(() => {
+        return localStorage.getItem('themePrimaryColor') || tokens.colors.primary.main
+    })
+
+    const [secondaryColor, setSecondaryColor] = useState(() => {
+        return localStorage.getItem('themeSecondaryColor') || tokens.colors.secondary.main
     })
 
     const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)')
@@ -26,13 +33,27 @@ export function ThemeProvider({ children }) {
         localStorage.setItem('themeMode', modePreference)
     }, [modePreference])
 
+    useEffect(() => {
+        localStorage.setItem('themePrimaryColor', primaryColor)
+    }, [primaryColor])
+
+    useEffect(() => {
+        localStorage.setItem('themeSecondaryColor', secondaryColor)
+    }, [secondaryColor])
+
     // Generate dynamic theme based on active mode
     const theme = useMemo(() => {
         return createTheme({
             palette: {
                 mode: activeMode,
-                primary: tokens.colors.primary,
-                secondary: tokens.colors.secondary,
+                primary: {
+                    ...tokens.colors.primary,
+                    main: primaryColor
+                },
+                secondary: {
+                    ...tokens.colors.secondary,
+                    main: secondaryColor
+                },
                 // Provide dynamic background/text based on mode
                 background: {
                     default: activeMode === 'dark' ? '#121212' : tokens.colors.background.default,
@@ -90,7 +111,7 @@ export function ThemeProvider({ children }) {
                             minWidth: '64px',
                             transition: 'color 0.2s ease-in-out',
                             '&.Mui-selected': {
-                                color: tokens.colors.primary.main,
+                                color: primaryColor,
                             },
                         },
                         label: {
@@ -116,14 +137,24 @@ export function ThemeProvider({ children }) {
                 },
             },
         })
-    }, [activeMode])
+    }, [activeMode, primaryColor, secondaryColor])
 
     const toggleTheme = (newMode) => {
         setModePreference(newMode)
     }
 
+    const contextValue = {
+        modePreference, 
+        activeMode, 
+        toggleTheme,
+        primaryColor,
+        setPrimaryColor,
+        secondaryColor,
+        setSecondaryColor
+    }
+
     return (
-        <ThemeContext.Provider value={{ modePreference, activeMode, toggleTheme }}>
+        <ThemeContext.Provider value={contextValue}>
             <MUIThemeProvider theme={theme}>
                 {children}
             </MUIThemeProvider>
