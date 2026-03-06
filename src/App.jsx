@@ -19,7 +19,7 @@ import PrivacyPage from './pages/PrivacyPage'
 import AddAthleteDialog from './components/AddAthleteDialog'
 import { AuthProvider, useAuth } from './context/AuthContext'
 import CircularProgress from '@mui/material/CircularProgress'
-
+import NotificationBell from './components/NotificationBell'
 
 function ProtectedRoute({ children }) {
   const { user, loading } = useAuth()
@@ -195,6 +195,9 @@ function AppContent() {
                 <TbCalendarPlus />
               </IconButton>
             )}
+            <Box sx={{ display: 'flex', ml: 'auto' }}>
+              <NotificationBell />
+            </Box>
           </Toolbar>
         </AppBar>
       )}

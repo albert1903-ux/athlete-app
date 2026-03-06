@@ -16,6 +16,10 @@ import 'dayjs/locale/es'
 import { supabase } from '../lib/supabase'
 import AddEventDialog from '../components/AddEventDialog'
 import EditParticipantDialog from '../components/EditParticipantDialog'
+import ShareCalendarDialog from '../components/ShareCalendarDialog'
+import { useCalendarShares } from '../hooks/useCalendarShares'
+import { TbUserPlus } from 'react-icons/tb'
+import { useAuth } from '../context/AuthContext'
 
 // Configurar dayjs para usar el locale español
 dayjs.locale('es')
@@ -29,12 +33,32 @@ const CalendarioPage = () => {
   const [bottomSheetOpen, setBottomSheetOpen] = useState(false)
   const [addEventDialogOpen, setAddEventDialogOpen] = useState(false)
   const [eventDates, setEventDates] = useState(new Set())
-  const [loadingEvents, setLoadingEvents] = useState(false)
+  const [, setLoadingEvents] = useState(false)
   const [dayParticipants, setDayParticipants] = useState([])
   const [loadingDayParticipants, setLoadingDayParticipants] = useState(false)
-  const [dayLocation, setDayLocation] = useState(null)
-  const [editingParticipant, setEditingParticipant] = useState(null)
+  const [, setDayLocation] = useState(null)
   const [editDialogOpen, setEditDialogOpen] = useState(false)
+  const [shareDialogOpen, setShareDialogOpen] = useState(false)
+  const [editingParticipant, setEditingParticipant] = useState(null)
+  
+  const { sharedWithMe } = useCalendarShares()
+  const { user } = useAuth()
+  const [visibleCalendars, setVisibleCalendars] = useState({})
+
+  // Inicializar calendarios visibles cuando el usuario o los shares cambien
+  useEffect(() => {
+    if (user) {
+      setVisibleCalendars(prev => {
+        const next = { ...prev }
+        if (next[user.id] === undefined) next[user.id] = true
+        sharedWithMe.filter(s => s.status === 'accepted').forEach(s => {
+          if (next[s.owner_id] === undefined) next[s.owner_id] = true
+        })
+        return next
+      })
+    }
+  }, [user, sharedWithMe])
+
 
   // Cargar eventos desde Supabase (solo fechas que tienen participantes)
   const loadEvents = async () => {
@@ -43,20 +67,22 @@ const CalendarioPage = () => {
       // Obtener eventos que tienen al menos un participante
       const { data: participantesData, error: participantesError } = await supabase
         .from('participantes_eventos')
-        .select('evento_id, eventos!inner(fecha)')
+        .select('evento_id, eventos!inner(fecha, user_id)')
 
       if (participantesError) throw participantesError
 
-      // Crear un Set con las fechas que tienen eventos con participantes (formato YYYY-MM-DD)
-      const datesSet = new Set()
+      // Crear un Map con las fechas (YYYY-MM-DD -> Set(user_ids))
+      const datesMap = new Map()
       if (participantesData) {
         participantesData.forEach(p => {
           if (p.eventos && p.eventos.fecha) {
-            datesSet.add(p.eventos.fecha)
+            const dateStr = p.eventos.fecha
+            if (!datesMap.has(dateStr)) datesMap.set(dateStr, new Set())
+            datesMap.get(dateStr).add(p.eventos.user_id)
           }
         })
       }
-      setEventDates(datesSet)
+      setEventDates(datesMap)
     } catch (err) {
       console.error('Error al cargar eventos:', err)
     } finally {
@@ -263,7 +289,13 @@ const CalendarioPage = () => {
   const CustomDay = (props) => {
     const { day, ...other } = props
     const dateStr = day.format('YYYY-MM-DD')
-    const hasEvent = eventDates.has(dateStr)
+    
+    const userIdsSet = eventDates instanceof Map ? (eventDates.get(dateStr) || new Set()) : new Set()
+    const userIdsWithEvent = Array.from(userIdsSet).filter(uid => visibleCalendars[uid])
+    const hasEvent = userIdsWithEvent.length > 0
+    const hasMyEvent = userIdsWithEvent.includes(user?.id)
+    const hasSharedEvent = userIdsWithEvent.some(uid => uid !== user?.id)
+
     const isToday = dayjs().format('YYYY-MM-DD') === dateStr
     const isSelected = selectedDate.format('YYYY-MM-DD') === dateStr
 
@@ -316,12 +348,17 @@ const CalendarioPage = () => {
               bottom: '2px',
               left: '50%',
               transform: 'translateX(-50%)',
-              width: '4px',
-              height: '4px',
-              borderRadius: '50%',
-              backgroundColor: '#E11141',
+              display: 'flex',
+              gap: '2px'
             }}
-          />
+          >
+            {hasMyEvent && (
+              <Box sx={{ width: '4px', height: '4px', borderRadius: '50%', backgroundColor: 'primary.main' }} />
+            )}
+            {hasSharedEvent && (
+              <Box sx={{ width: '4px', height: '4px', borderRadius: '50%', backgroundColor: '#00bcdc' }} />
+            )}
+          </Box>
         )}
       </Box>
     )
@@ -392,12 +429,21 @@ const CalendarioPage = () => {
     setLoadingDayParticipants(true)
     try {
       const fechaStr = date.format('YYYY-MM-DD')
+      const activeUserIds = Object.keys(visibleCalendars).filter(uid => visibleCalendars[uid])
+
+      if (activeUserIds.length === 0) {
+        setDayParticipants([])
+        setDayLocation(null)
+        setLoadingDayParticipants(false)
+        return
+      }
 
       // Obtener eventos del día
       const { data: eventosData, error: eventosError } = await supabase
         .from('eventos')
-        .select('evento_id, ubicacion')
+        .select('evento_id, ubicacion, user_id')
         .eq('fecha', fechaStr)
+        .in('user_id', activeUserIds)
 
       if (eventosError) throw eventosError
 
@@ -449,10 +495,13 @@ const CalendarioPage = () => {
         const pruebaNombre = p.prueba_id
           ? pruebasMap.get(p.prueba_id)
           : p.prueba_nombre_manual
+        const eventoDelParticipante = eventosData.find(e => e.evento_id === p.evento_id)
+        
         return {
           ...p,
           prueba_nombre: pruebaNombre,
-          ubicacion: eventosData.find(e => e.evento_id === p.evento_id)?.ubicacion
+          ubicacion: eventoDelParticipante?.ubicacion,
+          is_mine: eventoDelParticipante?.user_id === user?.id
         }
       })
 
@@ -489,7 +538,7 @@ const CalendarioPage = () => {
     })
 
     // Verificar conflictos para cada atleta
-    participantesPorAtleta.forEach((participantesAtleta, nombreAtletaNormalizado) => {
+    participantesPorAtleta.forEach((participantesAtleta) => {
       if (participantesAtleta.length < 2) return
 
       for (let i = 0; i < participantesAtleta.length; i++) {
@@ -597,6 +646,49 @@ const CalendarioPage = () => {
           gap: 2,
         }}
       >
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+            <Chip 
+              label="Mi Calendario" 
+              color={visibleCalendars[user?.id] ? "primary" : "default"} 
+              variant={visibleCalendars[user?.id] ? "filled" : "outlined"} 
+              onClick={() => {
+                if (user) setVisibleCalendars(prev => ({ ...prev, [user.id]: !prev[user.id] }))
+              }}
+            />
+            {sharedWithMe.filter(s => s.status === 'accepted').map(share => (
+              <Chip 
+                key={share.id}
+                label={`Calendario de ${share.owner?.raw_user_meta_data?.nombre || share.owner?.email?.split('@')[0]}`}
+                variant={visibleCalendars[share.owner_id] ? "filled" : "outlined"}
+                onClick={() => {
+                  setVisibleCalendars(prev => ({ ...prev, [share.owner_id]: !prev[share.owner_id] }))
+                }}
+                sx={visibleCalendars[share.owner_id] ? {
+                  backgroundColor: '#00bcdc',
+                  color: 'white',
+                  '&:hover': { backgroundColor: '#00a3bf' },
+                } : {
+                  borderColor: '#00bcdc',
+                  color: '#00bcdc',
+                }}
+              />
+            ))}
+          </Box>
+          <Button 
+            variant="outlined" 
+            size="small" 
+            startIcon={<TbUserPlus />}
+            onClick={() => setShareDialogOpen(true)}
+          >
+            Compartir
+          </Button>
+        </Box>
+
+        <ShareCalendarDialog 
+          open={shareDialogOpen} 
+          onClose={() => setShareDialogOpen(false)} 
+        />
 
         <Card
           sx={{
@@ -1017,7 +1109,7 @@ const CalendarioPage = () => {
 
                             {/* Mostrar todas las pruebas y horarios del grupo */}
                             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5, mb: 1 }}>
-                              {group.participantes.map((participante, idx) => (
+                              {group.participantes.map((participante) => (
                                 <Box key={participante.participante_id} sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
                                   <Chip
                                     label={participante.prueba_nombre || 'Sin prueba'}
@@ -1031,22 +1123,26 @@ const CalendarioPage = () => {
                                     size="small"
                                     variant="outlined"
                                   />
-                                  <IconButton
-                                    size="small"
-                                    onClick={() => handleEditParticipant(participante)}
-                                    color="primary"
-                                    sx={{ ml: 'auto', width: 32, height: 32 }}
-                                  >
-                                    <TbPencil size={20} />
-                                  </IconButton>
-                                  <IconButton
-                                    size="small"
-                                    onClick={() => handleDeleteParticipant(participante)}
-                                    color="error"
-                                    sx={{ width: 32, height: 32 }}
-                                  >
-                                    <TbTrash size={20} />
-                                  </IconButton>
+                                  {participante.is_mine && (
+                                    <>
+                                      <IconButton
+                                        size="small"
+                                        onClick={() => handleEditParticipant(participante)}
+                                        color="primary"
+                                        sx={{ ml: 'auto', width: 32, height: 32 }}
+                                      >
+                                        <TbPencil size={20} />
+                                      </IconButton>
+                                      <IconButton
+                                        size="small"
+                                        onClick={() => handleDeleteParticipant(participante)}
+                                        color="error"
+                                        sx={{ width: 32, height: 32 }}
+                                      >
+                                        <TbTrash size={20} />
+                                      </IconButton>
+                                    </>
+                                  )}
                                 </Box>
                               ))}
                             </Box>
