@@ -8,7 +8,8 @@ import {
   Alert,
   Paper,
   ToggleButton,
-  ToggleButtonGroup
+  ToggleButtonGroup,
+  useTheme
 } from '@mui/material'
 import {
   LineChart,
@@ -31,6 +32,7 @@ const MEASUREMENT_TYPES = {
 }
 
 function AthleteBodyMeasurementsChart() {
+  const theme = useTheme()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
   const [selectedAthlete, setSelectedAthlete] = useState(null)
@@ -337,7 +339,7 @@ function AthleteBodyMeasurementsChart() {
               <Line
                 type="monotone"
                 dataKey={dataKey}
-                stroke={measurementType.color}
+                stroke={selectedMeasurement === 'peso' ? theme.palette.primary.main : measurementType.color}
                 strokeWidth={2}
                 dot={{ r: 4 }}
                 activeDot={{ r: 6 }}

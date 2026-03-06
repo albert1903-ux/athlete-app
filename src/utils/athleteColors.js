@@ -1,7 +1,7 @@
 // Gestión centralizada de colores para atletas
 // Los colores se asignan basándose en atleta_id para mantener consistencia
 
-const MAIN_ATHLETE_COLOR = '#E11141'
+const DEFAULT_MAIN_COLOR = '#E11141'
 
 const COMPARATOR_COLORS = [
   '#009688', // Teal
@@ -19,10 +19,10 @@ const colorAssignments = new Map()
 // Función para obtener o asignar color a un atleta comparador
 // Si el atleta ya tiene color asignado, lo devuelve
 // Si no, asigna el siguiente color disponible de la lista
-export function getColorForAthlete(atletaId, isMainAthlete = false) {
-  // El atleta principal siempre tiene el mismo color
+export function getColorForAthlete(atletaId, isMainAthlete = false, mainAthleteColor = DEFAULT_MAIN_COLOR) {
+  // El atleta principal siempre tiene el mismo color dinámico
   if (isMainAthlete) {
-    return MAIN_ATHLETE_COLOR
+    return mainAthleteColor
   }
 
   // Si el atleta ya tiene un color asignado, devolverlo

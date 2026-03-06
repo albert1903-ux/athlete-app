@@ -915,7 +915,7 @@ function AthleteSpiderChart({ comparatorAthletes = [] }) {
 
     // Color para el atleta principal
     if (selectedAthlete) {
-      colorMap[selectedAthlete.atleta_id] = getColorForAthlete(selectedAthlete.atleta_id, true)
+      colorMap[selectedAthlete.atleta_id] = getColorForAthlete(selectedAthlete.atleta_id, true, theme.palette.primary.main)
     }
 
     // Inicializar colores para comparadores y obtener el mapa completo
@@ -1223,8 +1223,8 @@ function AthleteSpiderChart({ comparatorAthletes = [] }) {
                       key={athlete.atleta_id}
                       name={athlete.nombre}
                       dataKey={atletaIdKey}
-                      stroke={athleteColors[athlete.atleta_id] || getColorForAthlete(athlete.atleta_id, isMain) || '#8884d8'}
-                      fill={athleteColors[athlete.atleta_id] || getColorForAthlete(athlete.atleta_id, isMain) || '#8884d8'}
+                      stroke={athleteColors[athlete.atleta_id] || getColorForAthlete(athlete.atleta_id, isMain, theme.palette.primary.main) || '#8884d8'}
+                      fill={athleteColors[athlete.atleta_id] || getColorForAthlete(athlete.atleta_id, isMain, theme.palette.primary.main) || '#8884d8'}
                       fillOpacity={isMain ? 0.5 : 0.15}
                       connectNulls={true}
                       isAnimationActive={false}
@@ -1322,7 +1322,7 @@ function AthleteSpiderChart({ comparatorAthletes = [] }) {
                     variant="caption"
                     sx={{
                       display: 'block',
-                      color: athleteColors[athlete.atleta_id] || getColorForAthlete(athlete.atleta_id, athlete.atleta_id === selectedAthlete?.atleta_id) || 'text.primary',
+                      color: athleteColors[athlete.atleta_id] || getColorForAthlete(athlete.atleta_id, athlete.atleta_id === selectedAthlete?.atleta_id, theme.palette.primary.main) || 'text.primary',
                       fontWeight: 'bold',
                       ml: 1
                     }}

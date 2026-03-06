@@ -6,7 +6,8 @@ import {
   Typography,
   CircularProgress,
   Alert,
-  Paper
+  Paper,
+  useTheme
 } from '@mui/material'
 import {
   ScatterChart,
@@ -55,6 +56,7 @@ const CustomTooltip = ({ active, payload }) => {
 }
 
 function AthleteHeightWeightScatter() {
+  const theme = useTheme()
   const [selectedAthlete, setSelectedAthlete] = useState(null)
   const [measurements, setMeasurements] = useState([])
   const [loading, setLoading] = useState(false)
@@ -258,7 +260,7 @@ function AthleteHeightWeightScatter() {
                   <Scatter
                     name="Mediciones"
                     data={chartData}
-                    fill="#E11141"
+                    fill={theme.palette.primary.main}
                   />
                 </ScatterChart>
               </Box>

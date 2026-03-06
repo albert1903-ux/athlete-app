@@ -151,7 +151,7 @@ export default function NextEventCard({ athlete }) {
                 <Typography variant="h6" sx={{ fontFamily: 'Poppins', fontWeight: 500, fontSize: '20px', mb: 0, color: 'text.primary' }}>
                     Próxima competición
                 </Typography>
-                <Typography sx={{ fontSize: '1.25rem', fontWeight: 600, color: '#E11141' }}>
+                <Typography sx={{ fontSize: '1.25rem', fontWeight: 600, color: 'primary.main' }}>
                     {eventData.ubicacion}
                 </Typography>
             </Box>
@@ -170,7 +170,7 @@ export default function NextEventCard({ athlete }) {
                 <Box sx={{
                     minWidth: '90px',
                     height: '90px',
-                    bgcolor: '#E11141',
+                    bgcolor: 'primary.main',
                     borderRadius: '20px',
                     display: 'flex',
                     flexDirection: 'column',
