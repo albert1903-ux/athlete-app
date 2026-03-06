@@ -70,7 +70,7 @@ export default function ProfileDialog({ open, onClose }) {
     }
 
     return (
-        <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth PaperProps={{ sx: { borderRadius: 4 } }}>
+        <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
             <DialogTitle sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontFamily: 'Poppins', fontWeight: 600 }}>
                 Perfil
                 <IconButton onClick={onClose} size="small" disabled={loading}>
@@ -80,8 +80,8 @@ export default function ProfileDialog({ open, onClose }) {
 
             <DialogContent dividers>
                 <Box sx={{ py: 1, display: 'flex', flexDirection: 'column', gap: 3 }}>
-                    {error && <Alert severity="error" sx={{ borderRadius: 2 }}>{error}</Alert>}
-                    {success && <Alert severity="success" sx={{ borderRadius: 2 }}>{success}</Alert>}
+                    {error && <Alert severity="error">{error}</Alert>}
+                    {success && <Alert severity="success">{success}</Alert>}
 
                     <Box>
                         <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 1, color: 'text.secondary' }}>
@@ -94,7 +94,6 @@ export default function ProfileDialog({ open, onClose }) {
                             value={name}
                             onChange={(e) => setName(e.target.value)}
                             disabled={loading}
-                            sx={{ '& .MuiOutlinedInput-root': { borderRadius: 3 } }}
                         />
                         <TextField
                             label="Correo electrónico"
@@ -102,7 +101,7 @@ export default function ProfileDialog({ open, onClose }) {
                             fullWidth
                             value={user?.email || ''}
                             disabled
-                            sx={{ mt: 2, '& .MuiOutlinedInput-root': { borderRadius: 3 } }}
+                            sx={{ mt: 2 }}
                         />
                     </Box>
 
@@ -119,14 +118,13 @@ export default function ProfileDialog({ open, onClose }) {
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             disabled={loading}
-                            sx={{ '& .MuiOutlinedInput-root': { borderRadius: 3 } }}
                         />
                     </Box>
                 </Box>
             </DialogContent>
 
             <DialogActions sx={{ p: 2 }}>
-                <Button onClick={onClose} disabled={loading} sx={{ borderRadius: 8, textTransform: 'none' }}>
+                <Button onClick={onClose} disabled={loading} sx={{ textTransform: 'none' }}>
                     Cancelar
                 </Button>
                 <Button
@@ -134,7 +132,7 @@ export default function ProfileDialog({ open, onClose }) {
                     onClick={handleSave}
                     disabled={loading}
                     startIcon={loading ? <CircularProgress size={20} color="inherit" /> : <TbDeviceFloppy />}
-                    sx={{ borderRadius: 8, textTransform: 'none', px: 3, boxShadow: 'none' }}
+                    sx={{ textTransform: 'none', px: 3, boxShadow: 'none' }}
                 >
                     {loading ? 'Guardando...' : 'Guardar Cambios'}
                 </Button>

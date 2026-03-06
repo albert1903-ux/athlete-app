@@ -18,7 +18,7 @@ export default function AboutDialog({ open, onClose }) {
     }
 
     return (
-        <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth PaperProps={{ sx: { borderRadius: 4 } }}>
+        <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
             <DialogTitle sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontFamily: 'Poppins', fontWeight: 600 }}>
                 Acerca de
                 <IconButton onClick={onClose} size="small">
@@ -59,7 +59,7 @@ export default function AboutDialog({ open, onClose }) {
             </DialogContent>
 
             <DialogActions sx={{ p: 2 }}>
-                <Button onClick={onClose} sx={{ borderRadius: 8, textTransform: 'none' }}>
+                <Button onClick={onClose} sx={{ textTransform: 'none' }}>
                     Volver
                 </Button>
             </DialogActions>

@@ -66,7 +66,7 @@ export default function AdminApprovalDialog({ open, onClose }) {
     }
 
     return (
-        <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth PaperProps={{ sx: { borderRadius: 4 } }}>
+        <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
             <DialogTitle sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 Solicitudes de Acceso
                 <IconButton onClick={onClose} size="small">
@@ -130,7 +130,7 @@ export default function AdminApprovalDialog({ open, onClose }) {
             </DialogContent>
 
             <DialogActions sx={{ p: 2 }}>
-                <Button onClick={onClose} sx={{ borderRadius: 8, textTransform: 'none' }}>
+                <Button onClick={onClose} sx={{ textTransform: 'none' }}>
                     Cerrar
                 </Button>
             </DialogActions>

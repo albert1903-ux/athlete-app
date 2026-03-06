@@ -23,7 +23,7 @@ export default function SettingsDialog({ open, onClose }) {
     }
 
     return (
-        <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth PaperProps={{ sx: { borderRadius: 4 } }}>
+        <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
             <DialogTitle sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontFamily: 'Poppins', fontWeight: 600 }}>
                 Configuración
                 <IconButton onClick={onClose} size="small">
@@ -42,7 +42,6 @@ export default function SettingsDialog({ open, onClose }) {
                             value={modePreference}
                             label="Tema de la aplicación"
                             onChange={(e) => toggleTheme(e.target.value)}
-                            sx={{ borderRadius: 2 }}
                         >
                             <MenuItem value="light">
                                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}><TbSun /> Claro</Box>
@@ -69,7 +68,7 @@ export default function SettingsDialog({ open, onClose }) {
                         color="error"
                         startIcon={<TbTrash />}
                         onClick={handleClearCache}
-                        sx={{ borderRadius: 8, textTransform: 'none' }}
+                        sx={{ textTransform: 'none' }}
                     >
                         Limpiar datos temporales
                     </Button>
@@ -77,7 +76,7 @@ export default function SettingsDialog({ open, onClose }) {
             </DialogContent>
 
             <DialogActions sx={{ p: 2 }}>
-                <Button onClick={onClose} sx={{ borderRadius: 8, textTransform: 'none' }}>
+                <Button onClick={onClose} sx={{ textTransform: 'none' }}>
                     Cerrar
                 </Button>
             </DialogActions>
