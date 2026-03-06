@@ -47,12 +47,12 @@ export function ThemeProvider({ children }) {
             palette: {
                 mode: activeMode,
                 primary: {
-                    ...tokens.colors.primary,
-                    main: primaryColor
+                    main: primaryColor,
+                    contrastText: '#ffffff'
                 },
                 secondary: {
-                    ...tokens.colors.secondary,
-                    main: secondaryColor
+                    main: secondaryColor,
+                    contrastText: '#ffffff'
                 },
                 // Provide dynamic background/text based on mode
                 background: {
