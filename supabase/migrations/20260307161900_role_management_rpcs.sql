@@ -11,8 +11,8 @@ SECURITY DEFINER
 SET search_path = public
 AS $$
 BEGIN
-  -- Solo el admin puede invocarla
-  IF (SELECT raw_user_meta_data->>'role' FROM auth.users WHERE id = auth.uid()) != 'admin' THEN
+  -- Solo el admin puede invocarla (alias 'au' para evitar ambigüedad con RETURNS TABLE)
+  IF (SELECT au.raw_user_meta_data->>'role' FROM auth.users au WHERE au.id = auth.uid()) != 'admin' THEN
     RAISE EXCEPTION 'Acceso denegado';
   END IF;
 
@@ -30,9 +30,12 @@ LANGUAGE plpgsql
 SECURITY DEFINER
 SET search_path = public
 AS $$
+DECLARE
+  caller_role text;
 BEGIN
   -- Solo el admin puede invocarla
-  IF (SELECT raw_user_meta_data->>'role' FROM auth.users WHERE id = auth.uid()) != 'admin' THEN
+  SELECT au.raw_user_meta_data->>'role' INTO caller_role FROM auth.users au WHERE au.id = auth.uid();
+  IF caller_role != 'admin' THEN
     RAISE EXCEPTION 'Acceso denegado';
   END IF;
 
