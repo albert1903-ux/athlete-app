@@ -87,9 +87,9 @@ const MasPage = () => {
                 {menuItems.map((item, index) => (
                   <ListItem
                     key={index}
-                    button
                     onClick={item.onClick}
                     sx={{
+                      cursor: 'pointer',
                       '&:hover': {
                         backgroundColor: 'action.hover',
                       },

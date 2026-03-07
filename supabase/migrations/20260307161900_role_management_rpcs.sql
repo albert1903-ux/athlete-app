@@ -17,7 +17,8 @@ BEGIN
   END IF;
 
   RETURN QUERY
-  SELECT u.id, u.email, u.raw_user_meta_data, u.created_at
+  -- Cast email a text porque auth.users lo almacena como varchar(255)
+  SELECT u.id, u.email::text, u.raw_user_meta_data, u.created_at
   FROM auth.users u
   ORDER BY u.created_at DESC;
 END;
