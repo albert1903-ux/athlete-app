@@ -6,10 +6,11 @@ import List from '@mui/material/List'
 import ListItem from '@mui/material/ListItem'
 import ListItemIcon from '@mui/material/ListItemIcon'
 import ListItemText from '@mui/material/ListItemText'
-import { TbUser, TbSettings, TbInfoCircle, TbLogout, TbStar, TbUsers } from 'react-icons/tb'
+import { TbUser, TbSettings, TbInfoCircle, TbLogout, TbStar, TbUsers, TbShield } from 'react-icons/tb'
 import { useState } from 'react'
 import FavoritesDialog from '../components/FavoritesDialog'
 import AdminApprovalDialog from '../components/AdminApprovalDialog'
+import RoleManagementDialog from '../components/RoleManagementDialog'
 import ProfileDialog from '../components/ProfileDialog'
 import SettingsDialog from '../components/SettingsDialog'
 import AboutDialog from '../components/AboutDialog'
@@ -19,6 +20,7 @@ import { supabase } from '../lib/supabase'
 const MasPage = () => {
   const [favOpen, setFavOpen] = useState(false)
   const [adminOpen, setAdminOpen] = useState(false)
+  const [rolesOpen, setRolesOpen] = useState(false)
   const [profileOpen, setProfileOpen] = useState(false)
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [aboutOpen, setAboutOpen] = useState(false)
@@ -31,6 +33,7 @@ const MasPage = () => {
   const menuItems = [
     { icon: <TbStar size={24} />, text: 'Atletas favoritos', description: 'Gestiona tus atletas favoritos', onClick: () => setFavOpen(true) },
     ...(user?.role === 'admin' ? [{ icon: <TbUsers size={24} />, text: 'Solicitudes de Acceso', description: 'Aprueba o rechaza nuevos usuarios', onClick: () => setAdminOpen(true) }] : []),
+    ...(user?.role === 'admin' ? [{ icon: <TbShield size={24} />, text: 'Gestión de Roles', description: 'Asigna roles a los usuarios registrados', onClick: () => setRolesOpen(true) }] : []),
     { icon: <TbUser size={24} />, text: 'Perfil', description: 'Configura tu perfil de usuario', onClick: () => setProfileOpen(true) },
     { icon: <TbSettings size={24} />, text: 'Configuración', description: 'Ajustes de la aplicación', onClick: () => setSettingsOpen(true) },
     { icon: <TbInfoCircle size={24} />, text: 'Acerca de', description: 'Información sobre la aplicación', onClick: () => setAboutOpen(true) },
@@ -117,6 +120,7 @@ const MasPage = () => {
 
       <FavoritesDialog open={favOpen} onClose={() => setFavOpen(false)} />
       <AdminApprovalDialog open={adminOpen} onClose={() => setAdminOpen(false)} />
+      <RoleManagementDialog open={rolesOpen} onClose={() => setRolesOpen(false)} />
       <ProfileDialog open={profileOpen} onClose={() => setProfileOpen(false)} />
       <SettingsDialog open={settingsOpen} onClose={() => setSettingsOpen(false)} />
       <AboutDialog open={aboutOpen} onClose={() => setAboutOpen(false)} />

@@ -14,7 +14,7 @@ El rol de mayor jerarquía. Otorga privilegios plenos y sin restricciones en tod
 | **Seguimiento** | - Ver gráficas de progreso y comparar.<br>- Seleccionar atleta principal.<br>- Añadir y eliminar atletas comparadores.<br>- **Añadir nuevas marcas (resultados).**<br>- **Gestionar marcas (editar / borrar).**<br>- Visualizar "Próxima Competición". |
 | **Análisis** | - **Acceso completo a la página.**<br>- Añadir mediciones corporales.<br>- Ver historial y estadísticas físicas. |
 | **Calendario** | - Acceso completo.<br>- Crear nuevos eventos y recordatorios.<br>- Editar y eliminar eventos propios. |
-| **Más (Config.)**| - Gestión completa: Ver Atletas Favoritos, Editar Perfil, Configuración de la App, Ayuda, Acerca de.<br>- Cerrar Sesión. |
+| **Más (Config.)**| - Gestión completa: Ver Atletas Favoritos, Editar Perfil, Configuración de la App, Ayuda, Acerca de.<br>- **Solicitudes de Acceso:** Aprobar o rechazar nuevos registros.<br>- **Gestión de Roles:** Ver todos los usuarios registrados y cambiar su rol (`admin` ↔ `consulta`).<br>- Cerrar Sesión. |
 
 ---
 
@@ -28,9 +28,11 @@ Un rol orientado a la visualización y personalización de la experiencia local 
 | **Seguimiento** | 🟡 | ✅ Seleccionar atleta principal.<br>✅ Ver gráficas de progreso de lectura.<br>✅ Añadir/Quitar atletas a la compartiva local.<br>❌ **Restringido:** No aparece la opción de "Añadir marca".<br>❌ **Restringido:** No aparece la opción de "Gestionar marcas". |
 | **Análisis** | 🔴 | ❌ **Restringido:** Acceso denegado a la ruta `/analisis`. Redirige a Seguimiento si se fuerza la URL. |
 | **Calendario** | 🟢 | ✅ Acceso completo para gestionar el calendario personal vinculado a su usuario (crear, editar, eliminar eventos). Esto no altera datos de terceros. |
-| **Más (Config.)**| 🟢 | ✅ Gestión completa operativa de opciones locales (Atletas Favoritos manejados local o vinculados a su user id en BBDD, Perfil, Contraseñas, Cerrar Sesión). |
+| **Más (Config.)**| 🟢 | ✅ Gestión completa operativa de opciones locales (Atletas Favoritos manejados local o vinculados a su user id en BBDD, Perfil, Contraseñas, Cerrar Sesión).<br>❌ **Restringido:** Las opciones "Solicitudes de Acceso" y "Gestión de Roles" **no son visibles**. |
 
 ---
 
 ### Cómo expandir el tablero (Notas de futuro)
 Si en el futuro se requiriese un rol `entrenador_equipo` (que solo pueda "Gestionar marcas" de ciertos clubes), este modelo permite inyectar fácilmente una nueva columna. Las comprobaciones en React evaluarían algo como `if (userRoles.includes('entrenador_equipo') && checkClubPermission())`.
+
+> **Nota sobre Gestión de Roles:** El panel de gestión de roles (`RoleManagementDialog`) invoca las funciones RPC `get_all_users` y `update_user_role` en Supabase, ambas definidas como `SECURITY DEFINER`. Internamente comprueban que el invocador tiene rol `admin` antes de ejecutar ninguna acción, garantizando que ningún usuario no-admin pueda escalar privilegios aunque llame directamente a la API.
