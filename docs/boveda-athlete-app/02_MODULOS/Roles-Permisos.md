@@ -1,4 +1,10 @@
-# Matriz de Roles y Permisos (RBAC)
+---
+title: "Roles y Permisos (RBAC)"
+description: "Matriz de roles y control de acceso basado en roles."
+tags: [roles, permisos, rbac, seguridad]
+---
+
+# 🛂 Matriz de Roles y Permisos (RBAC)
 
 Este documento detalla las acciones permitidas y denegadas dentro de la plataforma para los roles disponibles. En caso de expandir el sistema a futuros roles (e.g. `editor`, `supervisor`), este listado servirá como base escalable.
 

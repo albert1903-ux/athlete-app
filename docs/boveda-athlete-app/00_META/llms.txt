@@ -1,0 +1,32 @@
+---
+title: "LLM Context - Athlete App"
+description: "Resumen ejecutivo del proyecto integral Athlete App para lectura prioritaria por IA."
+tags: [meta, ai, context]
+---
+
+# Project Executive Summary: Athlete App
+
+Este documento proporciona el contexto arquitectónico y de negocio del proyecto **Athlete App**, diseñado para que un agente LLM lo lea como punto de partida.
+
+## 1. Naturaleza del Proyecto
+El proyecto consiste en una plataforma integral de seguimiento de atletas y gestión de resultados (marcas, competiciones, pruebas, medidas corporales). Existen dos ecosistemas estrechamente acoplados:
+1. **Frontend (SPA):** Una aplicación en React (Vite) enfocada a visualización de datos y dashboards de atletas.
+2. **Backend & DB (Supabase):** Un ecosistema basado en PostgreSQL (Supabase) manejando autenticación, almacenamiento y lógica de negocio (RLS, Triggers, RPC).
+3. **Piel de Datos Local:** Un entorno local en Python (`bbdd-athlete-app`) responsable de extraer, limpiar y procesar los listados (Outliers, saneamiento de PDFs / CSVs) antes de enviarlos a producción.
+
+## 2. Stack Tecnológico Real
+Tras analizar el `package.json` y los directorios de código:
+- **Frontend Core:** Vite, React 19, React Router DOM.
+- **UI/Estilos:** Contrario a expectativas de Tailwind/shadcn, el sistema actual se fundamenta en **Material UI (MUI v7)** y `@emotion/react`.
+- **Theming:** Centralizado en `src/theme/tokens.js` y `src/theme/index.js`.
+- **Backend/ORM:** Supabase (`@supabase/supabase-js` v2) usando RLS policies restrictivas.
+- **Pipelines Locales:** Python (`.venv`, `requirements.txt`) para limpieza e inyección a local DB.
+
+## 3. Flujo de Datos Crítico (Dual DB)
+Se emplea una estrategia de **Doble Base de Datos**:
+- **Local Supabase (`bbdd.db` / Python DBManager):** Se utiliza primero para validar y detectar "outliers" (errores como marcas de saltos exorbitantes o problemas de parseo en saltos sin decimales).
+- **Producción:** Solo tras el volcado local exitoso y validado, los datos se sincronizan con la base remota de Supabase.
+
+## Navegación Rápida
+- Siguiente lectura recomendada: [[Project-Map]]
+- Para entender el modelo de negocio en DB: [[Estructura-Datos]]
