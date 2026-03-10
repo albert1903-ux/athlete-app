@@ -49,7 +49,8 @@ El sistema de "Ranking" (Top 50) diferencia estrictamente la manera de medir la 
 Cuando un usuario consulta un año concreto, el sistema ignora la `categoria_id` ligada al resultado en base de datos. En su defecto, **calcula dinámicamente quién era eligible** en ese año.
 1. Deduzca las edades de la categoría (ej. SUB12 = 10-11 años).
 2. Calcula los años de nacimiento permitidos (Año seleccionado - Edad).
-3. Obtiene marcas de la presente y pasada temporada de atletas nacidos estrictamente en esas fechas.
+3. Trae resultados cruzando dichos nacimientos.
+4. **Filtro de Temporada Deportiva:** El atletismo no se rige por años naturales puros, sino por Temporadas (Season). Por código, un "Año" abarca desde el **1 de Septiembre del año previo** al listado, lo que permite albergar competiciones de otoño/invierno (Cross, Pista Cubierta prematura) en el cómputo de las marcas evaluables.
 
 ### Filtrado Histórico (All-Time)
 A diferencia del filtro por año, el sistema delega en la base de datos la correspondencia mediante la Foreign Key original.
