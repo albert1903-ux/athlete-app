@@ -41,3 +41,17 @@ Dado que los datos de la federación provienen de archivos PDFs renegados con fa
 ## 4. Detección de Valores Atípicos (Outliers)
 Las marcas introducidas caen bajo el escrutinio de los scripts del proyecto en `bbdd-athlete-app/scripts`.
 - **Regla Decimal:** Si la marca recibida al parsear un CSV es puramente *entera* sin decimales, en pruebas de tiempo normalmente representa un error grosero del OCR (Ej. `845` en lugar de `8.45` segundos en el 60m libres). Estas marcas caen en un "Ranking de Outliers" y se vetan de la inyección a Supabase a menos que un admin verifique.
+
+## 5. Lógica de Paginación y Filtrado en Rankings
+El sistema de "Ranking" (Top 50) diferencia estrictamente la manera de medir la edad de los atletas dependiendo del horizonte temporal seleccionado:
+
+### Filtrado por Año Específico (Ej. 2024, 2025)
+Cuando un usuario consulta un año concreto, el sistema ignora la `categoria_id` ligada al resultado en base de datos. En su defecto, **calcula dinámicamente quién era eligible** en ese año.
+1. Deduzca las edades de la categoría (ej. SUB12 = 10-11 años).
+2. Calcula los años de nacimiento permitidos (Año seleccionado - Edad).
+3. Obtiene marcas de la presente y pasada temporada de atletas nacidos estrictamente en esas fechas.
+
+### Filtrado Histórico (All-Time)
+A diferencia del filtro por año, el sistema delega en la base de datos la correspondencia mediante la Foreign Key original.
+1. Trae **estrictamente** todas las marcas cuyo `categoria_id` coincida con la categoría seleccionada (Ej. ID 1 para SUB12), confiando en que en el momento del evento el atleta pertenecía a dicho grupo.
+2. Delega en la Base de Datos (`Supabase`) la ordenación natural del mejor resultado (Ascendente o Descendente según el 'Tipo de Prueba' detallado en el punto 1) antes de paginar los `limits`, garantizando que sin importar el volumen masivo de datos albergados en años, el Frontend siempre recibe matemáticamente las mejores marcas absolutas en vez de sufrir truncamientos.
