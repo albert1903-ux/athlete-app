@@ -272,9 +272,15 @@ function RankingDialog({
                     query = query.eq('genero', effectiveGender)
                 }
 
+                // Determine ascending/descending *before* DB fetch
+                const isTimeBased = prueba.isTimeBased ??
+                    (prueba.tipo_marca === 'tiempo' || prueba.tipo_marca === 'crono') ??
+                    true
+
                 // Execute
                 // Use a reasonably high limit for safety, though join filters strictly
-                query = query.limit(5000)
+                // CRUCIAL: Order in DB to not truncate best results when historically > 5000
+                query = query.order('marca_valor', { ascending: isTimeBased }).limit(5000)
 
                 const { data: resultsData, error: resultsError } = await query
 
@@ -287,10 +293,6 @@ function RankingDialog({
 
                 // Process Results (Deduplicate best marks)
                 const bestMarksMap = new Map()
-
-                const isTimeBased = prueba.isTimeBased ??
-                    (prueba.tipo_marca === 'tiempo' || prueba.tipo_marca === 'crono') ??
-                    true
 
                 resultsData.forEach(row => {
                     const atletaId = String(row.atleta_id)
