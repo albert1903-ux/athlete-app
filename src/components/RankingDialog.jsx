@@ -260,7 +260,9 @@ function RankingDialog({
                     // Filter by Season Start Date
                     const seasonStartYear = Number(selectedYear) - 1
                     const seasonStartDate = `${seasonStartYear}-09-01`
-                    query = query.gte('fecha', seasonStartDate)
+                    const seasonEndDate = `${selectedYear}-08-31`
+                    
+                    query = query.gte('fecha', seasonStartDate).lte('fecha', seasonEndDate)
 
                 } else {
                     // Historic: Just match category ID from the record

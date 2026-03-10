@@ -50,7 +50,7 @@ Cuando un usuario consulta un año concreto, el sistema ignora la `categoria_id`
 1. Deduzca las edades de la categoría (ej. SUB12 = 10-11 años).
 2. Calcula los años de nacimiento permitidos (Año seleccionado - Edad).
 3. Trae resultados cruzando dichos nacimientos.
-4. **Filtro de Temporada Deportiva:** El atletismo no se rige por años naturales puros, sino por Temporadas (Season). Por código, un "Año" abarca desde el **1 de Septiembre del año previo** al listado, lo que permite albergar competiciones de otoño/invierno (Cross, Pista Cubierta prematura) en el cómputo de las marcas evaluables.
+4. **Filtro de Temporada Deportiva:** El atletismo no se rige por años naturales puros, sino por Temporadas (Season). Por código, un "Año Deportivo" abarca desde el **1 de Septiembre del año previo** hasta el **31 de Agosto del año listado**, descartando marcas tardías de la siguiente pretemporada.
 
 ### Filtrado Histórico (All-Time)
 A diferencia del filtro por año, el sistema delega en la base de datos la correspondencia mediante la Foreign Key original.

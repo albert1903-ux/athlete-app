@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "04_BITACORA/2026-03-09-Inicio-Boveda.md",
+                "file": "05_FUNCIONAL/Reglas-de-Negocio.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "2026-03-09-Inicio-Boveda"
+              "title": "Reglas-de-Negocio"
             }
           }
         ]
@@ -94,7 +94,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "04_BITACORA/2026-03-09-Inicio-Boveda.md",
+                "file": "05_FUNCIONAL/Reglas-de-Negocio.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -104,7 +104,7 @@
                 "unlinkedCollapsed": true
               },
               "icon": "links-coming-in",
-              "title": "Enlaces entrantes de 2026-03-09-Inicio-Boveda"
+              "title": "Enlaces entrantes de Reglas-de-Negocio"
             }
           },
           {
@@ -113,12 +113,12 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "04_BITACORA/2026-03-09-Inicio-Boveda.md",
+                "file": "05_FUNCIONAL/Reglas-de-Negocio.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               },
               "icon": "links-going-out",
-              "title": "Enlaces salientes de 2026-03-09-Inicio-Boveda"
+              "title": "Enlaces salientes de Reglas-de-Negocio"
             }
           },
           {
@@ -156,13 +156,13 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "04_BITACORA/2026-03-09-Inicio-Boveda.md",
+                "file": "05_FUNCIONAL/Reglas-de-Negocio.md",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
               },
               "icon": "lucide-list",
-              "title": "Esquema de 2026-03-09-Inicio-Boveda"
+              "title": "Esquema de Reglas-de-Negocio"
             }
           }
         ]
@@ -185,25 +185,26 @@
   },
   "active": "8092ed0516ffbd10",
   "lastOpenFiles": [
-    "00_META/Project-Map.md",
+    "02_MODULOS/Frontend-Componentes.md",
+    "Sin título.canvas",
     "00_META/Templates/User-Story-Template.md",
     "00_META/Templates/Plantilla-Bitacora.md",
+    "05_FUNCIONAL/Reglas-de-Negocio.md",
+    "05_FUNCIONAL/Ciclo-de-Vida-del-Dato.md",
+    "04_BITACORA/2026-03-09-Inicio-Boveda.md",
+    "00_META/Project-Map.md",
     "05_FUNCIONAL/Glosario-Terminologia.md",
     "01_ARQUITECTURA/Estrategia-Testing-y-Calidad.md",
     "03_GUIAS_Y_OPS/Troubleshooting-Common-Errors.md",
     "00_META/Templates",
-    "05_FUNCIONAL/Reglas-de-Negocio.md",
     "05_FUNCIONAL/Mapa-de-Usuarios.md",
     "02_MODULOS/Roles-Permisos.md",
     "05_FUNCIONAL/Flujos-de-Pantalla.md",
-    "05_FUNCIONAL/Ciclo-de-Vida-del-Dato.md",
     "01_ARQUITECTURA/Estructura-Datos.md",
     "05_FUNCIONAL",
     "02_MODULOS/API-Endpoints.md",
     "02_MODULOS/Autenticacion.md",
-    "02_MODULOS/Frontend-Componentes.md",
     "03_GUIAS_Y_OPS/Convenciones-Codigo.md",
-    "04_BITACORA/2026-03-09-Inicio-Boveda.md",
     "00_META/Stack-Tecnico.md",
     "Bienvenido.md",
     "03_GUIAS_Y_OPS/Instalacion.md",
