@@ -10,7 +10,7 @@ import { TbDots, TbList, TbCircuitCapacitorPolarized, TbUser, TbSwords, TbUserMi
 import dayjs from 'dayjs'
 import { useFavorites } from '../store/favoritesStore'
 import { useAuth } from '../context/AuthContext'
-
+import { useAthleteProfile } from '../hooks/useAthleteProfile'
 
 import AthleteSpiderChart from '../components/AthleteSpiderChart'
 import AthleteResultsChart from '../components/AthleteResultsChart'
@@ -20,7 +20,6 @@ import MarksManagementDialog from '../components/MarksManagementDialog'
 import AddResultDialog from '../components/AddResultDialog'
 import NextEventCard from '../components/NextEventCard'
 import { getComparatorCache, setComparatorCache } from '../store/comparatorStore'
-import { supabase } from '../lib/supabase'
 
 const STORAGE_KEY = 'selectedAthlete'
 
@@ -39,7 +38,13 @@ function loadSelectedAthlete() {
 const SeguimientoPage = () => {
   const [comparatorAthletes, setComparatorAthletes] = useState(() => getComparatorCache())
   const [resultsRefreshKey, setResultsRefreshKey] = useState(0)
-  const [selectedAthlete, setSelectedAthlete] = useState(() => loadSelectedAthlete())
+  const [selectedAthleteState, setSelectedAthleteState] = useState(() => loadSelectedAthlete())
+
+  // Data fetching hook for profile
+  const { profile: selectedAthlete } = useAthleteProfile(selectedAthleteState?.atleta_id)
+
+  // Use the state version for initial checks, but enriched version for display
+  const effectiveAthlete = selectedAthlete || selectedAthleteState
 
   // Dialog states
   const [anchorEl, setAnchorEl] = useState(null)
@@ -55,43 +60,27 @@ const SeguimientoPage = () => {
 
   // Initial load: if no athlete selected, open selection dialog
   useEffect(() => {
-    if (!selectedAthlete) {
+    if (!selectedAthleteState) {
       setSelectAthleteOpen(true)
     }
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Enrich selectedAthlete with club if missing
+  // Store the enriched athlete back into localStorage
   useEffect(() => {
-    if (!selectedAthlete || selectedAthlete.club) return
-    const atletaId = selectedAthlete.atleta_id
-    if (!atletaId) return
-      ; (async () => {
-        try {
-          const { data: resultados } = await supabase
-            .from('resultados')
-            .select('club_id, fecha')
-            .eq('atleta_id', atletaId)
-            .order('fecha', { ascending: false })
-            .limit(1)
-          const clubId = resultados?.[0]?.club_id
-          if (!clubId) return
-          const { data: clubData } = await supabase
-            .from('clubes')
-            .select('nombre')
-            .eq('club_id', clubId)
-            .single()
-          if (clubData?.nombre) {
-            const enriched = { ...selectedAthlete, club: clubData.nombre }
-            setSelectedAthlete(enriched)
-            try {
-              localStorage.setItem(STORAGE_KEY, JSON.stringify(enriched))
-            } catch (_) { }
+    if (selectedAthlete && selectedAthleteState) {
+       const isEnriched = selectedAthlete.club && !selectedAthleteState.club
+       const isUpdated = isEnriched || selectedAthlete.fecha_nacimiento !== selectedAthleteState.fecha_nacimiento
+       if (isUpdated) {
+          const enriched = { ...selectedAthleteState, ...selectedAthlete }
+          setSelectedAthleteState(enriched)
+          try {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(enriched))
+          } catch (storageError) {
+             console.warn('Could not save to localStorage', storageError)
           }
-        } catch (err) {
-          console.error('Error enriching athlete club:', err)
-        }
-      })()
-  }, [selectedAthlete?.atleta_id]) // eslint-disable-line react-hooks/exhaustive-deps
+       }
+    }
+  }, [selectedAthlete, selectedAthleteState])
 
   useEffect(() => {
     const handleResultadoCreado = () => {
@@ -100,7 +89,7 @@ const SeguimientoPage = () => {
 
     // Also listen for changes in selected athlete from other tabs/windows or dialogs
     const handleStorageChange = () => {
-      setSelectedAthlete(loadSelectedAthlete())
+      setSelectedAthleteState(loadSelectedAthlete())
     }
 
     window.addEventListener('resultadoCreado', handleResultadoCreado)
@@ -143,7 +132,7 @@ const SeguimientoPage = () => {
 
   // Dialog completion handlers
   const handleAthleteSelected = (athlete) => {
-    setSelectedAthlete(athlete)
+    setSelectedAthleteState(athlete)
   }
 
   const handleComparatorAdded = (athlete) => {
@@ -185,20 +174,20 @@ const SeguimientoPage = () => {
       >
         <Box sx={{ mt: 2 }}>
           <Typography component="h1" sx={{ fontFamily: 'Poppins', fontWeight: 500, fontSize: '24px', color: 'text.primary', mb: 1 }}>
-            {selectedAthlete ? selectedAthlete.nombre : 'Selecciona un atleta'}
+            {effectiveAthlete ? effectiveAthlete.nombre : 'Selecciona un atleta'}
           </Typography>
 
           <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-            {selectedAthlete?.fecha_nacimiento && (
+            {effectiveAthlete?.fecha_nacimiento && (
               <Chip
-                label={dayjs(selectedAthlete.fecha_nacimiento).format('DD/MM/YYYY')}
+                label={dayjs(effectiveAthlete.fecha_nacimiento).format('DD/MM/YYYY')}
                 size="small"
                 sx={{ bgcolor: 'background.paper', color: 'text.primary', fontWeight: 600, border: '1px solid', borderColor: 'divider' }}
               />
             )}
-            {selectedAthlete?.club && (
+            {effectiveAthlete?.club && (
               <Chip
-                label={selectedAthlete.club}
+                label={effectiveAthlete.club}
                 size="small"
                 sx={{ bgcolor: 'background.paper', color: 'text.primary', fontWeight: 600, border: '1px solid', borderColor: 'divider' }}
               />
@@ -247,10 +236,10 @@ const SeguimientoPage = () => {
           pb: 'calc(80px + env(safe-area-inset-bottom))' // Espacio reservado para BottomNavigation
         }}
       >
-        {selectedAthlete ? (
+        {effectiveAthlete ? (
           <>
             {/* Próximo Competición */}
-            <NextEventCard athlete={selectedAthlete} />
+            <NextEventCard athlete={effectiveAthlete} />
 
             {/* Componente gráfico de araña */}
             <Box sx={{ width: '100%' }}>
@@ -348,7 +337,7 @@ const SeguimientoPage = () => {
               } catch (e) {
                 console.error('Error saving favorite athlete:', e)
               }
-              setSelectedAthlete(athlete)
+              setSelectedAthleteState(athlete)
               setFavAnchorEl(null)
             }}
           >

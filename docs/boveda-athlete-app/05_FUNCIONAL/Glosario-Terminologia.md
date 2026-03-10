@@ -35,3 +35,5 @@ Término de Ingeniería de Datos para un "Dato Atípico" derivado de un *Parsing
 - **DBManager:** La interfaz central de Base de Dato local SQLite alojada en `/bbdd-athlete-app`, empleada para pre-higienizar. Nunca apunta a Producción directamente para las inserciones.
 - **Service Role Key:** Llave privilegiada para el volcado final a Supabase. Se impone saltar RLS desde entornos de nodo y solo la corre un Admin vía CRON/Script seguro local.
 - **Admin vs Consulta:** Dos perfiles de autorización estrictos regulados que se definen extensamente en [[Roles-Permisos]]. Admin inyecta/repara, Consulta exclusivamente consume la UI.
+- **AI Agent Skills:** Habilidades de dominio (reglas, contexto) en formato Markdown ubicadas en `.agent/skills/` que proporcionan el contexto necesario a los agentes de Inteligencia Artificial para tareas específicas de este proyecto.
+- **Custom Hooks (React):** Archivos en `src/hooks/` responsables de la separación de la obtención de datos y procesamiento en memoria respecto al pintado y renderizado UI de React.

@@ -22,6 +22,11 @@ Este documento recopila los bugs más frecuentes y casos borde técnicos que ocu
 - **Causa Habitual:** Intentar insertar un `resultado` que ya existe. La tabla suele tener una restricción para evitar duplicar (atleta_id + prueba_id + fecha).
 - **Solución rápida:** Usar la función de Upsert o purgar los CSVs previos antes de hacer `DBManager.update()`.
 
+### Error: Errores de Serialización JSON (Decimales / Fechas)
+- **Síntoma:** El script de volcado a Supabase lanza un `TypeError: Object of type Decimal/Date is not JSON serializable`.
+- **Causa Habitual:** La librería de cliente de Supabase no convierte nativamente los tipos `Decimal` de Python ni los objetos `date`/`datetime` a JSON.
+- **Solución rápida:** Implementar una función serializadora o parsear los datos antes del `upsert`, convirtiendo `Decimal` a `float` y fechas a strings ISO 8601 (`YYYY-MM-DD`).
+
 ## 2. Ingesta de Datos (Scripts ETL y OCR)
 
 ### Error: Atletas que desaparecen o se duplican el "Spider Graph"

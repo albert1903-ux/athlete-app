@@ -21,6 +21,8 @@ Implementación en el código, separación de responsabilidades y themathization
 - **[[API-Endpoints]]:** La comunicación entre el SPA de Vite, y la base de datos (Supabase JS Client).
 - **[[Frontend-Componentes]]:** Configuración de MUI, tokens de diseño y UI general.
 - **[[Roles-Permisos]]:** Matriz de RBAC (Control de Acceso Basado en Roles) detallando los privilegios de `admin` y `consulta`.
+- **Custom Hooks:** Abstracción unificada de fetching de Supabase y lógica de gráficos (`useAthleteProfile`, `useAthleteResults`, `usePruebaMetrics`, etc.).
+- **AI Agent Skills:** Instrucciones para los IAs de mantenimiento, centralizadas en `.agent/skills/`.
 
 ### 🛠️ 3. Guías y Operaciones
 Manuales prácticos para el desarrollador e integrador de datos.
@@ -39,6 +41,7 @@ Reglas lógicas, experiencia de usuario y ciclo global, escritos en lenguaje agn
 
 ### 📓 5. Bitácora de Cambios
 - Últimos registros e histórico de las decisiones e hitos del proyecto.
+- **[[2026-03-10-Refactor-Hooks-Skills]]**
 - **[[2026-03-09-Inicio-Boveda]]**
 
 ### 📋 6. Plantillas
