@@ -10,6 +10,11 @@ Este documento recopila los bugs más frecuentes y casos borde técnicos que ocu
 
 ## 1. Problemas de Base de Datos y Seguridad (Supabase)
 
+### Error: "RLS references user metadata" (Linter Warning / Vulnerabilidad)
+- **Síntoma:** El Dashboard de Supabase (Database Linter) alerta de advertencias de nivel ERROR en políticas RLS: "RLS references user metadata".
+- **Causa Habitual:** Las políticas RLS o funciones RPC estaban usando `auth.jwt() -> 'user_metadata' ->> 'role'` para comprobar si un usuario era administrador. Como `user_metadata` es un objeto JSON escribible y modificable por el cliente mediante la API pública de Supabase Auth, abrir esto en RLS permite la escalada de privilegios (cualquier usuario podría inyectarse `"role": "admin"`).
+- **Solución rápida:** La información de autorización de roles DEBE vivir en `app_metadata`. Se ha creado una migración SQL en `supabase/migrations/` que transfiere esos metadatos, y todos los scripts/RPCs deben apuntar a `auth.jwt() -> 'app_metadata' ->> 'role'`.
+
 ### Error: "Row-Level Security (RLS) Policy Violation" al insertar
 - **Síntoma:** Requests de inserción/actualización desde el frontend o scripts locales devuelven un error `403 Forbidden` o silenciosamente no insertan.
 - **Causa Habitual:** 

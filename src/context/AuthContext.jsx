@@ -12,8 +12,8 @@ export const AuthProvider = ({ children }) => {
             const currentUser = session?.user ?? null;
             if (currentUser) {
                 // Determine the role and status from user_metadata
-                currentUser.role = currentUser.user_metadata?.role || 'consulta';
-                currentUser.status = currentUser.user_metadata?.status || 'pending';
+                currentUser.role = currentUser.app_metadata?.role || 'consulta';
+                currentUser.status = currentUser.app_metadata?.status || 'pending';
                 // Admin is automatically approved. Otherwise depends on status.
                 currentUser.isApproved = currentUser.role === 'admin' || currentUser.status === 'approved';
             }
@@ -26,8 +26,8 @@ export const AuthProvider = ({ children }) => {
             (_event, session) => {
                 const currentUser = session?.user ?? null;
                 if (currentUser) {
-                    currentUser.role = currentUser.user_metadata?.role || 'consulta';
-                    currentUser.status = currentUser.user_metadata?.status || 'pending';
+                    currentUser.role = currentUser.app_metadata?.role || 'consulta';
+                    currentUser.status = currentUser.app_metadata?.status || 'pending';
                     currentUser.isApproved = currentUser.role === 'admin' || currentUser.status === 'approved';
                 }
                 setUser(currentUser);

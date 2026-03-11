@@ -63,7 +63,7 @@ export default function RoleManagementDialog({ open, onClose }) {
             setUsers(prev =>
                 prev.map(u =>
                     u.id === userId
-                        ? { ...u, raw_user_meta_data: { ...u.raw_user_meta_data, role: newRole } }
+                        ? { ...u, raw_app_meta_data: { ...u.raw_app_meta_data, role: newRole } }
                         : u
                 )
             )
@@ -103,7 +103,7 @@ export default function RoleManagementDialog({ open, onClose }) {
                             {users.map((u) => {
                                 const name = u.raw_user_meta_data?.name || u.raw_user_meta_data?.full_name || 'Usuario'
                                 const email = u.email || 'Sin email'
-                                const currentRole = u.raw_user_meta_data?.role || 'consulta'
+                                const currentRole = u.raw_app_meta_data?.role || 'consulta'
                                 const isCurrentUser = u.id === currentUser?.id
                                 const chipProps = getRoleChipProps(currentRole)
 
