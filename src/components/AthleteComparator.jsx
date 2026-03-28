@@ -14,58 +14,18 @@ import {
 import { Button, Modal } from './ui'
 import { TbX, TbCheck, TbTrash, TbPlus, TbUserPlus, TbSwords } from 'react-icons/tb'
 import AthleteSearch from './AthleteSearch'
-
-const STORAGE_KEY_COMPARATORS = 'comparatorAthletes'
+import { useComparatorAthletes, setComparatorCache } from '../store/comparatorStore'
 
 function AthleteComparator({ onComparatorsChange, hideAddButton = false }) {
-  const [comparators, setComparators] = useState([])
+  const comparators = useComparatorAthletes()
   const [open, setOpen] = useState(false)
   const [tempSelectedAthlete, setTempSelectedAthlete] = useState(null)
   const [duplicateError, setDuplicateError] = useState(false)
 
-  // Cargar comparadores desde localStorage y escuchar cambios externos
+  // Notificar al padre cuando cambien los comparadores
   useEffect(() => {
-    const loadComparators = () => {
-      try {
-        const stored = localStorage.getItem(STORAGE_KEY_COMPARATORS)
-        if (stored) {
-          const parsed = JSON.parse(stored)
-          const comparadoresArray = Array.isArray(parsed) ? parsed : []
-          setComparators(comparadoresArray)
-        } else {
-          setComparators([])
-        }
-      } catch (error) {
-        console.error('Error al cargar comparadores desde localStorage:', error)
-        localStorage.removeItem(STORAGE_KEY_COMPARATORS)
-        setComparators([])
-      }
-    }
-
-    loadComparators()
-
-    // Escuchar evento personalizado para cambios externos (botón del header)
-    const handleExternalChange = () => {
-      loadComparators()
-    }
-
-    window.addEventListener('comparatorAthletesChanged', handleExternalChange)
-
-    return () => {
-      window.removeEventListener('comparatorAthletesChanged', handleExternalChange)
-    }
-  }, [])
-
-  // Guardar comparadores en localStorage cuando cambien
-  useEffect(() => {
-    try {
-      localStorage.setItem(STORAGE_KEY_COMPARATORS, JSON.stringify(comparators))
-      // Notificar al componente padre del cambio
-      if (onComparatorsChange) {
-        onComparatorsChange(comparators)
-      }
-    } catch (error) {
-      console.error('Error al guardar comparadores en localStorage:', error)
+    if (onComparatorsChange) {
+      onComparatorsChange(comparators)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [comparators])
@@ -84,10 +44,9 @@ function AthleteComparator({ onComparatorsChange, hideAddButton = false }) {
 
   const handleSelect = () => {
     if (tempSelectedAthlete) {
-      // Verificar que no esté ya añadido
       const exists = comparators.some(c => c.atleta_id === tempSelectedAthlete.atleta_id)
       if (!exists) {
-        setComparators(prev => [...prev, tempSelectedAthlete])
+        setComparatorCache([...comparators, tempSelectedAthlete])
         handleClose()
       } else {
         setDuplicateError(true)
@@ -100,7 +59,7 @@ function AthleteComparator({ onComparatorsChange, hideAddButton = false }) {
   }
 
   const handleRemove = (atletaId) => {
-    setComparators(prev => prev.filter(c => c.atleta_id !== atletaId))
+    setComparatorCache(comparators.filter(c => c.atleta_id !== atletaId))
   }
 
   if (comparators.length === 0) {

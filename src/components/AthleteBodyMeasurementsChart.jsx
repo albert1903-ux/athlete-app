@@ -21,8 +21,7 @@ import {
   Legend
 } from 'recharts'
 import { supabase } from '../lib/supabase'
-
-const STORAGE_KEY = 'selectedAthlete'
+import { useSelectedAthlete } from '../store/selectedAthleteStore'
 
 const MEASUREMENT_TYPES = {
   peso: { label: 'Peso', unit: 'kg', color: '#E11141' },
@@ -35,7 +34,7 @@ function AthleteBodyMeasurementsChart() {
   const theme = useTheme()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
-  const [selectedAthlete, setSelectedAthlete] = useState(null)
+  const selectedAthlete = useSelectedAthlete()
   const [selectedMeasurement, setSelectedMeasurement] = useState('peso')
   const [chartData, setChartData] = useState([])
   const [chartWidth, setChartWidth] = useState(() => {
@@ -60,55 +59,6 @@ function AthleteBodyMeasurementsChart() {
     return () => window.removeEventListener('resize', updateWidth)
   }, [])
 
-  // Cargar atleta seleccionado desde localStorage
-  useEffect(() => {
-    let lastAthleteId = null
-
-    const loadAthlete = () => {
-      try {
-        const stored = localStorage.getItem(STORAGE_KEY)
-        if (stored) {
-          const athlete = JSON.parse(stored)
-          if (athlete.atleta_id !== lastAthleteId) {
-            lastAthleteId = athlete.atleta_id
-            setSelectedAthlete(athlete)
-          }
-        } else {
-          if (lastAthleteId !== null) {
-            lastAthleteId = null
-            setSelectedAthlete(null)
-            setChartData([])
-          }
-        }
-      } catch (error) {
-        console.error('Error al cargar atleta desde localStorage:', error)
-        if (lastAthleteId !== null) {
-          lastAthleteId = null
-          setSelectedAthlete(null)
-        }
-      }
-    }
-
-    loadAthlete()
-
-    const handleStorageChange = (e) => {
-      if (e.key === STORAGE_KEY) {
-        loadAthlete()
-      }
-    }
-
-    const handleCustomStorageChange = () => {
-      loadAthlete()
-    }
-
-    window.addEventListener('storage', handleStorageChange)
-    window.addEventListener('localStorageChange', handleCustomStorageChange)
-
-    return () => {
-      window.removeEventListener('storage', handleStorageChange)
-      window.removeEventListener('localStorageChange', handleCustomStorageChange)
-    }
-  }, [])
 
   // Cargar datos de medidas corporales
   useEffect(() => {

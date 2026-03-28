@@ -19,8 +19,7 @@ import {
 } from 'recharts'
 import { TbChartScatter } from 'react-icons/tb'
 import { supabase } from '../lib/supabase'
-
-const STORAGE_KEY = 'selectedAthlete'
+import { useSelectedAthlete } from '../store/selectedAthleteStore'
 
 // Tooltip personalizado
 const CustomTooltip = ({ active, payload }) => {
@@ -57,7 +56,7 @@ const CustomTooltip = ({ active, payload }) => {
 
 function AthleteHeightWeightScatter() {
   const theme = useTheme()
-  const [selectedAthlete, setSelectedAthlete] = useState(null)
+  const selectedAthlete = useSelectedAthlete()
   const [measurements, setMeasurements] = useState([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
@@ -79,52 +78,6 @@ function AthleteHeightWeightScatter() {
     return () => window.removeEventListener('resize', updateWidth)
   }, [])
 
-  // Cargar atleta seleccionado desde localStorage
-  useEffect(() => {
-    let lastAthleteId = null
-
-    const loadAthlete = () => {
-      try {
-        const stored = localStorage.getItem(STORAGE_KEY)
-        if (stored) {
-          const athlete = JSON.parse(stored)
-          // Solo actualizar si el atleta realmente cambió
-          if (athlete.atleta_id !== lastAthleteId) {
-            lastAthleteId = athlete.atleta_id
-            setSelectedAthlete(athlete)
-          }
-        } else {
-          if (lastAthleteId !== null) {
-            lastAthleteId = null
-            setSelectedAthlete(null)
-          }
-        }
-      } catch (error) {
-        console.error('Error al cargar atleta:', error)
-        if (lastAthleteId !== null) {
-          lastAthleteId = null
-          setSelectedAthlete(null)
-        }
-      }
-    }
-
-    // Cargar inicialmente
-    loadAthlete()
-
-    const interval = setInterval(loadAthlete, 500)
-
-    const handleStorageChange = (e) => {
-      if (e.key === STORAGE_KEY) {
-        loadAthlete()
-      }
-    }
-    window.addEventListener('storage', handleStorageChange)
-
-    return () => {
-      clearInterval(interval)
-      window.removeEventListener('storage', handleStorageChange)
-    }
-  }, [])
 
   // Cargar mediciones cuando cambia el atleta
   useEffect(() => {

@@ -5,8 +5,10 @@ import { Typography } from './ui';
 import { supabase } from '../lib/supabase';
 import dayjs from 'dayjs';
 import 'dayjs/locale/es';
+import { useUI } from '../context/UIContext';
 
 export default function NextEventCard({ athlete }) {
+    const { eventVersion } = useUI();
     const [eventData, setEventData] = useState(null);
     const [loading, setLoading] = useState(true);
 
@@ -16,6 +18,7 @@ export default function NextEventCard({ athlete }) {
             setLoading(false);
             return;
         }
+        // eventVersion changes when CalendarioPage creates a new event
 
         const fetchNextEvent = async () => {
             setLoading(true);
@@ -114,21 +117,7 @@ export default function NextEventCard({ athlete }) {
         };
 
         fetchNextEvent();
-    }, [athlete]);
-
-    // Handle Event Listener para recargar si hay cambios de calendario
-    useEffect(() => {
-        const handleRecarga = () => {
-            // Forzar un trigger sobre la dependencia 'athlete' simulando un cambio de reference 
-            // si quisiéramos recargar al instante, pero lo hacemos simple relanzando si es el mismo
-            setEventData(prev => prev ? { ...prev } : null); // Dummy update para provocar re-render
-        };
-        window.addEventListener('openAddEventDialog', handleRecarga); // As placeholder, should listen to a calendar success event if globally dispatched
-
-        return () => {
-            window.removeEventListener('openAddEventDialog', handleRecarga);
-        }
-    }, []);
+    }, [athlete, eventVersion]);
 
     if (loading) {
         return (

@@ -20,18 +20,19 @@ import ShareCalendarDialog from '../components/ShareCalendarDialog'
 import { useCalendarShares } from '../hooks/useCalendarShares'
 import { TbUserPlus } from 'react-icons/tb'
 import { useAuth } from '../context/AuthContext'
+import { useUI } from '../context/UIContext'
 
 // Configurar dayjs para usar el locale español
 dayjs.locale('es')
 
 const CalendarioPage = () => {
+  const { addEventOpen, setAddEventOpen, notifyEventCreated } = useUI()
   const [selectedDate, setSelectedDate] = useState(dayjs())
   const [currentMonth, setCurrentMonth] = useState(dayjs())
   const [calendarMonth, setCalendarMonth] = useState(dayjs().startOf('month'))
   const [calendarKey, setCalendarKey] = useState(0)
   const [shouldRenderCalendar, setShouldRenderCalendar] = useState(true)
   const [bottomSheetOpen, setBottomSheetOpen] = useState(false)
-  const [addEventDialogOpen, setAddEventDialogOpen] = useState(false)
   const [eventDates, setEventDates] = useState(new Set())
   const [, setLoadingEvents] = useState(false)
   const [dayParticipants, setDayParticipants] = useState([])
@@ -92,33 +93,18 @@ const CalendarioPage = () => {
 
   useEffect(() => {
     loadEvents()
-  }, [addEventDialogOpen]) // Recargar cuando se cierra el diálogo de añadir evento
+  }, [addEventOpen]) // Recargar cuando se cierra el diálogo de añadir evento
 
   const handleAddEventDialogClose = () => {
-    setAddEventDialogOpen(false)
+    setAddEventOpen(false)
   }
 
-  // Escuchar evento desde el header
-  useEffect(() => {
-    const handleOpenAddEvent = () => {
-      setAddEventDialogOpen(true)
-    }
-
-    window.addEventListener('openAddEventDialog', handleOpenAddEvent)
-
-    return () => {
-      window.removeEventListener('openAddEventDialog', handleOpenAddEvent)
-    }
-  }, [])
-
   const handleEventSuccess = () => {
-    // Recargar eventos cuando se crea uno nuevo
     loadEvents()
-
-    // Recargar también los participantes del día seleccionado si el bottom sheet está abierto
     if (bottomSheetOpen) {
       loadDayParticipants(selectedDate)
     }
+    notifyEventCreated()
   }
 
   // Componente personalizado para el header del calendario (no se usa actualmente, pero se mantiene por si se necesita)
@@ -1034,7 +1020,7 @@ const CalendarioPage = () => {
               </Typography>
               <Button
                 variant="contained"
-                onClick={() => setAddEventDialogOpen(true)}
+                onClick={() => setAddEventOpen(true)}
                 startIcon={<TbPlus />}
                 sx={{
                   borderRadius: 2,
@@ -1166,7 +1152,7 @@ const CalendarioPage = () => {
 
       {/* Diálogo para añadir eventos */}
       <AddEventDialog
-        open={addEventDialogOpen}
+        open={addEventOpen}
         onClose={handleAddEventDialogClose}
         onSuccess={handleEventSuccess}
         selectedDate={selectedDate}

@@ -13,70 +13,16 @@ import {
 import { Button, Modal } from './ui'
 import { TbX, TbCheck, TbPencil, TbUser } from 'react-icons/tb'
 import AthleteSearch from './AthleteSearch'
-
-const STORAGE_KEY = 'selectedAthlete'
-
-// Función helper para cargar desde localStorage de forma síncrona
-function loadFromStorage() {
-  try {
-    const stored = localStorage.getItem(STORAGE_KEY)
-    if (stored) {
-      return JSON.parse(stored)
-    }
-  } catch (error) {
-    console.error('Error al cargar atleta desde localStorage:', error)
-    localStorage.removeItem(STORAGE_KEY)
-  }
-  return null
-}
+import { useSelectedAthlete, setSelectedAthlete } from '../store/selectedAthleteStore'
 
 function AthleteSelector() {
-  // Inicializar directamente desde localStorage para evitar el render inicial con null
-  const [open, setOpen] = useState(() => {
-    const athlete = loadFromStorage()
-    // Solo abrir popup si NO hay atleta guardado
-    return athlete === null
-  })
+  const selectedAthlete = useSelectedAthlete()
 
-  const [selectedAthlete, setSelectedAthlete] = useState(() => loadFromStorage())
-  const [tempSelectedAthlete, setTempSelectedAthlete] = useState(() => {
-    const stored = loadFromStorage()
-    return stored || null
-  })
-
-  // Guardar atleta seleccionado en localStorage cuando cambie
-  useEffect(() => {
-    if (selectedAthlete) {
-      try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(selectedAthlete))
-      } catch (error) {
-        console.error('Error al guardar atleta en localStorage:', error)
-      }
-    } else {
-      // Limpiar localStorage si no hay atleta seleccionado
-      localStorage.removeItem(STORAGE_KEY)
-    }
-  }, [selectedAthlete])
-
-  // Escuchar cambios externos (por ejemplo, desde RankingDialog)
-  useEffect(() => {
-    const handleExternalChange = () => {
-      const stored = loadFromStorage()
-      // Solo actualizar si es diferente para evitar loops
-      setSelectedAthlete(prev => {
-        if (!prev && !stored) return prev
-        if (prev && stored && prev.atleta_id === stored.atleta_id) return prev
-        return stored
-      })
-    }
-
-    window.addEventListener('localStorageChange', handleExternalChange)
-    return () => window.removeEventListener('localStorageChange', handleExternalChange)
-  }, [])
+  const [open, setOpen] = useState(() => selectedAthlete === null)
+  const [tempSelectedAthlete, setTempSelectedAthlete] = useState(() => selectedAthlete)
 
   const handleOpen = () => {
-    const candidate = selectedAthlete || loadFromStorage() || null
-    setTempSelectedAthlete(candidate)
+    setTempSelectedAthlete(selectedAthlete)
     setOpen(true)
   }
 
@@ -99,14 +45,12 @@ function AthleteSelector() {
   const handleRemove = () => {
     setSelectedAthlete(null)
     setTempSelectedAthlete(null)
-    localStorage.removeItem(STORAGE_KEY) // Limpiar explícitamente el localStorage
-    setOpen(true) // Abrir el popup al eliminar la selección
-    console.debug('[AthleteSelector] handleRemove')
+    setOpen(true)
   }
 
   useEffect(() => {
     if (open) {
-      const candidate = tempSelectedAthlete || selectedAthlete || loadFromStorage()
+      const candidate = tempSelectedAthlete || selectedAthlete
       if (candidate && (!tempSelectedAthlete || tempSelectedAthlete.atleta_id !== candidate.atleta_id)) {
         setTempSelectedAthlete(candidate)
       }

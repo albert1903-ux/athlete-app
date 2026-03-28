@@ -1,41 +1,16 @@
-import { useState, useEffect } from 'react'
 import Box from '@mui/material/Box'
 
 import AddMeasurementDialog from '../components/AddMeasurementDialog'
 import ViewMeasurementsDialog from '../components/ViewMeasurementsDialog'
 import AthleteHeightWeightScatter from '../components/AthleteHeightWeightScatter'
 import AthleteBodyMeasurementsChart from '../components/AthleteBodyMeasurementsChart'
+import { useUI } from '../context/UIContext'
 
 const AnalisisPage = () => {
-  const [dialogOpen, setDialogOpen] = useState(false)
-  const [viewDialogOpen, setViewDialogOpen] = useState(false)
-
-  const handleDialogClose = () => {
-    setDialogOpen(false)
-  }
-
-  const handleViewDialogClose = () => {
-    setViewDialogOpen(false)
-  }
-
-  // Escuchar eventos desde el header
-  useEffect(() => {
-    const handleOpenAddMeasurement = () => {
-      setDialogOpen(true)
-    }
-
-    const handleOpenViewMeasurements = () => {
-      setViewDialogOpen(true)
-    }
-
-    window.addEventListener('openAddMeasurementDialog', handleOpenAddMeasurement)
-    window.addEventListener('openViewMeasurementsDialog', handleOpenViewMeasurements)
-
-    return () => {
-      window.removeEventListener('openAddMeasurementDialog', handleOpenAddMeasurement)
-      window.removeEventListener('openViewMeasurementsDialog', handleOpenViewMeasurements)
-    }
-  }, [])
+  const {
+    addMeasurementOpen, setAddMeasurementOpen,
+    viewMeasurementsOpen, setViewMeasurementsOpen,
+  } = useUI()
 
   return (
     <Box
@@ -67,17 +42,15 @@ const AnalisisPage = () => {
         <AthleteHeightWeightScatter />
       </Box>
 
-      {/* Diálogo para añadir mediciones */}
       <AddMeasurementDialog
-        open={dialogOpen}
-        onClose={handleDialogClose}
-        onSuccess={handleDialogClose}
+        open={addMeasurementOpen}
+        onClose={() => setAddMeasurementOpen(false)}
+        onSuccess={() => setAddMeasurementOpen(false)}
       />
 
-      {/* Diálogo para visualizar mediciones */}
       <ViewMeasurementsDialog
-        open={viewDialogOpen}
-        onClose={handleViewDialogClose}
+        open={viewMeasurementsOpen}
+        onClose={() => setViewMeasurementsOpen(false)}
       />
     </Box>
   )

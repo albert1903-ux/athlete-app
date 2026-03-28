@@ -1,29 +1,16 @@
 import { useEffect, useMemo, useState, useCallback } from 'react'
-import {
-  Alert,
-  MenuItem,
-  Stack,
-  Autocomplete,
-  CircularProgress,
-  Divider
-} from '@mui/material'
+import { Alert, Stack, Divider } from '@mui/material'
 import { createFilterOptions } from '@mui/material/Autocomplete'
 import dayjs from 'dayjs'
 import { TbX, TbCheck, TbCircuitCapacitorPolarized } from 'react-icons/tb'
-import { supabase } from '../lib/supabase'
-import { Modal, Button, Input, Typography } from './ui'
-const GENERO_OPTIONS = [
-  { value: 'MASC', label: 'Masculino' },
-  { value: 'FEM', label: 'Femenino' },
-  { value: 'MIXTO', label: 'Mixto' }
-]
-
-const SUPERFICIE_OPTIONS = [
-  { value: 'AL', label: 'Aire libre (AL)' },
-  { value: 'PC', label: 'Pista cubierta (PC)' },
-  { value: 'RT', label: 'Ruta' },
-  { value: 'OT', label: 'Otra' }
-]
+import { Modal, Button, Typography } from './ui'
+import { useFormOptions } from '../hooks/useFormOptions'
+import { useAthleteSearch } from '../hooks/useAthleteSearch'
+import { useAutoAssignClub } from '../hooks/useAutoAssignClub'
+import { useResultSubmit } from '../hooks/useResultSubmit'
+import AthleteClubFields from './AddResultDialog/AthleteClubFields'
+import PruebaCategoriaFields from './AddResultDialog/PruebaCategoriaFields'
+import MarcaFields from './AddResultDialog/MarcaFields'
 
 const initialFormState = {
   atleta: null,
@@ -54,52 +41,35 @@ const convertMarcaTextoToValor = (texto) => {
   let total = 0
   for (let index = 0; index < parts.length; index += 1) {
     const value = Number(parts[index])
-    if (Number.isNaN(value)) {
-      return null
-    }
-    const power = parts.length - index - 1
-    total += value * (60 ** power)
+    if (Number.isNaN(value)) return null
+    total += value * (60 ** (parts.length - index - 1))
   }
   return total
 }
 
-const fetchNextResultadoId = async () => {
-  // Solo necesitamos esto si es INSERT
-  const { data, error } = await supabase
-    .from('resultados')
-    .select('resultado_id')
-    .order('resultado_id', { ascending: false })
-    .limit(1)
-
-  if (error) {
-    throw error
-  }
-
-  const lastId = data?.[0]?.resultado_id
-  const parsed = Number(lastId)
-  if (!lastId || Number.isNaN(parsed)) {
-    return 1
-  }
-  return parsed + 1
-}
-
 function AddResultDialog({ open, onClose, onSuccess, resultToEdit = null }) {
   const [formValues, setFormValues] = useState(initialFormState)
-  const [optionsLoading, setOptionsLoading] = useState(false)
-  const [submitLoading, setSubmitLoading] = useState(false)
-  const [submitError, setSubmitError] = useState(null)
-  const [submitSuccess, setSubmitSuccess] = useState(null)
-  const [options, setOptions] = useState({
-    atletas: [],
-    clubes: [],
-    pruebas: [],
-    categorias: []
-  })
-  const [autoAssigningClub, setAutoAssigningClub] = useState(false)
   const [atletaInputValue, setAtletaInputValue] = useState('')
-  const [athleteSearchLoading, setAthleteSearchLoading] = useState(false)
-  const [, setAthleteSearchError] = useState(null) // Error handling state (value unused, setter used)
   const [pruebaInputValue, setPruebaInputValue] = useState('')
+
+  const resetForm = useCallback(() => {
+    setFormValues(initialFormState)
+    setPruebaInputValue('')
+    setAtletaInputValue('')
+  }, [])
+
+  const { clubes, pruebas, categorias, loading: optionsLoading, error: optionsError, addClub } =
+    useFormOptions({ open })
+  const { atletas, loading: athleteSearchLoading } = useAthleteSearch({
+    inputValue: atletaInputValue,
+    open,
+    selectedAthlete: formValues.atleta,
+    resultToEdit
+  })
+  const { autoAssigning, getClubForAthlete } = useAutoAssignClub({ clubes, addClub })
+  const { loading: submitLoading, error: submitError, success: submitSuccess, submit } =
+    useResultSubmit({ resultToEdit, onSuccess, onReset: resetForm })
+
   const pruebaFilter = useMemo(
     () =>
       createFilterOptions({
@@ -110,54 +80,37 @@ function AddResultDialog({ open, onClose, onSuccess, resultToEdit = null }) {
       }),
     []
   )
+
   const normalizedIncludes = useCallback((text, query) => {
     const normalize = (str) =>
-      str
-        ?.toLowerCase()
-        .normalize('NFD')
-        .replace(/[\u0300-\u036f]/g, '') || ''
+      str?.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '') || ''
     return normalize(text).includes(normalize(query))
   }, [])
+
   const filteredPruebas = useMemo(() => {
-    if (!pruebaInputValue) {
-      return options.pruebas
-    }
-    return options.pruebas.filter((prueba) =>
-      normalizedIncludes(prueba?.nombre, pruebaInputValue)
-    )
-  }, [options.pruebas, pruebaInputValue, normalizedIncludes])
+    if (!pruebaInputValue) return pruebas
+    return pruebas.filter((prueba) => normalizedIncludes(prueba?.nombre, pruebaInputValue))
+  }, [pruebas, pruebaInputValue, normalizedIncludes])
 
-  const resetForm = useCallback(() => {
-    setFormValues(initialFormState)
-    setSubmitError(null)
-    setSubmitSuccess(null)
-    setPruebaInputValue('')
-    setAtletaInputValue('')
-    // setAthleteSearchError(null)
-  }, [])
+  const isFormValid = useMemo(
+    () =>
+      Boolean(formValues.atleta?.atleta_id) &&
+      Boolean(formValues.prueba?.prueba_id) &&
+      Boolean(formValues.club?.club_id) &&
+      Boolean(formValues.categoria?.categoria_id) &&
+      Boolean(formValues.fecha) &&
+      Boolean(formValues.marcaTexto.trim()) &&
+      Boolean(formValues.unidad.trim()) &&
+      Boolean(formValues.genero) &&
+      Boolean(formValues.superficie),
+    [formValues]
+  )
 
-  // Efecto para cargar datos en modo Edición
+  // Edit mode initialization
   useEffect(() => {
     if (open && resultToEdit) {
-      console.debug('Cargando datos para edición:', resultToEdit)
-      // Precargar los valores
-      // Nota: resultToEdit debe venir con los objetos completos de atleta, club, prueba, categoria
-      // o al menos con sus IDs para buscarlos en las opciones cargadas.
-      // Asumiremos que resultToEdit tiene la estructura enriquecida o fetcharemos si falta algo complejo
-
-      const {
-        atleta, // puede ser objeto {atleta_id, nombre, ...}
-        club,
-        prueba,
-        categoria,
-        fecha,
-        marca_texto,
-        marca_valor,
-        unidad,
-        genero,
-        superficie
-      } = resultToEdit
-
+      const { atleta, club, prueba, categoria, fecha, marca_texto, marca_valor, unidad, genero, superficie } =
+        resultToEdit
       setFormValues({
         atleta: atleta || null,
         club: club || null,
@@ -172,151 +125,15 @@ function AddResultDialog({ open, onClose, onSuccess, resultToEdit = null }) {
         marcaTexto: marca_texto || '',
         marcaValor: marca_valor || ''
       })
-
-      // Precargar inputValues para autocompletes
       if (atleta?.nombre) setAtletaInputValue(atleta.nombre)
       if (prueba?.nombre) setPruebaInputValue(prueba.nombre)
-
     } else if (open && !resultToEdit) {
       resetForm()
     }
   }, [open, resultToEdit, resetForm])
 
-  useEffect(() => {
-    if (!open) {
-      // Al cerrar, si NO estamos en modo edición (o si queremos limpiar siempre), reseteamos
-      // Pero mejor resetear al abrir en modo "nuevo", o al cerrar.
-      // Si cerramos el de editar, queremos que al volver a abrir 'nuevo' esté limpio.
-      // Lo manejamos arriba en el useEffect([open, resultToEdit])
-      return
-    }
-
-    let isMounted = true
-    const loadOptions = async () => {
-      setOptionsLoading(true)
-      setSubmitError(null)
-      try {
-        const [
-          { data: clubesData, error: clubesError },
-          { data: pruebasData, error: pruebasError },
-          { data: categoriasData, error: categoriasError }
-        ] = await Promise.all([
-          supabase
-            .from('clubes')
-            .select('club_id, nombre')
-            .order('nombre', { ascending: true }),
-          supabase
-            .from('pruebas')
-            .select('prueba_id, nombre, tipo_prueba, tipo_marca, unidad_default')
-            .order('nombre', { ascending: true }),
-          supabase
-            .from('categorias')
-            .select('categoria_id, nombre')
-            .order('nombre', { ascending: true })
-        ])
-
-        if (clubesError) throw clubesError
-        if (pruebasError) throw pruebasError
-        if (categoriasError) throw categoriasError
-
-        if (!isMounted) return
-        setOptions(prev => ({
-          ...prev,
-          atleta: resultToEdit?.atleta ? [resultToEdit.atleta] : [], // Pre-hidratar atleta si es edición
-          clubes: clubesData || [],
-          pruebas: pruebasData || [],
-          categorias: categoriasData || []
-        }))
-
-        // Si es edición, asegurar que el atleta está en las opciones
-        if (resultToEdit?.atleta) {
-          setOptions((prev) => ({
-            ...prev,
-            atletas: [resultToEdit.atleta]
-          }))
-        }
-
-      } catch (error) {
-        console.error('Error al cargar datos para el formulario:', error)
-        if (isMounted) {
-          setSubmitError(
-            error.message || 'No se pudieron cargar las opciones del formulario'
-          )
-        }
-      } finally {
-        if (isMounted) {
-          setOptionsLoading(false)
-        }
-      }
-    }
-
-    loadOptions()
-
-    return () => {
-      isMounted = false
-    }
-  }, [open, resultToEdit]) // Quitamos resetForm de deps para evitar loop, agregamos resultToEdit
-
-  // Búsqueda de atletas en Supabase mientras se escribe (debounced)
-  useEffect(() => {
-    if (!open) return
-
-    // Si estamos editando y el input coincide con el atleta cargado, no buscamos
-    if (resultToEdit && atletaInputValue === resultToEdit.atleta?.nombre) {
-      return
-    }
-
-    const controller = new AbortController()
-    const signal = controller.signal
-
-    const term = atletaInputValue?.trim()
-    if (!term || term.length < 2) {
-      setAthleteSearchLoading(false)
-      setAthleteSearchError(null)
-      // Mantener el atleta seleccionado en las opciones si existe
-      setOptions((prev) => ({
-        ...prev,
-        atletas: formValues.atleta ? [formValues.atleta] : []
-      }))
-      return
-    }
-
-    let timeoutId = setTimeout(async () => {
-      setAthleteSearchLoading(true)
-      setAthleteSearchError(null)
-      try {
-        const { data, error } = await supabase
-          .from('atletas')
-          .select('atleta_id, nombre, licencia')
-          .ilike('nombre', `%${term}%`)
-          .order('nombre', { ascending: true })
-          .limit(100)
-
-        if (error) throw error
-        if (signal.aborted) return
-        setOptions((prev) => ({ ...prev, atletas: data || [] }))
-      } catch (err) {
-        if (!signal.aborted) {
-          setAthleteSearchError(err.message || 'Error al buscar atletas')
-          setOptions((prev) => ({ ...prev, atletas: [] }))
-        }
-      } finally {
-        if (!signal.aborted) {
-          setAthleteSearchLoading(false)
-        }
-      }
-    }, 250)
-
-    return () => {
-      clearTimeout(timeoutId)
-      controller.abort()
-    }
-  }, [atletaInputValue, open, formValues.atleta, resultToEdit])
-
   const handleClose = () => {
-    if (!submitLoading) {
-      onClose?.()
-    }
+    if (!submitLoading) onClose?.()
   }
 
   const handleDateChange = (value) => {
@@ -324,13 +141,11 @@ function AddResultDialog({ open, onClose, onSuccess, resultToEdit = null }) {
       setFormValues((prev) => ({ ...prev, fecha: '', anio: '', mes: '' }))
       return
     }
-
     const parsed = dayjs(value)
     if (!parsed.isValid()) {
       setFormValues((prev) => ({ ...prev, fecha: value, anio: '', mes: '' }))
       return
     }
-
     setFormValues((prev) => ({
       ...prev,
       fecha: value,
@@ -340,211 +155,31 @@ function AddResultDialog({ open, onClose, onSuccess, resultToEdit = null }) {
   }
 
   const handleMarcaTextoChange = (value) => {
-    setFormValues((prev) => ({ ...prev, marcaTexto: value }))
     const autoValor = convertMarcaTextoToValor(value)
     setFormValues((prev) => ({
       ...prev,
+      marcaTexto: value,
       marcaValor: autoValor !== null ? autoValor : ''
     }))
   }
 
-  const isFormValid = useMemo(() => {
-    return (
-      Boolean(formValues.atleta?.atleta_id) &&
-      Boolean(formValues.prueba?.prueba_id) &&
-      Boolean(formValues.club?.club_id) &&
-      Boolean(formValues.categoria?.categoria_id) &&
-      Boolean(formValues.fecha) &&
-      Boolean(formValues.marcaTexto.trim()) &&
-      Boolean(formValues.unidad.trim()) &&
-      Boolean(formValues.genero) &&
-      Boolean(formValues.superficie)
-    )
-  }, [formValues])
-
   const handleAthleteChange = async (_, newValue) => {
     setFormValues((prev) => ({ ...prev, atleta: newValue }))
-
-    if (!newValue?.atleta_id) {
-      return
-    }
-
-    // Si estamos editando y cambiamos al mismo atleta original, podríamos restaurar su club original?
-    // Por simplicidad, ejecutamos la lógica de auto-asignar club siempre que cambie el atleta,
-    // salvo que estemos cargando el form inicial de edición.
-    // (Este handler se dispara user interaction, así que está bien).
-
-    setAutoAssigningClub(true)
-    try {
-      let clubId = null
-
-      // Preferir el club activo (fecha_fin nula) con fecha_inicio más reciente en atleta_club_hist
-      try {
-        const fetchLatestClub = async (onlyActive = false) => {
-          let query = supabase
-            .from('atleta_club_hist')
-            .select('club_id, fecha_inicio, fecha_fin')
-            .eq('atleta_id', newValue.atleta_id)
-            .order('fecha_inicio', { ascending: false, nullsFirst: false })
-            .limit(1)
-
-          if (onlyActive) {
-            query = query.is('fecha_fin', null)
-          }
-
-          const { data, error } = await query
-          if (error) throw error
-          return data?.[0] || null
-        }
-
-        const latestActive = await fetchLatestClub(true)
-        if (latestActive?.club_id) {
-          clubId = latestActive.club_id
-        } else {
-          const latestAny = await fetchLatestClub(false)
-          clubId = latestAny?.club_id || null
-        }
-      } catch (histFetchError) {
-        console.warn('No se pudo obtener historial de clubes:', histFetchError)
-      }
-
-      // Si no hay historial, usar el club más reciente según resultados
-      if (!clubId) {
-        const { data, error } = await supabase
-          .from('resultados')
-          .select('club_id')
-          .eq('atleta_id', newValue.atleta_id)
-          .order('fecha', { ascending: false, nullsFirst: false })
-          .limit(1)
-
-        if (error) throw error
-        clubId = data?.[0]?.club_id || null
-      }
-
-      if (!clubId) return
-
-      let resolvedClub = options.clubes.find((club) => club.club_id === clubId)
-
-      if (!resolvedClub) {
-        const { data: clubData, error: clubError } = await supabase
-          .from('clubes')
-          .select('club_id, nombre')
-          .eq('club_id', clubId)
-          .maybeSingle()
-
-        if (clubError) throw clubError
-
-        if (clubData) {
-          resolvedClub = clubData
-          setOptions((prev) => {
-            if (prev.clubes.some((club) => club.club_id === clubData.club_id)) {
-              return prev
-            }
-            return {
-              ...prev,
-              clubes: [...prev.clubes, clubData]
-            }
-          })
-        }
-      }
-
-      if (resolvedClub) {
-        setFormValues((prev) => ({ ...prev, club: resolvedClub }))
-      }
-    } catch (error) {
-      console.warn('No se pudo asignar el club automáticamente:', error)
-    } finally {
-      setAutoAssigningClub(false)
-    }
+    if (!newValue?.atleta_id) return
+    const club = await getClubForAthlete(newValue.atleta_id)
+    if (club) setFormValues((prev) => ({ ...prev, club }))
   }
 
-  const handleSubmit = async () => {
-    if (!isFormValid) {
-      setSubmitError('Completa todos los campos obligatorios antes de guardar')
-      return
-    }
-
-    setSubmitLoading(true)
-    setSubmitError(null)
-    setSubmitSuccess(null)
-
-    let nextResultadoId = null
-
-    // Solo calcular ID si es nuevo registro
-    if (!resultToEdit) {
-      try {
-        nextResultadoId = await fetchNextResultadoId()
-      } catch (error) {
-        console.warn('No se pudo obtener el siguiente resultado_id:', error)
-        setSubmitError('No se pudo calcular el identificador del nuevo resultado. Inténtalo de nuevo.')
-        setSubmitLoading(false)
-        return
-      }
-    }
-
-    const payload = {
-      // Si editamos, no cambiamos el resultado_id
-      ...(resultToEdit ? {} : { resultado_id: nextResultadoId }),
-      atleta_id: formValues.atleta.atleta_id,
-      club_id: formValues.club.club_id,
-      prueba_id: formValues.prueba.prueba_id,
-      categoria_id: formValues.categoria.categoria_id,
-      fecha: formValues.fecha,
-      anio: formValues.anio || (formValues.fecha ? dayjs(formValues.fecha).year() : null),
-      mes: formValues.mes || (formValues.fecha ? dayjs(formValues.fecha).month() + 1 : null),
-      marca_texto: formValues.marcaTexto.trim(),
-      marca_valor:
-        formValues.marcaValor === '' || formValues.marcaValor === null
-          ? null
-          : Number(formValues.marcaValor),
-      unidad: formValues.unidad.trim(),
-      genero: formValues.genero,
-      superficie: formValues.superficie
-    }
-
-    try {
-      let query = supabase.from('resultados')
-
-      if (resultToEdit) {
-        // UPDATE
-        query = query.update(payload).eq('resultado_id', resultToEdit.resultado_id)
-      } else {
-        // INSERT
-        query = query.insert([payload])
-      }
-
-      const { data, error } = await query
-        .select(
-          'resultado_id, atleta_id, club_id, prueba_id, categoria_id, fecha, anio, mes, marca_texto, marca_valor, unidad, genero, superficie'
-        )
-        .single()
-
-      if (error) throw error
-
-      setSubmitSuccess(resultToEdit ? 'Resultado actualizado correctamente' : 'Resultado añadido correctamente')
-
-      // Dispatch evento para refrescar (sirve tanto para Add como Edit si la vista escucha 'resultadoCreado' o similar)
-      window.dispatchEvent(new CustomEvent('resultadoCreado', { detail: data }))
-
-      onSuccess?.(data)
-      if (!resultToEdit) {
-        resetForm() // Solo limpiar si era añadir nuevo, si es edit se cierra el dialog habitualmente
-      }
-    } catch (error) {
-      console.error('Error al guardar resultado:', error)
-      setSubmitError(error.message || 'No se pudo guardar el resultado')
-    } finally {
-      setSubmitLoading(false)
-    }
+  const handlePruebaChange = (newValue) => {
+    setFormValues((prev) => ({
+      ...prev,
+      prueba: newValue,
+      unidad: newValue?.unidad_default || prev.unidad
+    }))
   }
 
   return (
-    <Modal.Root
-      open={open}
-      onClose={handleClose}
-      maxWidth="md"
-    >
-      {/* Using specific styling to match header pattern but using Modal structure */}
+    <Modal.Root open={open} onClose={handleClose} maxWidth="md">
       <Modal.Header onClose={handleClose}>
         <Stack direction="row" alignItems="center" gap={1}>
           <TbCircuitCapacitorPolarized size={24} />
@@ -555,194 +190,55 @@ function AddResultDialog({ open, onClose, onSuccess, resultToEdit = null }) {
       </Modal.Header>
       <Modal.Body>
         <Stack spacing={2}>
-
-          {submitError && <Alert severity="error">{submitError}</Alert>}
+          {(submitError || optionsError) && (
+            <Alert severity="error">{submitError || optionsError}</Alert>
+          )}
           {submitSuccess && <Alert severity="success">{submitSuccess}</Alert>}
 
-          <Stack spacing={2}>
-            <Autocomplete
-              value={formValues.atleta}
-              onChange={handleAthleteChange}
-              options={options.atletas}
-              loading={optionsLoading || athleteSearchLoading}
-              inputValue={atletaInputValue}
-              onInputChange={(_, value) => setAtletaInputValue(value)}
-              filterOptions={(opts) => opts}
-              getOptionLabel={(option) =>
-                option?.nombre
-                  ? `${option.nombre}${option.licencia ? ` · ${option.licencia}` : ''}`
-                  : ''
-              }
-              isOptionEqualToValue={(option, value) =>
-                option?.atleta_id === value?.atleta_id
-              }
-              renderInput={(params) => (
-                <Input
-                  {...params}
-                  label="Nombre del atleta"
-                  required
-                  InputProps={{
-                    ...params.InputProps,
-                    endAdornment: (
-                      <>
-                        {optionsLoading ? <CircularProgress size={20} /> : null}
-                        {params.InputProps.endAdornment}
-                      </>
-                    )
-                  }}
-                />
-              )}
-            />
-
-            <Autocomplete
-              value={formValues.club}
-              onChange={(_, newValue) => {
-                setFormValues((prev) => ({ ...prev, club: newValue }))
-              }}
-              options={options.clubes}
-              loading={optionsLoading || autoAssigningClub}
-              getOptionLabel={(option) => option?.nombre || ''}
-              isOptionEqualToValue={(option, value) => option?.club_id === value?.club_id}
-              renderInput={(params) => (
-                <Input
-                  {...params}
-                  label="Club"
-                  required
-                  InputProps={{
-                    ...params.InputProps,
-                    endAdornment: (
-                      <>
-                        {optionsLoading ? <CircularProgress size={20} /> : null}
-                        {params.InputProps.endAdornment}
-                      </>
-                    )
-                  }}
-                />
-              )}
-            />
-
-            <Autocomplete
-              value={formValues.prueba}
-              onChange={(_, newValue) => {
-                setFormValues((prev) => ({
-                  ...prev,
-                  prueba: newValue,
-                  unidad: newValue?.unidad_default || prev.unidad
-                }))
-              }}
-              options={filteredPruebas}
-              loading={optionsLoading}
-              filterOptions={pruebaFilter}
-              inputValue={pruebaInputValue}
-              onInputChange={(_, value) => setPruebaInputValue(value)}
-              getOptionLabel={(option) => option?.nombre || ''}
-              isOptionEqualToValue={(option, value) =>
-                option?.prueba_id === value?.prueba_id
-              }
-              renderInput={(params) => (
-                <Input
-                  {...params}
-                  label="Prueba disputada"
-                  required
-                  InputProps={{
-                    ...params.InputProps,
-                    endAdornment: (
-                      <>
-                        {optionsLoading ? <CircularProgress size={20} /> : null}
-                        {params.InputProps.endAdornment}
-                      </>
-                    )
-                  }}
-                />
-              )}
-            />
-
-            <Autocomplete
-              value={formValues.categoria}
-              onChange={(_, newValue) => {
-                setFormValues((prev) => ({ ...prev, categoria: newValue }))
-              }}
-              options={options.categorias}
-              loading={optionsLoading}
-              getOptionLabel={(option) => option?.nombre || ''}
-              isOptionEqualToValue={(option, value) =>
-                option?.categoria_id === value?.categoria_id
-              }
-              renderInput={(params) => (
-                <Input
-                  {...params}
-                  label="Categoría"
-                  required
-                  InputProps={{
-                    ...params.InputProps,
-                    endAdornment: (
-                      <>
-                        {optionsLoading ? <CircularProgress size={20} /> : null}
-                        {params.InputProps.endAdornment}
-                      </>
-                    )
-                  }}
-                />
-              )}
-            />
-          </Stack>
+          <AthleteClubFields
+            atletaValue={formValues.atleta}
+            onAthleteChange={handleAthleteChange}
+            atletas={atletas}
+            athleteSearchLoading={athleteSearchLoading}
+            optionsLoading={optionsLoading}
+            atletaInputValue={atletaInputValue}
+            onAtletaInputChange={setAtletaInputValue}
+            clubValue={formValues.club}
+            onClubChange={(newValue) => setFormValues((prev) => ({ ...prev, club: newValue }))}
+            clubes={clubes}
+            autoAssigning={autoAssigning}
+          />
 
           <Divider />
 
-          <Input
-            label="Fecha"
-            type="date"
-            value={formValues.fecha}
-            onChange={(event) => handleDateChange(event.target.value)}
-            required
-            InputLabelProps={{ shrink: true }}
-            fullWidth
+          <PruebaCategoriaFields
+            pruebaValue={formValues.prueba}
+            onPruebaChange={handlePruebaChange}
+            filteredPruebas={filteredPruebas}
+            pruebaFilter={pruebaFilter}
+            pruebaInputValue={pruebaInputValue}
+            onPruebaInputChange={setPruebaInputValue}
+            optionsLoading={optionsLoading}
+            categoriaValue={formValues.categoria}
+            onCategoriaChange={(newValue) =>
+              setFormValues((prev) => ({ ...prev, categoria: newValue }))
+            }
+            categorias={categorias}
           />
 
-          <Stack spacing={2} direction={{ xs: 'column', sm: 'row' }}>
-            <Input
-              label="Género"
-              select
-              value={formValues.genero}
-              onChange={(event) =>
-                setFormValues((prev) => ({ ...prev, genero: event.target.value }))
-              }
-              required
-              fullWidth
-            >
-              {GENERO_OPTIONS.map((option) => (
-                <MenuItem key={option.value} value={option.value}>
-                  {option.label}
-                </MenuItem>
-              ))}
-            </Input>
+          <Divider />
 
-            <Input
-              label="Superficie"
-              select
-              value={formValues.superficie}
-              onChange={(event) =>
-                setFormValues((prev) => ({ ...prev, superficie: event.target.value }))
-              }
-              required
-              fullWidth
-            >
-              {SUPERFICIE_OPTIONS.map((option) => (
-                <MenuItem key={option.value} value={option.value}>
-                  {option.label}
-                </MenuItem>
-              ))}
-            </Input>
-          </Stack>
-
-          <Input
-            label="Marca (texto oficial)"
-            value={formValues.marcaTexto}
-            onChange={(event) => handleMarcaTextoChange(event.target.value)}
-            placeholder="Ej. 2:11.96 o 11.23"
-            helperText="Se calculará automáticamente el valor numérico para almacenar en la base de datos."
-            required
-            fullWidth
+          <MarcaFields
+            fecha={formValues.fecha}
+            onFechaChange={handleDateChange}
+            genero={formValues.genero}
+            onGeneroChange={(value) => setFormValues((prev) => ({ ...prev, genero: value }))}
+            superficie={formValues.superficie}
+            onSuperficieChange={(value) =>
+              setFormValues((prev) => ({ ...prev, superficie: value }))
+            }
+            marcaTexto={formValues.marcaTexto}
+            onMarcaTextoChange={handleMarcaTextoChange}
           />
         </Stack>
       </Modal.Body>
@@ -756,7 +252,7 @@ function AddResultDialog({ open, onClose, onSuccess, resultToEdit = null }) {
           Cancelar
         </Button>
         <Button
-          onClick={handleSubmit}
+          onClick={() => submit(formValues, isFormValid)}
           variant="primary"
           color="secondary"
           startIcon={<TbCheck />}
@@ -771,5 +267,3 @@ function AddResultDialog({ open, onClose, onSuccess, resultToEdit = null }) {
 }
 
 export default AddResultDialog
-
-

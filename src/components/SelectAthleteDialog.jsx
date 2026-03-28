@@ -4,33 +4,18 @@ import { TbX, TbCheck, TbUser } from 'react-icons/tb'
 import AthleteSearch from './AthleteSearch'
 import { Modal, Button, Typography } from './ui'
 import SelectedAthleteCard from './SelectedAthleteCard'
-
-// Función helper para cargar desde localStorage de forma síncrona
-const STORAGE_KEY = 'selectedAthlete'
-function loadFromStorage() {
-    try {
-        const stored = localStorage.getItem(STORAGE_KEY)
-        if (stored) {
-            return JSON.parse(stored)
-        }
-    } catch (error) {
-        console.error('Error al cargar atleta desde localStorage:', error)
-        localStorage.removeItem(STORAGE_KEY)
-    }
-    return null
-}
+import { getSelectedAthlete, setSelectedAthlete } from '../store/selectedAthleteStore'
 
 function SelectAthleteDialog({ open, onClose, onSelect }) {
     const [tempSelectedAthlete, setTempSelectedAthlete] = useState(null)
-    // We need to know who is 'currently' selected to default the temp selection or highlight
-    const [currentAthlete, setCurrentAthlete] = useState(loadFromStorage())
+    const [currentAthlete, setCurrentAthlete] = useState(getSelectedAthlete)
 
     // Reset temp selection when opening
     useEffect(() => {
         if (open) {
-            const stored = loadFromStorage()
-            setCurrentAthlete(stored)
-            setTempSelectedAthlete(stored || null)
+            const current = getSelectedAthlete()
+            setCurrentAthlete(current)
+            setTempSelectedAthlete(current || null)
         }
     }, [open])
 
@@ -40,15 +25,7 @@ function SelectAthleteDialog({ open, onClose, onSelect }) {
 
     const handleConfirm = () => {
         if (tempSelectedAthlete) {
-            // Save globally
-            try {
-                localStorage.setItem(STORAGE_KEY, JSON.stringify(tempSelectedAthlete))
-                // Dispatch event for other components to know
-                window.dispatchEvent(new Event('localStorageChange'))
-            } catch (error) {
-                console.error('Error al guardar atleta:', error)
-            }
-
+            setSelectedAthlete(tempSelectedAthlete)
             if (onSelect) {
                 onSelect(tempSelectedAthlete)
             }

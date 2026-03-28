@@ -18,6 +18,8 @@ import TermsPage from './pages/TermsPage'
 import PrivacyPage from './pages/PrivacyPage'
 import AddAthleteDialog from './components/AddAthleteDialog'
 import { AuthProvider, useAuth } from './context/AuthContext'
+import { UIProvider, useUI } from './context/UIContext'
+import { getComparatorCache, setComparatorCache } from './store/comparatorStore'
 import CircularProgress from '@mui/material/CircularProgress'
 import NotificationBell from './components/NotificationBell'
 
@@ -106,31 +108,17 @@ function AppContent() {
 
 
   const handleAddAthlete = (athlete) => {
-    try {
-      const stored = localStorage.getItem('comparatorAthletes')
-      const comparators = stored ? JSON.parse(stored) : []
-      const updated = [...comparators, athlete]
-      localStorage.setItem('comparatorAthletes', JSON.stringify(updated))
-      // Disparar evento personalizado para que SeguimientoPage se actualice
-      window.dispatchEvent(new Event('comparatorAthletesChanged'))
-    } catch (error) {
-      console.error('Error al añadir atleta:', error)
+    const current = getComparatorCache()
+    if (!current.some(c => c.atleta_id === athlete.atleta_id)) {
+      setComparatorCache([...current, athlete])
     }
   }
 
-  // Handlers para los botones de AnalisisPage
-  const handleAddMeasurement = () => {
-    window.dispatchEvent(new Event('openAddMeasurementDialog'))
-  }
+  const { setAddMeasurementOpen, setViewMeasurementsOpen, setAddEventOpen } = useUI()
 
-  const handleViewMeasurements = () => {
-    window.dispatchEvent(new Event('openViewMeasurementsDialog'))
-  }
-
-  // Handler para el botón de CalendarioPage
-  const handleAddEvent = () => {
-    window.dispatchEvent(new Event('openAddEventDialog'))
-  }
+  const handleAddMeasurement = () => setAddMeasurementOpen(true)
+  const handleViewMeasurements = () => setViewMeasurementsOpen(true)
+  const handleAddEvent = () => setAddEventOpen(true)
 
   return (
     <Box
@@ -257,7 +245,9 @@ function App() {
       }}
     >
       <AuthProvider>
-        <AppContent />
+        <UIProvider>
+          <AppContent />
+        </UIProvider>
       </AuthProvider>
     </Router>
   )

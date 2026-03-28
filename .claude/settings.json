@@ -1,0 +1,46 @@
+{
+  "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cd /Users/albert/Documents/athlete-app && npm run build 2>&1 | tail -20",
+            "timeout": 120,
+            "statusMessage": "Verificando build..."
+          },
+          {
+            "type": "command",
+            "command": "LOG=\"/Users/albert/Documents/athlete-app/docs/boveda-athlete-app/04_BITACORA/_session_log.md\"; [ ! -f \"$LOG\" ] && printf '# Log de Sesión Automático\\n\\n' > \"$LOG\"; printf '\\n---\\n**Sesión terminada:** %s\\n' \"$(date '+%Y-%m-%d %H:%M:%S')\" >> \"$LOG\" 2>/dev/null || true",
+            "timeout": 10,
+            "statusMessage": "Marcando fin de sesión en bóveda..."
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "jq -r '.tool_input.file_path // \"\"' | { read -r f; [ -n \"$f\" ] && echo \"$f\" | grep -qE '\\.(js|jsx)$' && cd /Users/albert/Documents/athlete-app && npx eslint \"$f\" 2>&1 | head -30; } 2>/dev/null || true",
+            "timeout": 30,
+            "statusMessage": "Lint..."
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "dt=$(date '+%Y-%m-%d %H:%M'); cmd=$(jq -r '.tool_input.command // \"\"'); echo \"$cmd\" | grep -qE 'npm (test|run build|run lint|run test:coverage)' && { LOG=\"/Users/albert/Documents/athlete-app/docs/boveda-athlete-app/04_BITACORA/_session_log.md\"; [ ! -f \"$LOG\" ] && printf '# Log de Sesión Automático\\n\\n' > \"$LOG\"; printf -- '- %s `%s`\\n' \"$dt\" \"${cmd:0:120}\" >> \"$LOG\"; } 2>/dev/null; exit 0",
+            "timeout": 10,
+            "statusMessage": "Registrando en bóveda..."
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -29,7 +29,7 @@ function loadSelectedAthlete() {
     }
 }
 
-function MarksManagementDialog({ open, onClose }) {
+function MarksManagementDialog({ open, onClose, onResultChanged }) {
 
     const [athlete, setAthlete] = useState(null)
     const [marks, setMarks] = useState([])
@@ -126,11 +126,8 @@ function MarksManagementDialog({ open, onClose }) {
 
             if (error) throw error
 
-            // Remove from local list
             setMarks(prev => prev.filter(m => m.resultado_id !== markId))
-
-            // Notify other components
-            window.dispatchEvent(new Event('resultadoCreado')) // Reusing this event to trigger refreshes
+            onResultChanged?.()
 
         } catch (err) {
             alert('Error al eliminar la marca: ' + err.message)
@@ -142,10 +139,10 @@ function MarksManagementDialog({ open, onClose }) {
     const handleEditSuccess = () => {
         setEditDialogOpen(false)
         setResultToEdit(null)
-        // Refresh list
         if (athlete) {
             fetchMarks(athlete)
         }
+        onResultChanged?.()
     }
 
     const handleEditClose = () => {

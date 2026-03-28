@@ -19,26 +19,13 @@ import AddComparatorDialog from '../components/AddComparatorDialog'
 import MarksManagementDialog from '../components/MarksManagementDialog'
 import AddResultDialog from '../components/AddResultDialog'
 import NextEventCard from '../components/NextEventCard'
-import { getComparatorCache, setComparatorCache } from '../store/comparatorStore'
-
-const STORAGE_KEY = 'selectedAthlete'
-
-function loadSelectedAthlete() {
-  try {
-    const stored = localStorage.getItem(STORAGE_KEY)
-    if (stored) {
-      return JSON.parse(stored)
-    }
-  } catch (error) {
-    console.error('Error al cargar atleta:', error)
-  }
-  return null
-}
+import { setComparatorCache, useComparatorAthletes } from '../store/comparatorStore'
+import { useSelectedAthlete, setSelectedAthlete } from '../store/selectedAthleteStore'
 
 const SeguimientoPage = () => {
-  const [comparatorAthletes, setComparatorAthletes] = useState(() => getComparatorCache())
+  const selectedAthleteState = useSelectedAthlete()
+  const comparatorAthletes = useComparatorAthletes()
   const [resultsRefreshKey, setResultsRefreshKey] = useState(0)
-  const [selectedAthleteState, setSelectedAthleteState] = useState(() => loadSelectedAthlete())
 
   // Data fetching hook for profile
   const { profile: selectedAthlete } = useAthleteProfile(selectedAthleteState?.atleta_id)
@@ -65,41 +52,16 @@ const SeguimientoPage = () => {
     }
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Store the enriched athlete back into localStorage
+  // Enriquecer el atleta en el store cuando el perfil cargue datos adicionales (club, fecha)
   useEffect(() => {
     if (selectedAthlete && selectedAthleteState) {
-       const isEnriched = selectedAthlete.club && !selectedAthleteState.club
-       const isUpdated = isEnriched || selectedAthlete.fecha_nacimiento !== selectedAthleteState.fecha_nacimiento
-       if (isUpdated) {
-          const enriched = { ...selectedAthleteState, ...selectedAthlete }
-          setSelectedAthleteState(enriched)
-          try {
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(enriched))
-          } catch (storageError) {
-             console.warn('Could not save to localStorage', storageError)
-          }
-       }
+      const isEnriched = selectedAthlete.club && !selectedAthleteState.club
+      const isUpdated = isEnriched || selectedAthlete.fecha_nacimiento !== selectedAthleteState.fecha_nacimiento
+      if (isUpdated) {
+        setSelectedAthlete({ ...selectedAthleteState, ...selectedAthlete })
+      }
     }
   }, [selectedAthlete, selectedAthleteState])
-
-  useEffect(() => {
-    const handleResultadoCreado = () => {
-      setResultsRefreshKey((prev) => prev + 1)
-    }
-
-    // Also listen for changes in selected athlete from other tabs/windows or dialogs
-    const handleStorageChange = () => {
-      setSelectedAthleteState(loadSelectedAthlete())
-    }
-
-    window.addEventListener('resultadoCreado', handleResultadoCreado)
-    window.addEventListener('localStorageChange', handleStorageChange)
-
-    return () => {
-      window.removeEventListener('resultadoCreado', handleResultadoCreado)
-      window.removeEventListener('localStorageChange', handleStorageChange)
-    }
-  }, [])
 
   // Menu handlers
   const handleMenuOpen = (event) => {
@@ -132,20 +94,16 @@ const SeguimientoPage = () => {
 
   // Dialog completion handlers
   const handleAthleteSelected = (athlete) => {
-    setSelectedAthleteState(athlete)
+    setSelectedAthlete(athlete)
   }
 
   const handleComparatorAdded = (athlete) => {
-    const newComparators = [...comparatorAthletes, athlete]
-    setComparatorAthletes(newComparators)
-    setComparatorCache(newComparators)
+    setComparatorCache([...comparatorAthletes, athlete])
   }
 
   const handleRemoveComparator = (atletaId) => {
     handleMenuClose()
-    const newComparators = comparatorAthletes.filter(c => c.atleta_id !== atletaId)
-    setComparatorAthletes(newComparators)
-    setComparatorCache(newComparators)
+    setComparatorCache(comparatorAthletes.filter(c => c.atleta_id !== atletaId))
   }
 
   return (
@@ -331,13 +289,7 @@ const SeguimientoPage = () => {
           <MenuItem
             key={athlete.atleta_id}
             onClick={() => {
-              try {
-                localStorage.setItem(STORAGE_KEY, JSON.stringify(athlete))
-                window.dispatchEvent(new Event('localStorageChange'))
-              } catch (e) {
-                console.error('Error saving favorite athlete:', e)
-              }
-              setSelectedAthleteState(athlete)
+              setSelectedAthlete(athlete)
               setFavAnchorEl(null)
             }}
           >
@@ -369,12 +321,16 @@ const SeguimientoPage = () => {
       <MarksManagementDialog
         open={marksOpen}
         onClose={() => setMarksOpen(false)}
+        onResultChanged={() => setResultsRefreshKey((prev) => prev + 1)}
       />
 
       <AddResultDialog
         open={addResultOpen}
         onClose={() => setAddResultOpen(false)}
-        onSuccess={() => setAddResultOpen(false)}
+        onSuccess={() => {
+          setAddResultOpen(false)
+          setResultsRefreshKey((prev) => prev + 1)
+        }}
       />
 
     </Box>
