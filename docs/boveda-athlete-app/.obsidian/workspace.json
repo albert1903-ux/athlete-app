@@ -184,8 +184,14 @@
       "bases:Crear nueva base": false
     }
   },
-  "active": "2e5cf4aade3ae1d9",
+  "active": "8092ed0516ffbd10",
   "lastOpenFiles": [
+    "04_BITACORA/_session_log.md",
+    "04_BITACORA/2026-03-29-Arquitectura-SaaS-Onboarding.md",
+    "04_BITACORA/2026-03-28-Semana4-Refactoring-Componentes-Grandes.md",
+    "04_BITACORA/2026-03-28-Semana3-Auditoria-RLS-Hardening.md",
+    "04_BITACORA/2026-03-28-Skill-ObsidianSync-Y-Hooks-Documentacion.md",
+    "04_BITACORA/2026-03-27-Analisis-y-Hoja-de-Ruta.md",
     "04_BITACORA/2026-03-11-Migracion-Roles.md",
     "04_BITACORA/2026-03-10-Refactor-Hooks-Skills.md",
     "01_ARQUITECTURA/Estructura-Datos.md",
@@ -209,11 +215,6 @@
     "05_FUNCIONAL",
     "03_GUIAS_Y_OPS/Convenciones-Codigo.md",
     "00_META/Stack-Tecnico.md",
-    "Bienvenido.md",
-    "03_GUIAS_Y_OPS/Instalacion.md",
-    "03_GUIAS_Y_OPS/Despliegue.md",
-    "01_ARQUITECTURA/Diagramas-Mermaid.md",
-    "01_ARQUITECTURA/Decisiones-Diseño.md",
     "99_RECURSOS",
     "04_BITACORA",
     "03_GUIAS_Y_OPS",

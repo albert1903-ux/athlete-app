@@ -22,11 +22,10 @@ import {
 import { Button, Modal, Input } from './ui'
 import { TbPlus, TbPencil, TbTrash, TbBarbell, TbHeartPlus } from 'react-icons/tb'
 import { supabase } from '../lib/supabase'
-
-const STORAGE_KEY = 'selectedAthlete'
+import { useSelectedAthlete } from '../store/selectedAthleteStore'
 
 function AthleteBodyMeasurements() {
-  const [selectedAthlete, setSelectedAthlete] = useState(null)
+  const selectedAthlete = useSelectedAthlete()
   const [measurements, setMeasurements] = useState([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
@@ -40,39 +39,6 @@ function AthleteBodyMeasurements() {
     peso: '',
     envergadura: ''
   })
-
-  // Cargar atleta seleccionado desde localStorage
-  useEffect(() => {
-    const loadAthlete = () => {
-      try {
-        const stored = localStorage.getItem(STORAGE_KEY)
-        if (stored) {
-          const athlete = JSON.parse(stored)
-          setSelectedAthlete(athlete)
-        } else {
-          setSelectedAthlete(null)
-        }
-      } catch (error) {
-        console.error('Error al cargar atleta:', error)
-        setSelectedAthlete(null)
-      }
-    }
-
-    loadAthlete()
-    const interval = setInterval(loadAthlete, 500)
-
-    const handleStorageChange = (e) => {
-      if (e.key === STORAGE_KEY) {
-        loadAthlete()
-      }
-    }
-    window.addEventListener('storage', handleStorageChange)
-
-    return () => {
-      clearInterval(interval)
-      window.removeEventListener('storage', handleStorageChange)
-    }
-  }, [])
 
   // Cargar mediciones cuando cambia el atleta
   useEffect(() => {

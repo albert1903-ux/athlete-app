@@ -16,8 +16,7 @@ import {
 import { TbHeartbeat } from 'react-icons/tb'
 import { Modal, Button, Typography } from './ui'
 import { supabase } from '../lib/supabase'
-
-const STORAGE_KEY = 'selectedAthlete'
+import { useSelectedAthlete } from '../store/selectedAthleteStore'
 
 // Función para obtener el color del IMC según su valor
 const getIMCStatus = (imc) => {
@@ -56,67 +55,13 @@ const formatNumber = (value, decimals = 1) => {
 }
 
 function ViewMeasurementsDialog({ open, onClose }) {
-  const [selectedAthlete, setSelectedAthlete] = useState(null)
+  const selectedAthlete = useSelectedAthlete()
   const [measurements, setMeasurements] = useState([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
   const [page, setPage] = useState(0)
   const [rowsPerPage, setRowsPerPage] = useState(10)
-  const lastAthleteIdRef = useRef(null)
   const isLoadingRef = useRef(false)
-
-  // Cargar atleta seleccionado desde localStorage
-  // Solo hacer polling cuando el diálogo está abierto
-  useEffect(() => {
-    if (!open) {
-      // Limpiar referencia cuando se cierra el diálogo
-      lastAthleteIdRef.current = null
-      return
-    }
-
-    const loadAthlete = () => {
-      try {
-        const stored = localStorage.getItem(STORAGE_KEY)
-        if (stored) {
-          const athlete = JSON.parse(stored)
-          // Solo actualizar si cambió el atleta_id para evitar re-renders innecesarios
-          if (athlete.atleta_id !== lastAthleteIdRef.current) {
-            lastAthleteIdRef.current = athlete.atleta_id
-            setSelectedAthlete(athlete)
-          }
-        } else {
-          if (lastAthleteIdRef.current !== null) {
-            lastAthleteIdRef.current = null
-            setSelectedAthlete(null)
-          }
-        }
-      } catch (error) {
-        console.error('Error al cargar atleta:', error)
-        if (lastAthleteIdRef.current !== null) {
-          lastAthleteIdRef.current = null
-          setSelectedAthlete(null)
-        }
-      }
-    }
-
-    // Cargar inmediatamente
-    loadAthlete()
-
-    // Solo hacer polling cuando el diálogo está abierto (cada 2 segundos para reducir carga)
-    const interval = setInterval(loadAthlete, 2000)
-
-    const handleStorageChange = (e) => {
-      if (e.key === STORAGE_KEY) {
-        loadAthlete()
-      }
-    }
-    window.addEventListener('storage', handleStorageChange)
-
-    return () => {
-      clearInterval(interval)
-      window.removeEventListener('storage', handleStorageChange)
-    }
-  }, [open])
 
   // Función para cargar mediciones (memoizada para evitar recreaciones)
   const fetchMeasurements = useCallback(async (atletaId) => {

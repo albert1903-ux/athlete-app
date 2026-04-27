@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate, Link as RouterLink } from 'react-router-dom';
+import { useNavigate, useSearchParams, Link as RouterLink } from 'react-router-dom';
 import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
@@ -12,6 +12,8 @@ import { FcGoogle } from 'react-icons/fc';
 
 export default function LoginPage() {
     const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
+    const redirectTo = searchParams.get('redirect') || '/seguimiento';
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState(null);
@@ -30,7 +32,7 @@ export default function LoginPage() {
         if (signInError) {
             setError(signInError.message);
         } else {
-            navigate('/seguimiento', { replace: true });
+            navigate(decodeURIComponent(redirectTo), { replace: true });
         }
         setLoading(false);
     };

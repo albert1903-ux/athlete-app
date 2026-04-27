@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '../lib/supabase'
+import { useAuth } from '../context/AuthContext'
 
 /**
  * Hook to manage the current user's favourite athletes.
@@ -11,6 +12,7 @@ import { supabase } from '../lib/supabase'
  *   loading       – boolean
  */
 export function useFavorites() {
+    const { user } = useAuth()
     const [favorites, setFavorites] = useState([])
     const [loading, setLoading] = useState(true)
 
@@ -45,6 +47,26 @@ export function useFavorites() {
             }))
 
             if (base.length === 0) {
+                // Trainers: auto-populate favorites with their group athletes on first load
+                if (user?.role === 'trainer') {
+                    const { data: trainerAthletes } = await supabase.rpc('get_trainer_athletes')
+                    if (trainerAthletes?.length > 0) {
+                        const rows = trainerAthletes.map((a) => ({ atleta_id: a.atleta_id }))
+                        await supabase
+                            .from('atletas_favoritos')
+                            .upsert(rows, { onConflict: 'user_id,atleta_id', ignoreDuplicates: true })
+                        const defaultFavs = trainerAthletes.map((a) => ({
+                            atleta_id: a.atleta_id,
+                            nombre: a.nombre,
+                            fecha_nacimiento: a.fecha_nac,
+                            licencia: null,
+                            club: null,
+                        }))
+                        setFavorites(defaultFavs)
+                        setLoading(false)
+                        return
+                    }
+                }
                 setFavorites([])
                 setLoading(false)
                 return
@@ -108,7 +130,7 @@ export function useFavorites() {
         } finally {
             setLoading(false)
         }
-    }, [])
+    }, [user?.role])
 
     useEffect(() => {
         load()

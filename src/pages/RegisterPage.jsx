@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate, Link as RouterLink } from 'react-router-dom';
+import { useNavigate, useSearchParams, Link as RouterLink } from 'react-router-dom';
 import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
@@ -12,6 +12,8 @@ import { FcGoogle } from 'react-icons/fc';
 
 export default function RegisterPage() {
     const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
+    const redirectAfterVerification = searchParams.get('redirect');
     const [step, setStep] = useState(1);
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -130,10 +132,15 @@ export default function RegisterPage() {
                         <Typography variant="body1">
                             Haz clic en el enlace del correo para verificar tu dirección. Una vez verificado, podrás iniciar sesión (tu cuenta requerirá de aprobación previa).
                         </Typography>
+                        {redirectAfterVerification && (
+                            <Alert severity="info" sx={{ textAlign: 'left' }}>
+                                Tras iniciar sesión, completa el proceso accediendo de nuevo al enlace de invitación.
+                            </Alert>
+                        )}
                         <Button
                             variant="contained"
                             fullWidth
-                            onClick={() => navigate('/login')}
+                            onClick={() => navigate(redirectAfterVerification ? `/login?redirect=${encodeURIComponent(redirectAfterVerification)}` : '/login')}
                             sx={{
                                 py: 1.5,
                                 borderRadius: 2,

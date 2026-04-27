@@ -16,6 +16,7 @@ import RegisterPage from './pages/RegisterPage'
 import PendingApprovalPage from './pages/PendingApprovalPage'
 import TermsPage from './pages/TermsPage'
 import PrivacyPage from './pages/PrivacyPage'
+import AcceptInvitationPage from './pages/AcceptInvitationPage'
 import AddAthleteDialog from './components/AddAthleteDialog'
 import { AuthProvider, useAuth } from './context/AuthContext'
 import { UIProvider, useUI } from './context/UIContext'
@@ -83,7 +84,8 @@ function AppContent() {
   const isRegisterPage = location.pathname === '/register'
   const isPendingApprovalPage = location.pathname === '/pending-approval'
 
-  const hideChrome = isLoginPage || isRegisterPage || isPendingApprovalPage
+  const isJoinPage = location.pathname === '/join'
+  const hideChrome = isLoginPage || isRegisterPage || isPendingApprovalPage || isJoinPage
 
   // Función para obtener el título de la página actual
   const getPageTitle = () => {
@@ -213,6 +215,7 @@ function AppContent() {
         }}
       >
         <Routes>
+          <Route path="/join" element={<AcceptInvitationPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/terms" element={<TermsPage />} />
@@ -220,7 +223,7 @@ function AppContent() {
           <Route path="/pending-approval" element={user && !user.isApproved ? <PendingApprovalPage /> : <Navigate to="/seguimiento" replace />} />
           <Route path="/" element={<Navigate to="/seguimiento" replace />} />
           <Route path="/seguimiento" element={<ProtectedRoute><SeguimientoPage /></ProtectedRoute>} />
-          <Route path="/analisis" element={<RoleProtectedRoute allowedRoles={['admin']}><AnalisisPage /></RoleProtectedRoute>} />
+          <Route path="/analisis" element={<RoleProtectedRoute allowedRoles={['superadmin', 'club', 'trainer', 'athlete']}><AnalisisPage /></RoleProtectedRoute>} />
           <Route path="/calendario" element={<ProtectedRoute><CalendarioPage /></ProtectedRoute>} />
           <Route path="/mas" element={<ProtectedRoute><MasPage /></ProtectedRoute>} />
         </Routes>

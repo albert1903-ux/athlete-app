@@ -48,7 +48,7 @@ Aplicación de gestión deportiva de nicho bien definido: seguimiento de atletas
 | Calendario de eventos | ✅ Funcional |
 | Compartir calendario | ✅ Funcional |
 | Notificaciones | ✅ Funcional |
-| Tests automatizados | ✅ ≥80% cobertura hooks (64 tests) |
+| Tests automatizados | ✅ ≥80% cobertura hooks + 2 componentes (165 tests) |
 | CI/CD con gates de calidad | ❌ No existe |
 | Onboarding SaaS | ❌ Sin implementar |
 | Gestión de suscripciones | ❌ Sin implementar |
@@ -198,18 +198,44 @@ Aplicación de gestión deportiva de nicho bien definido: seguimiento de atletas
 
 ---
 
-### Semana 4 — Refactorización de componentes grandes
+### Semana 4 — Refactorización de componentes grandes ✅ COMPLETADA (2026-03-28)
 
-**Objetivo:** Ningún componente con más de 350 líneas. Usar `/split-component`.
+**Objetivo:** Ningún componente con más de 350 líneas. Resultado: 125 tests, todos pasando.
 
-| Componente | Líneas | Plan |
-|-----------|--------|------|
-| `AddResultDialog.jsx` | ~650 | Hook `usePruebas`, `useCategorias`; sub-componentes `PruebaSelector`, `FechaUbicacionFields`, `ValorInput` |
-| `AthleteResultsChart.jsx` | ~500 | Hook `useResultados`; sub-componentes `ChartFilters`, `ChartLegend` |
-| `RankingDialog.jsx` | ~400 | Hook `useRanking`; sub-componentes `RankingTable`, `RankingFilters` |
-| `AthleteSpiderChart.jsx` | ~380 | Hook `useSpiderData`; sub-componente `ComparatorLegend` |
+| Componente | Antes | Después | Hooks extraídos |
+|-----------|-------|---------|-----------------|
+| `AddResultDialog.jsx` | 773 | 269 | `useFormOptions`, `useAthleteSearch`, `useAutoAssignClub`, `useResultSubmit` |
+| `AthleteResultsChart.jsx` | 1522 | 137 | `useAthleteResultsChartData`, `useComparatorChartData`, `useCombinedChartData` |
+| `RankingDialog.jsx` | 558 | 112 | `useRankingYears`, `useRankingData` |
+| `AthleteSpiderChart.jsx` | 724 | 320 | `useAvailableCategories`, `useRadarChartData`, `useChartDimensions` |
 
-**Proceso:** Para cada componente: `/split-component` → plan → aprobación → ejecución → `npm run build` → `npm test`.
+---
+
+### Semana 4b — Gestión SaaS: Organizaciones y Usuarios ✅ COMPLETADA (2026-04-01/02)
+
+**Objetivo:** Funcionalidades superadmin para gestionar organizaciones y usuarios del sistema.
+
+#### Features implementadas
+
+| Funcionalidad | Componente | RPCs Supabase |
+|--------------|-----------|---------------|
+| Editar nombre + club de una org | `OrganizationsDialog` | `update_organization(p_club_id, p_name, p_org_id)` |
+| Cambiar usuario de contacto de una org | `OrganizationsDialog` | `update_organization_contact(p_contact_user_id, p_org_id)`, `get_club_users_for_club(p_club_id)` |
+| Deshabilitar organización (con confirmación) | `OrganizationsDialog` | `disable_organization(p_org_id)` |
+| Habilitar organización (con confirmación) | `OrganizationsDialog` | `enable_organization(p_org_id)` |
+| Asignar club a usuario club/trainer | `RoleManagementDialog` | `update_user_club(p_club_id, p_target_user_id)` |
+
+**Nota crítica:** PostgREST envía params en orden **alfabético**. Todos los RPCs con múltiples params deben definirlos en ese orden en SQL.
+
+#### Tests escritos (2026-04-02)
+
+| Archivo | Tests |
+|---------|-------|
+| `src/test/hooks/useScopedAthletes.test.jsx` | 14 |
+| `src/test/components/OrganizationsDialog.test.jsx` | 14 |
+| `src/test/components/RoleManagementDialog.test.jsx` | 12 |
+
+**Total acumulado:** 165 tests · Ver bitácora `2026-04-02-Tests-Componentes-OrgsDialog-RolesDialog.md` para detalles.
 
 ---
 

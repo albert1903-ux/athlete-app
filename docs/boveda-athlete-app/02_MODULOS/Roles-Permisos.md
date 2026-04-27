@@ -4,42 +4,89 @@ description: "Matriz de roles y control de acceso basado en roles."
 tags: [roles, permisos, rbac, seguridad]
 ---
 
-# 🛂 Matriz de Roles y Permisos (RBAC)
+# Matriz de Roles y Permisos (RBAC)
 
-Este documento detalla las acciones permitidas y denegadas dentro de la plataforma para los roles disponibles. En caso de expandir el sistema a futuros roles (e.g. `editor`, `supervisor`), este listado servirá como base escalable.
-
----
-
-## 🔑 Rol: Administrador (`admin`)
-
-El rol de mayor jerarquía. Otorga privilegios plenos y sin restricciones en toda la aplicación. Este es el comportamiento por defecto de la app inicial.
-
-| Página / Módulo | Acciones Permitidas |
-| :--- | :--- |
-| **Global** | - Iniciar sesión.<br>- Navegar por el *Bottom Navigation Bar* completo. |
-| **Seguimiento** | - Ver gráficas de progreso y comparar.<br>- Seleccionar atleta principal.<br>- Añadir y eliminar atletas comparadores.<br>- **Añadir nuevas marcas (resultados).**<br>- **Gestionar marcas (editar / borrar).**<br>- Visualizar "Próxima Competición". |
-| **Análisis** | - **Acceso completo a la página.**<br>- Añadir mediciones corporales.<br>- Ver historial y estadísticas físicas. |
-| **Calendario** | - Acceso completo.<br>- Crear nuevos eventos y recordatorios.<br>- Editar y eliminar eventos propios. |
-| **Más (Config.)**| - Gestión completa: Ver Atletas Favoritos, Editar Perfil, Configuración de la App, Ayuda, Acerca de.<br>- **Solicitudes de Acceso:** Aprobar o rechazar nuevos registros.<br>- **Gestión de Roles:** Ver todos los usuarios registrados y cambiar su rol (`admin` ↔ `consulta`).<br>- Cerrar Sesión. |
+Este documento detalla las acciones permitidas y denegadas dentro de la plataforma para los 5 roles disponibles.
 
 ---
 
-## 👁️ Rol: Consulta (`consulta`)
+## Roles del sistema
 
-Un rol orientado a la visualización y personalización de la experiencia local para un observador, sin privilegios para alterar las estadísticas o resultados compartidos (BBDD global).
-
-| Página / Módulo | Estado | Acciones Permitidas / Restringidas |
-| :--- | :---: | :--- |
-| **Global** | 🔵 | - Iniciar sesión.<br> - Navegar por Seguimiento, Calendario y Más. (Botón de "Análisis" **oculto**). |
-| **Seguimiento** | 🟡 | ✅ Seleccionar atleta principal.<br>✅ Ver gráficas de progreso de lectura.<br>✅ Añadir/Quitar atletas a la compartiva local.<br>❌ **Restringido:** No aparece la opción de "Añadir marca".<br>❌ **Restringido:** No aparece la opción de "Gestionar marcas". |
-| **Análisis** | 🔴 | ❌ **Restringido:** Acceso denegado a la ruta `/analisis`. Redirige a Seguimiento si se fuerza la URL. |
-| **Calendario** | 🟢 | ✅ Acceso completo para gestionar el calendario personal vinculado a su usuario (crear, editar, eliminar eventos). Esto no altera datos de terceros. |
-| **Más (Config.)**| 🟢 | ✅ Gestión completa operativa de opciones locales (Atletas Favoritos manejados local o vinculados a su user id en BBDD, Perfil, Contraseñas, Cerrar Sesión).<br>❌ **Restringido:** Las opciones "Solicitudes de Acceso" y "Gestión de Roles" **no son visibles**. |
+| Rol | Valor en `app_metadata` | Descripción |
+|:----|:------------------------|:------------|
+| **Superadmin** | `superadmin` | Acceso total al sistema. Gestiona organizaciones, usuarios, roles |
+| **Club** | `club` | Administrador de un club. Gestiona entrenadores, grupos y atletas de su club |
+| **Entrenador** | `trainer` | Gestiona marcas y mediciones de los atletas de sus grupos asignados |
+| **Atleta** | `athlete` | Ve sus propias marcas (lectura). Puede añadir sus propias mediciones corporales |
+| **Consulta** | `consulta` | Solo lectura. Sin acceso a Análisis ni gestión de marcas |
 
 ---
 
-### Cómo expandir el tablero (Notas de futuro)
-Si en el futuro se requiriese un rol `entrenador_equipo` (que solo pueda "Gestionar marcas" de ciertos clubes), este modelo permite inyectar fácilmente una nueva columna. Las comprobaciones en React evaluarían algo como `if (userRoles.includes('entrenador_equipo') && checkClubPermission())`.
+## Matriz de permisos por módulo
 
-> **Nota sobre Gestión de Roles y Seguridad (`app_metadata` vs `user_metadata`):** 
-> Los roles determinantes (`admin`, `consulta`, y el `status` de aprobación) **nunca** deben vivir en `user_metadata`. Supabase permite a un usuario cliente actualizar libremente cualquier valor de su `user_metadata`, por lo que anclar políticas RLS a este campo provoca una vulnerabilidad de *Escalada de Privilegios*. Por ello, los roles en Atleta App se gestionan exclusivamente mutando e interrogando el `app_metadata` desde funciones RPC (`SECURITY DEFINER`) protegidas, garantizando que un usuario no pueda concederse a sí mismo privilegios arbitrariamente.
+| Módulo / Acción | Superadmin | Club | Entrenador | Atleta | Consulta |
+|:---|:---:|:---:|:---:|:---:|:---:|
+| **GLOBAL** | | | | | |
+| Iniciar sesión | ✅ | ✅ | ✅ | ✅ | ✅ |
+| Bottom Nav completo (incl. Análisis) | ✅ | ✅ | ✅ | ✅ | ❌ sin Análisis |
+| **SEGUIMIENTO** | | | | | |
+| Ver gráficas / comparar | ✅ todos | ✅ todos | ✅ todos | ✅ todos | ✅ todos |
+| Seleccionar atleta principal | ✅ todos | ✅ todos | ✅ todos | ✅ solo él | ✅ todos |
+| Añadir/quitar comparadores | ✅ | ✅ | ✅ | ✅ | ✅ |
+| **Añadir marcas** | ✅ cualquiera | ✅ su club | ✅ su grupo | ❌ | ❌ |
+| **Gestionar marcas** (editar/borrar) | ✅ cualquiera | ✅ su club | ✅ su grupo | ❌ | ❌ |
+| Próxima Competición | ✅ | ✅ | ✅ | ✅ | ✅ |
+| **ANÁLISIS** | | | | | |
+| Acceso a `/analisis` | ✅ | ✅ | ✅ | ✅ solo él | ❌ |
+| Añadir mediciones corporales | ✅ cualquiera | ✅ su club | ✅ su grupo | ✅ solo él | ❌ |
+| Ver historial/estadísticas | ✅ cualquiera | ✅ su club | ✅ su grupo | ✅ solo él | ❌ |
+| **CALENDARIO** | | | | | |
+| Gestionar eventos propios | ✅ | ✅ | ✅ | ✅ | ✅ |
+| Compartir/recibir calendario | ✅ | ✅ su club | ✅ su club | ❌ | ❌ |
+| **MÁS** | | | | | |
+| Atletas Favoritos / Perfil / Config | ✅ | ✅ | ✅ | ✅ | ✅ |
+| Solicitudes de Acceso | ✅ | ❌ | ❌ | ❌ | ❌ |
+| Gestión de Roles | ✅ | ❌ | ❌ | ❌ | ❌ |
+| Organizaciones (crear/listar) | ✅ | ❌ | ❌ | ❌ | ❌ |
+| Mi Organización (panel club) | ❌ | ✅ | ❌ | ❌ | ❌ |
+| Invitar entrenadores + asignar grupo | ❌ | ✅ | ❌ | ❌ | ❌ |
+| Gestionar atletas del grupo | ❌ | ✅ todos del club | ❌ | ❌ | ❌ |
+
+---
+
+## Modelo de datos para acceso basado en grupo
+
+```
+organizations ──(club_id)──▶ clubes
+     │
+     │ organization_id
+     ▼
+trainer_groups ──(trainer_user_id)──▶ auth.users
+     │
+     │ group_id
+     ▼
+group_athletes ──(atleta_id)──▶ atletas
+```
+
+- **`organizations.club_id`**: vincula la organización SaaS con el club deportivo
+- **`trainer_groups`**: grupos dentro de un club (SUB10, SUB12 Fem, etc.), cada uno asignado a un entrenador
+- **`group_athletes`**: atletas asignados a cada grupo
+
+---
+
+## Estado de implementación
+
+| Fase | Descripción | Estado |
+|:-----|:------------|:------:|
+| Fase 1 | Renombrar roles + nuevas tablas (trainer_groups, group_athletes) | ✅ Completada |
+| Fase 2 | RLS scoped por club/grupo en resultados y medidas_corporales | ✅ Completada |
+| Fase 3 | Frontend: crear organización vinculada a club existente | ✅ Completada |
+| Fase 4 | Frontend: panel Club ampliado (grupos, asignar entrenadores/atletas) | ✅ Completada |
+| Fase 5 | Frontend: vista scoped para Entrenador | ✅ Completada |
+| Fase 6 | Frontend: vista scoped para Atleta | ✅ Completada |
+| Fase 7 | Migración a producción: aplicar SQL, verificar RLS, smoke test end-to-end | Pendiente |
+
+---
+
+> **Nota sobre seguridad (`app_metadata` vs `user_metadata`):**
+> Los roles determinantes (`superadmin`, `club`, `trainer`, `athlete`, `consulta` y el `status` de aprobación) **nunca** deben vivir en `user_metadata`. Supabase permite a un usuario cliente actualizar libremente cualquier valor de su `user_metadata`, por lo que anclar políticas RLS a este campo provoca una vulnerabilidad de *Escalada de Privilegios*. Por ello, los roles en Athlete App se gestionan exclusivamente mutando e interrogando el `app_metadata` desde funciones RPC (`SECURITY DEFINER`) protegidas.
