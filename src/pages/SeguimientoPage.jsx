@@ -21,6 +21,7 @@ import AddResultDialog from '../components/AddResultDialog'
 import NextEventCard from '../components/NextEventCard'
 import { setComparatorCache, useComparatorAthletes } from '../store/comparatorStore'
 import { useSelectedAthlete, setSelectedAthlete } from '../store/selectedAthleteStore'
+import { useScopedAthletes } from '../hooks/useScopedAthletes'
 
 const SeguimientoPage = () => {
   const selectedAthleteState = useSelectedAthlete()
@@ -41,16 +42,26 @@ const SeguimientoPage = () => {
   const [selectAthleteOpen, setSelectAthleteOpen] = useState(false)
   const [addComparatorOpen, setAddComparatorOpen] = useState(false)
 
-  // Favorites
   const { favorites } = useFavorites()
   const { user } = useAuth()
+  const { scopedAthletes, loading: scopedLoading } = useScopedAthletes()
+  const isAthlete = user?.role === 'athlete'
+  const scopeAthleteIds = scopedAthletes?.map((a) => a.atleta_id) ?? null
 
-  // Initial load: if no athlete selected, open selection dialog
+  // Initial load for non-athlete roles: open selection dialog if nothing selected
   useEffect(() => {
-    if (!selectedAthleteState) {
+    if (!isAthlete && !selectedAthleteState) {
       setSelectAthleteOpen(true)
     }
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Athlete role: auto-select their own athlete record once it loads
+  useEffect(() => {
+    if (!isAthlete || scopedLoading) return
+    if (scopedAthletes?.length === 1 && !selectedAthleteState) {
+      setSelectedAthlete(scopedAthletes[0])
+    }
+  }, [isAthlete, scopedLoading, scopedAthletes]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // Enriquecer el atleta en el store cuando el perfil cargue datos adicionales (club, fecha)
   useEffect(() => {
@@ -105,6 +116,9 @@ const SeguimientoPage = () => {
     handleMenuClose()
     setComparatorCache(comparatorAthletes.filter(c => c.atleta_id !== atletaId))
   }
+
+  // Athlete with no linked record: show a clear message instead of an empty page
+  const athleteNotLinked = isAthlete && !scopedLoading && scopedAthletes?.length === 0
 
   return (
     <Box
@@ -194,7 +208,14 @@ const SeguimientoPage = () => {
           pb: 'calc(80px + env(safe-area-inset-bottom))' // Espacio reservado para BottomNavigation
         }}
       >
-        {effectiveAthlete ? (
+        {athleteNotLinked ? (
+          <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '200px' }}>
+            <Typography color="text.secondary" sx={{ textAlign: 'center' }}>
+              Tu cuenta aún no está vinculada a ningún perfil de atleta.<br />
+              Contacta con tu entrenador o club para activar tu perfil.
+            </Typography>
+          </Box>
+        ) : effectiveAthlete ? (
           <>
             {/* Próximo Competición */}
             <NextEventCard athlete={effectiveAthlete} />
@@ -214,8 +235,6 @@ const SeguimientoPage = () => {
                 comparatorAthletes={comparatorAthletes}
               />
             </Box>
-
-
           </>
         ) : (
           <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '200px' }}>
@@ -238,19 +257,22 @@ const SeguimientoPage = () => {
           sx: { borderRadius: 2, mt: 1, minWidth: 200 }
         }}
       >
-        <MenuItem onClick={() => handleAction('select_athlete')}>
-          <ListItemIcon><TbUser /></ListItemIcon>
-          Seleccionar atleta
-        </MenuItem>
+        {/* Athlete role: cannot select a different athlete */}
+        {!isAthlete && (
+          <MenuItem onClick={() => handleAction('select_athlete')}>
+            <ListItemIcon><TbUser /></ListItemIcon>
+            Seleccionar atleta
+          </MenuItem>
+        )}
 
-        {user?.role === 'admin' && (
+        {['superadmin', 'club', 'trainer'].includes(user?.role) && (
           <MenuItem onClick={() => handleAction('add_result')}>
             <ListItemIcon><TbCircuitCapacitorPolarized /></ListItemIcon>
             Añadir marca
           </MenuItem>
         )}
 
-        {user?.role === 'admin' && (
+        {['superadmin', 'club', 'trainer'].includes(user?.role) && (
           <MenuItem onClick={() => handleAction('marks')}>
             <ListItemIcon><TbList /></ListItemIcon>
             Gestionar marcas
@@ -304,12 +326,15 @@ const SeguimientoPage = () => {
         ))}
       </Menu>
 
-      {/* Dialogs */}
-      <SelectAthleteDialog
-        open={selectAthleteOpen}
-        onClose={() => setSelectAthleteOpen(false)}
-        onSelect={handleAthleteSelected}
-      />
+      {/* Dialogs — SelectAthleteDialog not available for athletes (they have exactly one profile) */}
+      {!isAthlete && (
+        <SelectAthleteDialog
+          open={selectAthleteOpen}
+          onClose={() => setSelectAthleteOpen(false)}
+          onSelect={handleAthleteSelected}
+          scopedAthletes={scopedAthletes}
+        />
+      )}
 
       <AddComparatorDialog
         open={addComparatorOpen}
@@ -331,6 +356,7 @@ const SeguimientoPage = () => {
           setAddResultOpen(false)
           setResultsRefreshKey((prev) => prev + 1)
         }}
+        scopeAthleteIds={scopeAthleteIds}
       />
 
     </Box>

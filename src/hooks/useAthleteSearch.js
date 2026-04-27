@@ -1,7 +1,16 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabase'
 
-export function useAthleteSearch({ inputValue, open, selectedAthlete, resultToEdit }) {
+/**
+ * Searches athletes by name with optional scope restriction.
+ *
+ * @param {string}   inputValue       – current text in the athlete autocomplete
+ * @param {boolean}  open             – whether the parent dialog is open
+ * @param {object}   selectedAthlete  – already-selected athlete (shown when input is short)
+ * @param {object}   resultToEdit     – result being edited (skips search when input matches name)
+ * @param {number[]|null} scopeAthleteIds – when provided, restricts search to these atleta_ids
+ */
+export function useAthleteSearch({ inputValue, open, selectedAthlete, resultToEdit, scopeAthleteIds = null }) {
   const [atletas, setAtletas] = useState([])
   const [loading, setLoading] = useState(false)
 
@@ -10,6 +19,12 @@ export function useAthleteSearch({ inputValue, open, selectedAthlete, resultToEd
 
     // In edit mode, if input matches the loaded athlete, no need to search
     if (resultToEdit && inputValue === resultToEdit.atleta?.nombre) {
+      return
+    }
+
+    // Scoped to empty list — no results possible
+    if (scopeAthleteIds !== null && scopeAthleteIds.length === 0) {
+      setAtletas([])
       return
     }
 
@@ -26,13 +41,18 @@ export function useAthleteSearch({ inputValue, open, selectedAthlete, resultToEd
     const timeoutId = setTimeout(async () => {
       setLoading(true)
       try {
-        const { data, error } = await supabase
+        let query = supabase
           .from('atletas')
           .select('atleta_id, nombre, licencia')
           .ilike('nombre', `%${term}%`)
           .order('nombre', { ascending: true })
-          .limit(100)
+          .limit(scopeAthleteIds ? 50 : 100)
 
+        if (scopeAthleteIds?.length > 0) {
+          query = query.in('atleta_id', scopeAthleteIds)
+        }
+
+        const { data, error } = await query
         if (error) throw error
         if (signal.aborted) return
         setAtletas(data || [])
@@ -49,7 +69,7 @@ export function useAthleteSearch({ inputValue, open, selectedAthlete, resultToEd
       clearTimeout(timeoutId)
       controller.abort()
     }
-  }, [inputValue, open, selectedAthlete, resultToEdit])
+  }, [inputValue, open, selectedAthlete, resultToEdit, scopeAthleteIds])
 
   return { atletas, loading }
 }

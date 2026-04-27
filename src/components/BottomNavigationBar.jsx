@@ -88,7 +88,7 @@ const BottomNavigationBar = () => {
             icon={<TbChartRadar size={24} />}
             aria-label="Seguimiento deportivo"
           />
-          {user?.role === 'admin' && (
+          {user?.role !== 'consulta' && (
             <BottomNavigationAction
               label="Análisis"
               value="analisis"

@@ -6,7 +6,7 @@ import List from '@mui/material/List'
 import ListItem from '@mui/material/ListItem'
 import ListItemIcon from '@mui/material/ListItemIcon'
 import ListItemText from '@mui/material/ListItemText'
-import { TbUser, TbSettings, TbInfoCircle, TbLogout, TbStar, TbUsers, TbShield } from 'react-icons/tb'
+import { TbUser, TbSettings, TbInfoCircle, TbLogout, TbStar, TbUsers, TbShield, TbBuilding } from 'react-icons/tb'
 import { useState } from 'react'
 import FavoritesDialog from '../components/FavoritesDialog'
 import AdminApprovalDialog from '../components/AdminApprovalDialog'
@@ -14,6 +14,8 @@ import RoleManagementDialog from '../components/RoleManagementDialog'
 import ProfileDialog from '../components/ProfileDialog'
 import SettingsDialog from '../components/SettingsDialog'
 import AboutDialog from '../components/AboutDialog'
+import OrganizationsDialog from '../components/OrganizationsDialog'
+import OrganizationPanelDialog from '../components/OrganizationPanelDialog'
 import { useAuth } from '../context/AuthContext'
 import { supabase } from '../lib/supabase'
 
@@ -21,10 +23,21 @@ const MasPage = () => {
   const [favOpen, setFavOpen] = useState(false)
   const [adminOpen, setAdminOpen] = useState(false)
   const [rolesOpen, setRolesOpen] = useState(false)
+  const [orgsOpen, setOrgsOpen] = useState(false)
+  const [orgPanelOpen, setOrgPanelOpen] = useState(false)
   const [profileOpen, setProfileOpen] = useState(false)
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [aboutOpen, setAboutOpen] = useState(false)
   const { user } = useAuth()
+
+  const roleLabels = {
+    superadmin: 'Superadmin',
+    club: 'Club',
+    trainer: 'Entrenador',
+    athlete: 'Atleta',
+    consulta: 'Usuario',
+  }
+  const roleLabel = roleLabels[user?.role] ?? 'Usuario'
 
   const handleLogout = async () => {
     await supabase.auth.signOut()
@@ -32,8 +45,10 @@ const MasPage = () => {
 
   const menuItems = [
     { icon: <TbStar size={24} />, text: 'Atletas favoritos', description: 'Gestiona tus atletas favoritos', onClick: () => setFavOpen(true) },
-    ...(user?.role === 'admin' ? [{ icon: <TbUsers size={24} />, text: 'Solicitudes de Acceso', description: 'Aprueba o rechaza nuevos usuarios', onClick: () => setAdminOpen(true) }] : []),
-    ...(user?.role === 'admin' ? [{ icon: <TbShield size={24} />, text: 'Gestión de Roles', description: 'Asigna roles a los usuarios registrados', onClick: () => setRolesOpen(true) }] : []),
+    ...(user?.role === 'superadmin' ? [{ icon: <TbUsers size={24} />, text: 'Solicitudes de Acceso', description: 'Aprueba o rechaza nuevos usuarios', onClick: () => setAdminOpen(true) }] : []),
+    ...(user?.role === 'superadmin' ? [{ icon: <TbShield size={24} />, text: 'Gestión de Usuarios', description: 'Asigna roles y vincula usuarios a clubes', onClick: () => setRolesOpen(true) }] : []),
+    ...(user?.role === 'superadmin' ? [{ icon: <TbBuilding size={24} />, text: 'Organizaciones', description: 'Gestiona las organizaciones del sistema', onClick: () => setOrgsOpen(true) }] : []),
+    ...(user?.role === 'club' ? [{ icon: <TbBuilding size={24} />, text: 'Mi Organización', description: 'Gestiona miembros e invitaciones de tu club', onClick: () => setOrgPanelOpen(true) }] : []),
     { icon: <TbUser size={24} />, text: 'Perfil', description: 'Configura tu perfil de usuario', onClick: () => setProfileOpen(true) },
     { icon: <TbSettings size={24} />, text: 'Configuración', description: 'Ajustes de la aplicación', onClick: () => setSettingsOpen(true) },
     { icon: <TbInfoCircle size={24} />, text: 'Acerca de', description: 'Información sobre la aplicación', onClick: () => setAboutOpen(true) },
@@ -71,7 +86,7 @@ const MasPage = () => {
                 </Box>
                 <Box>
                   <Typography variant="h6" sx={{ fontWeight: 600, lineHeight: 1.2, fontFamily: 'Poppins' }}>
-                    Entrenador
+                    {roleLabel}
                   </Typography>
                   <Typography variant="body2" sx={{ opacity: 0.8, fontFamily: 'Poppins' }}>
                     {user.email}
@@ -121,6 +136,8 @@ const MasPage = () => {
       <FavoritesDialog open={favOpen} onClose={() => setFavOpen(false)} />
       <AdminApprovalDialog open={adminOpen} onClose={() => setAdminOpen(false)} />
       <RoleManagementDialog open={rolesOpen} onClose={() => setRolesOpen(false)} />
+      <OrganizationsDialog open={orgsOpen} onClose={() => setOrgsOpen(false)} />
+      <OrganizationPanelDialog open={orgPanelOpen} onClose={() => setOrgPanelOpen(false)} />
       <ProfileDialog open={profileOpen} onClose={() => setProfileOpen(false)} />
       <SettingsDialog open={settingsOpen} onClose={() => setSettingsOpen(false)} />
       <AboutDialog open={aboutOpen} onClose={() => setAboutOpen(false)} />

@@ -47,7 +47,7 @@ const convertMarcaTextoToValor = (texto) => {
   return total
 }
 
-function AddResultDialog({ open, onClose, onSuccess, resultToEdit = null }) {
+function AddResultDialog({ open, onClose, onSuccess, resultToEdit = null, scopeAthleteIds = null }) {
   const [formValues, setFormValues] = useState(initialFormState)
   const [atletaInputValue, setAtletaInputValue] = useState('')
   const [pruebaInputValue, setPruebaInputValue] = useState('')
@@ -64,7 +64,8 @@ function AddResultDialog({ open, onClose, onSuccess, resultToEdit = null }) {
     inputValue: atletaInputValue,
     open,
     selectedAthlete: formValues.atleta,
-    resultToEdit
+    resultToEdit,
+    scopeAthleteIds,
   })
   const { autoAssigning, getClubForAthlete } = useAutoAssignClub({ clubes, addClub })
   const { loading: submitLoading, error: submitError, success: submitSuccess, submit } =

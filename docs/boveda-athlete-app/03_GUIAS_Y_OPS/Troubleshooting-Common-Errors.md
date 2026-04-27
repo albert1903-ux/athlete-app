@@ -8,6 +8,19 @@ tags: [errores, soporte, debug, rls, supabase, parseo]
 
 Este documento recopila los bugs más frecuentes y casos borde técnicos que ocurren en el proyecto, diseñados para que un desarrollador (o una IA de mantenimiento) pueda resolver incidencias en minutos en lugar de horas.
 
+## 0. 🔴 Incidente Crítico: Migraciones Incorrectas en Producción
+
+- **Síntoma:** Se han aplicado migraciones o tablas que no deberían estar en producción (ej. tablas en desarrollo como `group_athletes`, `invitations`, `organizations`, `trainer_groups`).
+- **Causa Habitual:** Ejecutar `supabase db push` sin revisar previamente con `supabase db diff --linked`. La BD local de Supabase mezcla tablas estables con tablas en desarrollo.
+- **Solución de emergencia:**
+  1. Identifica el último backup limpio en `backups/pg_backup_*.sql`
+  2. Ejecuta `python3 scripts/restore_via_management_api.py` (no necesita `psql` ni contraseña)
+  3. El script trunca y restaura solo las tablas públicas estables
+- **Prevención:** Leer [[Gestion-BD-Local-y-Produccion]] antes de cualquier operación de BD. Usar siempre `supabase db diff --linked` antes de `db push`.
+- **Post-mortem completo:** [[2026-04-25-Incidente-BD-Produccion-Restauracion]]
+
+---
+
 ## 1. Problemas de Base de Datos y Seguridad (Supabase)
 
 ### Error: "RLS references user metadata" (Linter Warning / Vulnerabilidad)
