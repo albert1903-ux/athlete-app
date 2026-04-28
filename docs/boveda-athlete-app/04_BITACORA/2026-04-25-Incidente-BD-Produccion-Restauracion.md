@@ -83,4 +83,5 @@ python3 scripts/restore_via_management_api.py
 - [x] BD producción restaurada al estado del 28 de marzo
 - [x] Documentada la arquitectura de BDs locales → ver [[Gestion-BD-Local-y-Produccion]]
 - [x] Documentado proceso de restauración → ver [[Gestion-BD-Local-y-Produccion]]
-- [ ] Pendiente: Separar migraciones de desarrollo de las de producción en ramas Git distintas
+- [x] Release SaaS multitenant subido a producción (2026-04-27, commit `e4e35fa`) — tablas en desarrollo (`organizations`, `group_athletes`, `invitations`, `trainer_groups`) ya forman parte del schema oficial de prod.
+- [x] **Stack TEST y stack PROD-MIRROR físicamente separados** (2026-04-28): containers `supabase_db_athlete-test` (puerto 54322) y `supabase_db_athlete-prod-mirror` (puerto 54422). Marker `_meta_environment` en cada BD + 4 defensas activas en `sync_to_supabase.py` e `import_from_supabase.py`. Reproducir el incidente requiere desactivar manualmente las 4 defensas.

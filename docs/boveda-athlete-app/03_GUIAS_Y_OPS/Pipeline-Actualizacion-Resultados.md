@@ -29,20 +29,44 @@ Producción tiene ~178.548 resultados (IDs hasta ~178.548).
 
 ---
 
+## Mapa de la infraestructura (post 2026-04-28)
+
+|  | **TEST** 🧪 | **MIRROR** 🪞 |
+|---|---|---|
+| **Workdir Supabase** | `/Users/albert/Documents/athlete-app/supabase/` | `/Users/albert/Documents/bbdd-athlete-app/supabase/` |
+| **`project_id`** | `athlete-test` | `athlete-prod-mirror` |
+| **Container Postgres** | `supabase_db_athlete-test` | `supabase_db_athlete-prod-mirror` |
+| **Puerto BD** | `54322` | `54422` |
+| **Puerto API/Kong** | `54321` | `54421` |
+| **Puerto Studio** | `54323` | `54423` |
+| **Puerto Inbucket** | `54324` | `54424` |
+| **Puerto Analytics** | `54327` | `54427` |
+| **Marker `_meta_environment`** | `'test'` | `'prod-mirror'` |
+| **Datos** | ~2.745 atletas, ~4.605 resultados (inventados) | espejo de prod (~15k atletas, ~175k resultados) |
+| **Linked a producción (`doibexyiiayjiijxziqm`)** | ✅ Sí | ❌ No |
+| **Migrations** | `supabase/migrations/` (24 ficheros, canónicas) | symlink → `athlete-app/supabase/migrations/` |
+| **`db push` posible** | ✅ Solo desde aquí | ❌ Falla con "Cannot find project ref" |
+| **`DATABASE_URL` por defecto en scripts ETL** | ❌ 54322 — los scripts abortan si lo detectan como origen/destino erróneo | ✅ 54422 |
+| **Rol** | Desarrollo frontend (`npm run dev`) | Carga masiva ETL + sync a prod |
+
+---
+
 ## Flujo Completo (Paso a Paso)
 
 ```
-[Producción: 178.548 resultados]
+[Producción: ~178.548 resultados]
          │
          ▼
-  1. import_from_supabase ──→ [Local: se llena hasta ~178.548]
+  1. import_from_supabase ──→ [MIRROR: se llena hasta ~178.548]
          │
          ▼
-  2. Importar CSV preview ──→ [Local: nuevos IDs desde 178.549+]
+  2. Importar CSV preview ──→ [MIRROR: nuevos IDs desde 178.549+]
          │
          ▼
   3. sync_to_supabase ──────→ [Producción: 178.548 + nuevos]
 ```
+
+> El stack TEST nunca participa en este flujo. Si los scripts detectan TEST como origen o destino vía el marker `_meta_environment`, abortan automáticamente.
 
 ---
 
@@ -57,11 +81,11 @@ source .venv/bin/activate
 python3 scripts/main.py 2026-04 --import-csv preview_2026-04.csv
 ```
 
-`main.py` ejecuta automáticamente en este orden:
-1. Backup de la BD local
-2. `import_from_supabase.py` → sincroniza producción → local
-3. `DBManager.update()` → importa CSV a local
-4. `sync_to_supabase.py` → sube cambios a producción
+`main.py` ejecuta en orden:
+1. **Backup** del MIRROR (ahora apunta al container correcto, antes fallaba en silencio).
+2. **`import_from_supabase.py`** → baja producción al MIRROR. Aborta si destino tiene `environment='test'`.
+3. **`DBManager.update()`** → importa CSV al MIRROR (genera IDs `MAX+1`, sin colisión).
+4. **`sync_to_supabase.py`** → sube MIRROR → producción. Aborta si origen no es `'prod-mirror'`. Pide confirmación interactiva escribiendo `subir-a-produccion`.
 
 ### Opción B: Manual paso a paso (para mayor control)
 
@@ -69,20 +93,38 @@ python3 scripts/main.py 2026-04 --import-csv preview_2026-04.csv
 cd /Users/albert/Documents/bbdd-athlete-app
 source .venv/bin/activate
 
-# Paso 1: Sincronizar producción → local (OBLIGATORIO PRIMERO)
+# Paso 1: Sincronizar producción → MIRROR (OBLIGATORIO antes del CSV)
 python3 scripts/import_from_supabase.py
 
-# Verificar que local tiene el volumen correcto antes de continuar:
-# docker exec supabase_db_athlete-app psql -U postgres -d postgres \
-#   -c "SELECT COUNT(*) FROM resultados;"
-# Debe ser ~178.000+, no 4.588
+# Verificar que el MIRROR tiene el volumen correcto antes de continuar:
+docker exec supabase_db_athlete-prod-mirror psql -U postgres -d postgres \
+  -c "SELECT COUNT(*) FROM resultados;"
+# Esperado: ~178.000+ (no ~4.000 — eso significaría que el script apuntó al TEST por error)
 
-# Paso 2: Importar CSV a local
+# Paso 2: Importar CSV al MIRROR sin sync automático
 python3 scripts/main.py 2026-04 --import-csv preview_2026-04.csv --skip-sync
 
-# Paso 3: Sincronizar local → producción (solo año actual)
+# Paso 3: Inspeccionar el resultado en Studio del MIRROR (http://127.0.0.1:54423)
+#   o vía SQL:
+docker exec supabase_db_athlete-prod-mirror psql -U postgres -d postgres \
+  -c "SELECT MAX(resultado_id), COUNT(*) FROM resultados WHERE anio = 2026;"
+
+# Paso 4: Sincronizar MIRROR → producción (solo año actual, más rápido)
 python3 scripts/sync_to_supabase.py --year 2026
+# Pedirá confirmación interactiva: escribir literal `subir-a-produccion`
 ```
+
+---
+
+## Defensas activas (post-incidente 25-Abr-2026)
+
+Cinco capas garantizan que sea muy difícil repetir el incidente:
+
+1. **Marker `_meta_environment` en cada BD**: los scripts ETL leen `value` antes de cualquier escritura. `sync_to_supabase` exige `'prod-mirror'`; `import_from_supabase` rehúsa si encuentra `'test'`.
+2. **`DATABASE_URL` por defecto** en `sync_to_supabase.py:30`, `import_from_supabase.py:32`, `src/db_manager.py:11` y `bbdd-athlete-app/.env` apunta a `54422` (MIRROR), nunca a `54322` (TEST).
+3. **Confirmación interactiva** en `sync_to_supabase.py`: muestra origen y destino y exige escribir literal `subir-a-produccion`. Cualquier otra respuesta aborta.
+4. **Backup defensivo**: `backup_local_db()` apunta al container correcto. Antes apuntaba a uno inexistente y fallaba en silencio.
+5. **Solo `athlete-app/supabase/` está linked a prod**: `bbdd-athlete-app/supabase/` no tiene `.temp/project-ref`, así que `supabase db push` desde el directorio del MIRROR falla con "Cannot find project ref". Migraciones imposibles de divergir gracias al symlink.
 
 ---
 
@@ -90,11 +132,13 @@ python3 scripts/sync_to_supabase.py --year 2026
 
 | Regla | Motivo |
 |---|---|
-| ✅ Siempre ejecutar `import_from_supabase.py` antes de importar un CSV | Evita colisión de IDs |
-| ✅ Usar `--year YYYY` en sync cuando sea posible | Más rápido y menos riesgo |
-| ❌ Nunca ejecutar `sync_to_supabase.py` directamente con la BD en estado TEST | Sobreescribirá datos de producción con IDs incorrectos |
-| ❌ Nunca truncar la BD local antes de bajar producción | Necesitas el estado de producción como base |
-| ✅ Revisar el CSV antes de importar | El CSV puede tener duplicados (mismo atleta, misma marca, misma fecha) |
+| ✅ Siempre ejecutar `import_from_supabase.py` antes de importar un CSV | Evita colisión de IDs (necesitas `MAX(resultado_id) ≈ 178k+` en el MIRROR antes de insertar) |
+| ✅ Usar `--year YYYY` en sync cuando sea posible | Más rápido y menos volumen de upsert |
+| ✅ Usar `--skip-sync` para revisar el MIRROR antes de subir | Permite inspección manual entre import del CSV y sync |
+| ✅ Revisar el CSV antes de importar | El CSV puede tener duplicados (mismo atleta + prueba + fecha + marca) |
+| ❌ Nunca ejecutar `sync_to_supabase.py` con `DATABASE_URL` apuntando a 54322 | El marker abortará, pero el principio sigue: TEST nunca es origen del sync |
+| ❌ Nunca ejecutar `import_from_supabase.py` con destino TEST | El marker abortará, pero igualmente: no debe sobrescribir TEST con datos reales |
+| ❌ Nunca truncar el MIRROR sin antes hacer `import_from_supabase` | Necesitas el estado de producción como base para que los IDs nuevos no colisionen |
 
 ---
 
@@ -147,11 +191,11 @@ Antes del paso 3 (sync a producción), verificar:
 
 ```bash
 # Contar resultados locales (debe ser ~178.000+, no 4.588)
-docker exec supabase_db_athlete-app psql -U postgres -d postgres \
+docker exec supabase_db_athlete-prod-mirror psql -U postgres -d postgres \
   -c "SELECT COUNT(*) FROM resultados;"
 
 # Ver los últimos IDs insertados (deben ser > 178.548)
-docker exec supabase_db_athlete-app psql -U postgres -d postgres \
+docker exec supabase_db_athlete-prod-mirror psql -U postgres -d postgres \
   -c "SELECT MAX(resultado_id), COUNT(*) FROM resultados WHERE anio = 2026;"
 ```
 

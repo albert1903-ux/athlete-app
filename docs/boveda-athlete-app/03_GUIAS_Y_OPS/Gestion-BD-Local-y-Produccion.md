@@ -10,46 +10,46 @@ tags: [base-de-datos, supabase, docker, migraciones, produccion, seguridad]
 
 ---
 
-## Mapa de Bases de Datos
+## Mapa de Bases de Datos (actualizado 2026-04-28)
 
-Hay **dos contenedores PostgreSQL locales** corriendo simultáneamente:
+Hay **dos stacks Supabase locales** corriendo en Docker, físicamente separados con nombres autodescriptivos:
 
-### 1. `supabase_db_athlete-app` — Puerto 54322 ⭐
+### 1. `supabase_db_athlete-test` — Puerto 54322 🧪 (TEST)
 
 ```
 postgresql://postgres:postgres@127.0.0.1:54322/postgres
 ```
 
-**Esta es la BD de staging/TEST desde donde se sincroniza hacia producción.** Es el stack completo de Supabase local (con Auth, Storage, Studio, etc.). En estado normal tiene solo ~4.588 resultados (TEST), **no es un espejo de producción**. Se convierte en espejo solo después de ejecutar `import_from_supabase.py`.
+BD de **desarrollo del frontend**, con datos inventados (~2.745 atletas, ~4.605 resultados, 132 clubes, usuarios test). Conecta el `npm run dev` y permite probar features sin tocar nada real.
 
-**Contiene dos tipos de tablas mezcladas:**
+- Marker en BD: `_meta_environment.environment = 'test'`.
+- **NUNCA usar como origen de `sync_to_supabase.py`**. Si se intenta, los scripts ETL abortan automáticamente leyendo el marker.
+- **NUNCA usar como destino de `import_from_supabase.py`**. Si se intenta, los scripts abortan también.
+- Stack completo: kong (54321), studio (54323), inbucket (54324), analytics (54327).
 
-| Tabla | Estado | Sincroniza con producción |
-|---|---|---|
-| `atletas` | ✅ Estable | ✅ Sí |
-| `clubes` | ✅ Estable | ✅ Sí |
-| `categorias` | ✅ Estable | ✅ Sí |
-| `pruebas` | ✅ Estable | ✅ Sí |
-| `resultados` | ✅ Estable | ✅ Sí |
-| `atleta_club_hist` | ✅ Estable | ✅ Sí |
-| `medidas_corporales` | ✅ Estable | ✅ Sí |
-| `eventos` | ✅ Estable | ✅ Sí |
-| `participantes_eventos` | ✅ Estable | ✅ Sí |
-| `atletas_favoritos` | ✅ Estable | ✅ Sí |
-| `calendar_shares` | ✅ Estable | ✅ Sí |
-| `notifications` | ✅ Estable | ✅ Sí |
-| `group_athletes` | 🚧 En desarrollo | ❌ NO todavía |
-| `invitations` | 🚧 En desarrollo | ❌ NO todavía |
-| `organizations` | 🚧 En desarrollo | ❌ NO todavía |
-| `trainer_groups` | 🚧 En desarrollo | ❌ NO todavía |
-
-### 2. `athlete-app-db` — Puerto 5432
+### 2. `supabase_db_athlete-prod-mirror` — Puerto 54422 🪞 (PROD MIRROR)
 
 ```
-postgresql://postgres:postgres@127.0.0.1:5432/athlete_db
+postgresql://postgres:postgres@127.0.0.1:54422/postgres
 ```
 
-BD de otro proyecto / pruebas aisladas. **No tiene relación con el sync a producción.** Actualmente vacía.
+**Espejo de producción.** Hidratado desde `pg_dump_produccion_*.sql` y mantenido en línea con `import_from_supabase.py`. Datos reales (~15.569 atletas, ~175.048 resultados, 511 clubes).
+
+- Marker en BD: `_meta_environment.environment = 'prod-mirror'`.
+- **Único origen permitido** para `sync_to_supabase.py`.
+- **Único destino permitido** para `import_from_supabase.py`.
+- `DATABASE_URL` por defecto en `bbdd-athlete-app/.env` apunta aquí.
+- Stack completo: kong (54421), studio (54423), inbucket (54424), analytics (54427).
+
+### Defensas activas anti-incidente
+
+Tras el incidente del 25-Abr-2026 (3 ocurrencias previas de subir TEST a prod), se añadieron 5 capas de defensa:
+
+1. **Marker `_meta_environment` en cada BD**: los scripts ETL leen `value` antes de cualquier escritura. Si no coincide con el esperado, abortan con `sys.exit(2)`.
+2. **`DATABASE_URL` por defecto en código** apunta a 54422 (mirror), no a 54322 (test). El `.env` lo refuerza.
+3. **Confirmación interactiva en `sync_to_supabase.py`**: muestra origen y destino y exige escribir literal `subir-a-produccion` antes de continuar.
+4. **Backup defensivo arreglado**: `backup_local_db()` apunta al container correcto (`supabase_db_athlete-prod-mirror`), no al container inexistente que tenía antes (fallo silencioso histórico).
+5. **Solo `athlete-app/supabase/` está linked a prod**: `bbdd-athlete-app/supabase/` no tiene `.temp/project-ref`, así que `supabase db push` desde el directorio del mirror falla con "Cannot find project ref". Para mantener migraciones sincronizadas entre los dos workdirs, `bbdd-athlete-app/supabase/migrations/` es un symlink absoluto a `athlete-app/supabase/migrations/` — imposible que diverjan.
 
 ---
 
