@@ -130,7 +130,7 @@ function ResultsLineChart({
                   px: 1, py: 0.4,
                   fontSize: '0.82rem', fontWeight: 600
                 }}>
-                  {mejorado
+                  {delta < 0
                     ? <TbTrendingDown size={15} />
                     : <TbTrendingUp size={15} />
                   }
