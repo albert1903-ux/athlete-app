@@ -1,5 +1,6 @@
 import { useMemo } from 'react'
 import { Box, Button, Card, CardContent, CircularProgress, Paper, Typography, useTheme } from '@mui/material'
+import { TbTrendingDown, TbTrendingUp } from 'react-icons/tb'
 import {
   LineChart,
   Line,
@@ -102,9 +103,49 @@ function ResultsLineChart({
     return null
   }
 
+  const lastPoint = combinedChartData[combinedChartData.length - 1]
+  const prevPoint = combinedChartData[combinedChartData.length - 2]
+  const showDelta = lastPoint?.marca != null && prevPoint?.marca != null
+  const delta = showDelta ? lastPoint.marca - prevPoint.marca : 0
+  const unidadLower = unidad.toLowerCase().trim()
+  const menorEsMejor = ['s', 'seg', 'segundos'].includes(unidadLower)
+  const mejorado = menorEsMejor ? delta < 0 : delta > 0
+
   return (
     <Card sx={{ width: '100%', bgcolor: 'action.hover', borderRadius: '20px', boxShadow: 'none' }}>
       <CardContent sx={{ px: { xs: 2 }, py: { xs: 3 } }}>
+
+        {lastPoint?.marca != null && (
+          <Box sx={{ mb: 2 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+              <Typography sx={{ fontSize: '2rem', fontWeight: 700, lineHeight: 1 }}>
+                {formatTiempo(lastPoint.marca, unidad)}{unidad}
+              </Typography>
+              {showDelta && delta !== 0 && (
+                <Box sx={{
+                  display: 'flex', alignItems: 'center', gap: 0.4,
+                  bgcolor: mejorado ? 'success.main' : 'error.main',
+                  color: '#fff',
+                  borderRadius: '8px',
+                  px: 1, py: 0.4,
+                  fontSize: '0.82rem', fontWeight: 600
+                }}>
+                  {mejorado
+                    ? <TbTrendingDown size={15} />
+                    : <TbTrendingUp size={15} />
+                  }
+                  {formatTiempo(Math.abs(delta), unidad)}{unidad}
+                </Box>
+              )}
+            </Box>
+            {showDelta && (
+              <Typography variant="caption" color="text.secondary">
+                vs. {prevPoint.fecha}
+              </Typography>
+            )}
+          </Box>
+        )}
+
         {chartWidth > 0 ? (
           <Box sx={{ width: '100%', overflow: 'hidden' }}>
             <LineChart
