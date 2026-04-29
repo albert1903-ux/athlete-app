@@ -44,7 +44,6 @@ function ResultsLineChart({
 }) {
   const theme = useTheme()
   const unidad = chartData.pruebas?.[0]?.unidad || ''
-  const primaryColor = chartData.pruebas?.[0]?.color || theme.palette.primary.main
 
   const CustomTooltip = useMemo(() => {
     return ({ active, payload, label }) => {
@@ -75,13 +74,6 @@ function ResultsLineChart({
           )}
           {payload.map((entry, index) => {
             if (entry.value === null || entry.value === undefined) return null
-            if (entry.dataKey === 'sma') {
-              return (
-                <Typography key={index} variant="body2" sx={{ color: entry.color, fontStyle: 'italic' }}>
-                  {entry.name}: {formatTiempo(entry.value, unidad)}{textoUnidad}
-                </Typography>
-              )
-            }
             return (
               <Typography key={index} variant="body2" sx={{ color: entry.color }}>
                 {entry.name}: {formatTiempo(entry.value, unidad)}{textoUnidad}
@@ -181,21 +173,6 @@ function ResultsLineChart({
                   activeDot={{ r: 6, strokeWidth: 0 }}
                   connectNulls
                   name={selectedAthlete?.nombre || 'Atleta Principal'}
-                />
-              )}
-
-              {hasRangeControls && (
-                <Line
-                  type="monotone"
-                  dataKey="sma"
-                  stroke={primaryColor}
-                  strokeWidth={1.5}
-                  strokeOpacity={0.55}
-                  strokeDasharray="6 3"
-                  dot={false}
-                  activeDot={false}
-                  connectNulls={false}
-                  name="Media móvil"
                 />
               )}
 

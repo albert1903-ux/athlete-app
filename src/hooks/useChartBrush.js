@@ -2,18 +2,6 @@ import { useState, useEffect, useMemo } from 'react'
 
 const RANGE_MONTHS = { '1M': 1, '3M': 3, '6M': 6, '1A': 12 }
 
-function calcSma(data) {
-  if (!data || data.length < 5) return []
-  const period = Math.max(3, Math.round(data.length / 5))
-  return data.map((_, i) => {
-    if (i < period - 1) return null
-    const slice = data.slice(i - period + 1, i + 1)
-    const vals = slice.map(d => d.marca).filter(v => v !== null && v !== undefined && !isNaN(v))
-    if (vals.length === 0) return null
-    return vals.reduce((s, v) => s + v, 0) / vals.length
-  })
-}
-
 export function useChartBrush(combinedChartData, viewMode, selectedPrueba) {
   const len = combinedChartData?.length ?? 0
 
@@ -58,15 +46,10 @@ export function useChartBrush(combinedChartData, viewMode, selectedPrueba) {
     })
   }
 
-  const smaValues = useMemo(() => calcSma(combinedChartData), [combinedChartData])
-
   const filteredData = useMemo(() => {
     if (!combinedChartData || combinedChartData.length === 0) return combinedChartData
-    const enriched = smaValues.length > 0
-      ? combinedChartData.map((point, i) => ({ ...point, sma: smaValues[i] }))
-      : combinedChartData
-    return enriched.slice(brushRange.startIndex, brushRange.endIndex + 1)
-  }, [combinedChartData, smaValues, brushRange.startIndex, brushRange.endIndex])
+    return combinedChartData.slice(brushRange.startIndex, brushRange.endIndex + 1)
+  }, [combinedChartData, brushRange.startIndex, brushRange.endIndex])
 
   const hasRangeControls = len >= 5
 
