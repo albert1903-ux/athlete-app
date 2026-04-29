@@ -202,7 +202,7 @@ function ResultsLineChart({
 
             </LineChart>
 
-            {hasRangeControls && viewMode === 'fecha' && (
+            {hasRangeControls && (
               <Box sx={{ display: 'flex', justifyContent: 'center', gap: 0.75, mt: 1.5 }}>
                 {RANGES.map(r => (
                   <Button
