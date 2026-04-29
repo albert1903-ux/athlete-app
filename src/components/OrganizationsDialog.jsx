@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import Autocomplete from '@mui/material/Autocomplete'
 import Dialog from '@mui/material/Dialog'
 import DialogTitle from '@mui/material/DialogTitle'
 import DialogContent from '@mui/material/DialogContent'
@@ -99,9 +100,9 @@ export default function OrganizationsDialog({ open, onClose }) {
     await loadContactUsers(org.club_id, org.admin_id, org.admin_email, org.admin_name)
   }
 
-  const handleEditClubChange = async (newClubId) => {
-    setEditOrg((s) => ({ ...s, clubId: newClubId, adminId: '' }))
-    await loadContactUsers(newClubId, null)
+  const handleEditClubChange = async (newClub) => {
+    setEditOrg((s) => ({ ...s, clubId: newClub?.club_id ?? '', adminId: '' }))
+    await loadContactUsers(newClub?.club_id ?? null, null)
   }
 
   const handleSaveEditOrg = async () => {
@@ -292,20 +293,17 @@ export default function OrganizationsDialog({ open, onClose }) {
               required
               autoFocus
             />
-            <FormControl fullWidth required>
-              <InputLabel>Club vinculado</InputLabel>
-              <Select
-                value={editOrg.clubId}
-                onChange={(e) => handleEditClubChange(e.target.value)}
-                label="Club vinculado"
-              >
-                {clubs.map((c) => (
-                  <MenuItem key={c.club_id} value={c.club_id}>
-                    {c.nombre}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
+            <Autocomplete
+              options={clubs}
+              getOptionLabel={(o) => o.nombre}
+              isOptionEqualToValue={(o, v) => o.club_id === v.club_id}
+              value={clubs.find((c) => c.club_id === editOrg.clubId) ?? null}
+              onChange={(_, newValue) => handleEditClubChange(newValue)}
+              noOptionsText="No hay clubes disponibles"
+              renderInput={(params) => (
+                <TextField {...params} label="Club vinculado" required />
+              )}
+            />
 
             <FormControl fullWidth>
               <InputLabel>Usuario de contacto</InputLabel>

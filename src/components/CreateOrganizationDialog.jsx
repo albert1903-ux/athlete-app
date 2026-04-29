@@ -6,6 +6,7 @@ import DialogActions from '@mui/material/DialogActions'
 import Button from '@mui/material/Button'
 import IconButton from '@mui/material/IconButton'
 import TextField from '@mui/material/TextField'
+import Autocomplete from '@mui/material/Autocomplete'
 import FormControl from '@mui/material/FormControl'
 import InputLabel from '@mui/material/InputLabel'
 import Select from '@mui/material/Select'
@@ -21,7 +22,7 @@ import { supabase } from '../lib/supabase'
 export default function CreateOrganizationDialog({ open, onClose, onSuccess }) {
   const [orgName, setOrgName] = useState('')
   const [selectedUserId, setSelectedUserId] = useState('')
-  const [selectedClubId, setSelectedClubId] = useState('')
+  const [selectedClub, setSelectedClub] = useState(null)
   const [users, setUsers] = useState([])
   const [clubs, setClubs] = useState([])
   const [loading, setLoading] = useState(false)
@@ -33,7 +34,7 @@ export default function CreateOrganizationDialog({ open, onClose, onSuccess }) {
     if (open) {
       setOrgName('')
       setSelectedUserId('')
-      setSelectedClubId('')
+      setSelectedClub(null)
       setError(null)
       fetchData()
     }
@@ -59,7 +60,7 @@ export default function CreateOrganizationDialog({ open, onClose, onSuccess }) {
   }
 
   const handleSubmit = async () => {
-    if (!orgName.trim() || !selectedUserId || !selectedClubId) return
+    if (!orgName.trim() || !selectedUserId || !selectedClub) return
 
     setSaving(true)
     setError(null)
@@ -67,7 +68,7 @@ export default function CreateOrganizationDialog({ open, onClose, onSuccess }) {
     const { error: rpcError } = await supabase.rpc('create_organization', {
       org_name: orgName.trim(),
       admin_user_id: selectedUserId,
-      club_id: selectedClubId,
+      club_id: selectedClub.club_id,
     })
 
     if (rpcError) {
@@ -113,25 +114,17 @@ export default function CreateOrganizationDialog({ open, onClose, onSuccess }) {
               </Box>
             ) : (
               <>
-                <FormControl fullWidth required>
-                  <InputLabel>Club vinculado</InputLabel>
-                  <Select
-                    value={selectedClubId}
-                    onChange={(e) => setSelectedClubId(e.target.value)}
-                    label="Club vinculado"
-                  >
-                    {clubs.length === 0 && (
-                      <MenuItem disabled value="">
-                        No hay clubes disponibles
-                      </MenuItem>
-                    )}
-                    {clubs.map((c) => (
-                      <MenuItem key={c.club_id} value={c.club_id}>
-                        {c.nombre}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
+                <Autocomplete
+                  options={clubs}
+                  getOptionLabel={(o) => o.nombre}
+                  isOptionEqualToValue={(o, v) => o.club_id === v.club_id}
+                  value={selectedClub}
+                  onChange={(_, newValue) => setSelectedClub(newValue)}
+                  noOptionsText="No hay clubes disponibles"
+                  renderInput={(params) => (
+                    <TextField {...params} label="Club vinculado" required />
+                  )}
+                />
 
                 <FormControl fullWidth required>
                   <InputLabel>Usuario de contacto</InputLabel>
@@ -164,7 +157,7 @@ export default function CreateOrganizationDialog({ open, onClose, onSuccess }) {
           <Button
             onClick={handleSubmit}
             variant="contained"
-            disabled={!orgName.trim() || !selectedUserId || !selectedClubId || saving || loading}
+            disabled={!orgName.trim() || !selectedUserId || !selectedClub || saving || loading}
             startIcon={saving ? <CircularProgress size={16} /> : null}
           >
             Crear organización
