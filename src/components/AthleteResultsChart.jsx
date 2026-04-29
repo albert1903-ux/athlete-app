@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useMemo } from 'react'
 import { Box, Card, CardContent, Typography, CircularProgress, Alert } from '@mui/material'
 import { initializeColorsForComparators } from '../utils/athleteColors'
 import { useSelectedAthlete } from '../store/selectedAthleteStore'
@@ -6,6 +6,7 @@ import { useAthleteResultsChartData } from '../hooks/useAthleteResultsChartData'
 import { useComparatorChartData } from '../hooks/useComparatorChartData'
 import { useCombinedChartData } from '../hooks/useCombinedChartData'
 import { useChartDimensions } from '../hooks/useChartDimensions'
+import { useChartBrush } from '../hooks/useChartBrush'
 import ChartHeader from './AthleteResultsChart/ChartHeader'
 import ViewModeToggle from './AthleteResultsChart/ViewModeToggle'
 import ResultsLineChart from './AthleteResultsChart/ResultsLineChart'
@@ -31,6 +32,9 @@ function AthleteResultsChart({ comparatorAthletes = [] }) {
   })
 
   const { width: chartWidth } = useChartDimensions()
+
+  const { activeRange, brushRange, enrichedChartData, hasBrush, handleRangeButton, handleBrushChange } =
+    useChartBrush(combinedChartData, viewMode, selectedPrueba)
 
   const athleteColors = useMemo(() => {
     if (comparatorAthletes.length === 0) return {}
@@ -109,10 +113,14 @@ function AthleteResultsChart({ comparatorAthletes = [] }) {
         selectedPrueba={selectedPrueba}
         pruebasDisponibles={pruebasDisponibles}
         onPruebaChange={handlePruebaChange}
+        activeRange={activeRange}
+        onRangeChange={handleRangeButton}
+        viewMode={viewMode}
+        hasBrush={hasBrush}
       />
       <ViewModeToggle viewMode={viewMode} onViewModeChange={setViewMode} />
       <ResultsLineChart
-        combinedChartData={combinedChartData}
+        combinedChartData={enrichedChartData}
         chartData={chartData}
         chartWidth={chartWidth}
         viewMode={viewMode}
@@ -121,6 +129,9 @@ function AthleteResultsChart({ comparatorAthletes = [] }) {
         comparatorAthletes={comparatorAthletes}
         comparatorData={comparatorData}
         athleteColors={athleteColors}
+        brushRange={brushRange}
+        onBrushChange={handleBrushChange}
+        hasBrush={hasBrush}
       />
     </Box>
   )

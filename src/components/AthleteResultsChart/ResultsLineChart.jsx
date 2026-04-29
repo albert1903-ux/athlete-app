@@ -7,7 +7,8 @@ import {
   YAxis,
   CartesianGrid,
   Tooltip,
-  Legend
+  Legend,
+  Brush
 } from 'recharts'
 import { getColorForAthlete } from '../../utils/athleteColors'
 
@@ -35,10 +36,14 @@ function ResultsLineChart({
   selectedAthlete,
   comparatorAthletes,
   comparatorData,
-  athleteColors
+  athleteColors,
+  brushRange,
+  onBrushChange,
+  hasBrush
 }) {
   const theme = useTheme()
   const unidad = chartData.pruebas?.[0]?.unidad || ''
+  const primaryColor = chartData.pruebas?.[0]?.color || theme.palette.primary.main
 
   const CustomTooltip = useMemo(() => {
     return ({ active, payload, label }) => {
@@ -69,6 +74,13 @@ function ResultsLineChart({
           )}
           {payload.map((entry, index) => {
             if (entry.value === null || entry.value === undefined) return null
+            if (entry.dataKey === 'sma') {
+              return (
+                <Typography key={index} variant="body2" sx={{ color: entry.color, fontStyle: 'italic' }}>
+                  {entry.name}: {formatTiempo(entry.value, unidad)}{textoUnidad}
+                </Typography>
+              )
+            }
             return (
               <Typography key={index} variant="body2" sx={{ color: entry.color }}>
                 {entry.name}: {formatTiempo(entry.value, unidad)}{textoUnidad}
@@ -97,6 +109,8 @@ function ResultsLineChart({
     return null
   }
 
+  const chartHeight = hasBrush ? 360 : 300
+
   return (
     <Card sx={{ width: '100%', bgcolor: 'action.hover', borderRadius: '20px', boxShadow: 'none' }}>
       <CardContent sx={{ px: { xs: 2 }, py: { xs: 3 } }}>
@@ -104,7 +118,7 @@ function ResultsLineChart({
           <Box sx={{ width: '100%', overflow: 'hidden' }}>
             <LineChart
               width={chartWidth}
-              height={300}
+              height={chartHeight}
               data={combinedChartData}
               margin={{ top: 5, right: 30, left: 10, bottom: 20 }}
             >
@@ -171,6 +185,21 @@ function ResultsLineChart({
                 />
               )}
 
+              {hasBrush && (
+                <Line
+                  type="monotone"
+                  dataKey="sma"
+                  stroke={primaryColor}
+                  strokeWidth={1.5}
+                  strokeOpacity={0.55}
+                  strokeDasharray="6 3"
+                  dot={false}
+                  activeDot={false}
+                  connectNulls={false}
+                  name="Media móvil"
+                />
+              )}
+
               {comparatorAthletes.map((athlete) => {
                 const compData = comparatorData[athlete.atleta_id]
                 if (!compData || !compData[selectedPrueba]) return null
@@ -194,6 +223,22 @@ function ResultsLineChart({
                   />
                 )
               })}
+
+              {hasBrush && (
+                <Brush
+                  dataKey={viewMode === 'edad' ? 'edad' : 'fecha'}
+                  startIndex={brushRange.startIndex}
+                  endIndex={brushRange.endIndex}
+                  onChange={onBrushChange}
+                  height={28}
+                  travellerWidth={8}
+                  stroke={theme.palette?.divider || '#ccc'}
+                  fill={theme.palette?.background?.paper || '#fff'}
+                  tickFormatter={(value) =>
+                    viewMode === 'edad' && typeof value === 'number' ? value.toFixed(1) : value
+                  }
+                />
+              )}
             </LineChart>
           </Box>
         ) : (
