@@ -58,20 +58,17 @@ export function useChartBrush(combinedChartData, viewMode, selectedPrueba) {
     })
   }
 
-  const handleBrushChange = ({ startIndex, endIndex }) => {
-    setActiveRange(null)
-    setBrushRange({ startIndex, endIndex })
-  }
-
   const smaValues = useMemo(() => calcSma(combinedChartData), [combinedChartData])
 
-  const enrichedChartData = useMemo(() => {
+  const filteredData = useMemo(() => {
     if (!combinedChartData || combinedChartData.length === 0) return combinedChartData
-    if (smaValues.length === 0) return combinedChartData
-    return combinedChartData.map((point, i) => ({ ...point, sma: smaValues[i] }))
-  }, [combinedChartData, smaValues])
+    const enriched = smaValues.length > 0
+      ? combinedChartData.map((point, i) => ({ ...point, sma: smaValues[i] }))
+      : combinedChartData
+    return enriched.slice(brushRange.startIndex, brushRange.endIndex + 1)
+  }, [combinedChartData, smaValues, brushRange.startIndex, brushRange.endIndex])
 
-  const hasBrush = len >= 5
+  const hasRangeControls = len >= 5
 
-  return { activeRange, brushRange, enrichedChartData, hasBrush, handleRangeButton, handleBrushChange }
+  return { activeRange, filteredData, hasRangeControls, handleRangeButton }
 }

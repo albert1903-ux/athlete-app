@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import { Box, Card, CardContent, CircularProgress, Paper, Typography, useTheme } from '@mui/material'
+import { Box, Card, CardContent, CircularProgress, Paper, Typography, useTheme, ToggleButtonGroup, ToggleButton } from '@mui/material'
 import {
   LineChart,
   Line,
@@ -7,10 +7,11 @@ import {
   YAxis,
   CartesianGrid,
   Tooltip,
-  Legend,
-  Brush
+  Legend
 } from 'recharts'
 import { getColorForAthlete } from '../../utils/athleteColors'
+
+const RANGES = ['1M', '3M', '6M', '1A', 'Todo']
 
 const formatTiempo = (segundos, unidad) => {
   if (segundos === null || segundos === undefined || isNaN(segundos)) return ''
@@ -37,9 +38,9 @@ function ResultsLineChart({
   comparatorAthletes,
   comparatorData,
   athleteColors,
-  brushRange,
-  onBrushChange,
-  hasBrush
+  activeRange,
+  onRangeChange,
+  hasRangeControls
 }) {
   const theme = useTheme()
   const unidad = chartData.pruebas?.[0]?.unidad || ''
@@ -109,8 +110,6 @@ function ResultsLineChart({
     return null
   }
 
-  const chartHeight = hasBrush ? 360 : 300
-
   return (
     <Card sx={{ width: '100%', bgcolor: 'action.hover', borderRadius: '20px', boxShadow: 'none' }}>
       <CardContent sx={{ px: { xs: 2 }, py: { xs: 3 } }}>
@@ -118,7 +117,7 @@ function ResultsLineChart({
           <Box sx={{ width: '100%', overflow: 'hidden' }}>
             <LineChart
               width={chartWidth}
-              height={chartHeight}
+              height={300}
               data={combinedChartData}
               margin={{ top: 5, right: 30, left: 10, bottom: 20 }}
             >
@@ -185,7 +184,7 @@ function ResultsLineChart({
                 />
               )}
 
-              {hasBrush && (
+              {hasRangeControls && (
                 <Line
                   type="monotone"
                   dataKey="sma"
@@ -224,22 +223,43 @@ function ResultsLineChart({
                 )
               })}
 
-              {hasBrush && (
-                <Brush
-                  dataKey={viewMode === 'edad' ? 'edad' : 'fecha'}
-                  startIndex={brushRange.startIndex}
-                  endIndex={brushRange.endIndex}
-                  onChange={onBrushChange}
-                  height={28}
-                  travellerWidth={8}
-                  stroke={theme.palette?.divider || '#ccc'}
-                  fill={theme.palette?.background?.paper || '#fff'}
-                  tickFormatter={(value) =>
-                    viewMode === 'edad' && typeof value === 'number' ? value.toFixed(1) : value
-                  }
-                />
-              )}
             </LineChart>
+
+            {hasRangeControls && viewMode === 'fecha' && (
+              <Box sx={{ display: 'flex', justifyContent: 'center', mt: 1.5 }}>
+                <ToggleButtonGroup
+                  value={activeRange}
+                  exclusive
+                  onChange={(_, val) => { if (val !== null) onRangeChange(val) }}
+                  size="small"
+                  sx={{ gap: 0.5 }}
+                >
+                  {RANGES.map(r => (
+                    <ToggleButton
+                      key={r}
+                      value={r}
+                      sx={{
+                        px: 1.5,
+                        py: 0.25,
+                        fontSize: '0.72rem',
+                        fontWeight: 500,
+                        borderRadius: '12px !important',
+                        border: '1px solid',
+                        borderColor: 'divider',
+                        '&.Mui-selected': {
+                          bgcolor: 'primary.main',
+                          color: 'primary.contrastText',
+                          borderColor: 'primary.main',
+                          '&:hover': { bgcolor: 'primary.dark' }
+                        }
+                      }}
+                    >
+                      {r}
+                    </ToggleButton>
+                  ))}
+                </ToggleButtonGroup>
+              </Box>
+            )}
           </Box>
         ) : (
           <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '300px' }}>

@@ -33,7 +33,7 @@ function AthleteResultsChart({ comparatorAthletes = [] }) {
 
   const { width: chartWidth } = useChartDimensions()
 
-  const { activeRange, brushRange, enrichedChartData, hasBrush, handleRangeButton, handleBrushChange } =
+  const { activeRange, filteredData, hasRangeControls, handleRangeButton } =
     useChartBrush(combinedChartData, viewMode, selectedPrueba)
 
   const athleteColors = useMemo(() => {
@@ -113,14 +113,10 @@ function AthleteResultsChart({ comparatorAthletes = [] }) {
         selectedPrueba={selectedPrueba}
         pruebasDisponibles={pruebasDisponibles}
         onPruebaChange={handlePruebaChange}
-        activeRange={activeRange}
-        onRangeChange={handleRangeButton}
-        viewMode={viewMode}
-        hasBrush={hasBrush}
       />
       <ViewModeToggle viewMode={viewMode} onViewModeChange={setViewMode} />
       <ResultsLineChart
-        combinedChartData={enrichedChartData}
+        combinedChartData={filteredData}
         chartData={chartData}
         chartWidth={chartWidth}
         viewMode={viewMode}
@@ -129,9 +125,9 @@ function AthleteResultsChart({ comparatorAthletes = [] }) {
         comparatorAthletes={comparatorAthletes}
         comparatorData={comparatorData}
         athleteColors={athleteColors}
-        brushRange={brushRange}
-        onBrushChange={handleBrushChange}
-        hasBrush={hasBrush}
+        activeRange={activeRange}
+        onRangeChange={handleRangeButton}
+        hasRangeControls={hasRangeControls}
       />
     </Box>
   )
