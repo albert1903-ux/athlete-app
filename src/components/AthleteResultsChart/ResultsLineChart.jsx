@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import { Box, Card, CardContent, CircularProgress, Paper, Typography, useTheme, ToggleButtonGroup, ToggleButton } from '@mui/material'
+import { Box, Button, Card, CardContent, CircularProgress, Paper, Typography, useTheme } from '@mui/material'
 import {
   LineChart,
   Line,
@@ -203,38 +203,27 @@ function ResultsLineChart({
             </LineChart>
 
             {hasRangeControls && viewMode === 'fecha' && (
-              <Box sx={{ display: 'flex', justifyContent: 'center', mt: 1.5 }}>
-                <ToggleButtonGroup
-                  value={activeRange}
-                  exclusive
-                  onChange={(_, val) => { if (val !== null) onRangeChange(val) }}
-                  size="small"
-                  sx={{ gap: 0.5 }}
-                >
-                  {RANGES.map(r => (
-                    <ToggleButton
-                      key={r}
-                      value={r}
-                      sx={{
-                        px: 1.5,
-                        py: 0.25,
-                        fontSize: '0.72rem',
-                        fontWeight: 500,
-                        borderRadius: '12px !important',
-                        border: '1px solid',
-                        borderColor: 'divider',
-                        '&.Mui-selected': {
-                          bgcolor: 'primary.main',
-                          color: 'primary.contrastText',
-                          borderColor: 'primary.main',
-                          '&:hover': { bgcolor: 'primary.dark' }
-                        }
-                      }}
-                    >
-                      {r}
-                    </ToggleButton>
-                  ))}
-                </ToggleButtonGroup>
+              <Box sx={{ display: 'flex', justifyContent: 'center', gap: 0.75, mt: 1.5 }}>
+                {RANGES.map(r => (
+                  <Button
+                    key={r}
+                    size="small"
+                    onClick={() => onRangeChange(r)}
+                    variant={activeRange === r ? 'contained' : 'outlined'}
+                    sx={{
+                      px: 1.5,
+                      py: 0.25,
+                      minWidth: 'auto',
+                      fontSize: '0.72rem',
+                      fontWeight: 500,
+                      borderRadius: '12px',
+                      boxShadow: 'none',
+                      '&:hover': { boxShadow: 'none' }
+                    }}
+                  >
+                    {r}
+                  </Button>
+                ))}
               </Box>
             )}
           </Box>
