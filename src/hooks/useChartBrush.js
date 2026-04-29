@@ -8,12 +8,12 @@ export function useChartBrush(combinedChartData, viewMode, selectedPrueba) {
   const [activeRange, setActiveRange] = useState('Todo')
   const [brushRange, setBrushRange] = useState({ startIndex: 0, endIndex: Math.max(0, len - 1) })
 
-  // Resetear al cambiar prueba o modo de vista
+  // Resetear solo al cambiar de prueba
   useEffect(() => {
     setActiveRange('Todo')
     setBrushRange({ startIndex: 0, endIndex: Math.max(0, (combinedChartData?.length ?? 1) - 1) })
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedPrueba, viewMode])
+  }, [selectedPrueba])
 
   // Ajustar endIndex cuando llegan nuevos datos
   useEffect(() => {
